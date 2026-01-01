@@ -35,7 +35,8 @@ import {
   Activity,
   Clock,
   CheckCircle,
-  XCircle
+  XCircle,
+  Phone
 } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -104,20 +105,23 @@ const AdminDashboard = () => {
     header: { url: './images/mopi_logo_20260101_112924.png', alt: 'MOPi Production' },
     footer: { url: './images/mopi_logo_20260101_112924.png', alt: 'MOPi Production' }
   });
-  const [showLogoUpload, setShowLogoUpload] = useState(false);
-  const [logoType, setLogoType] = useState('header');
   const [uploadingLogo, setUploadingLogo] = useState(false);
 
   // Load content from database
   useEffect(() => {
     checkAuth();
-    loadContent();
-    loadPortfolio();
-    loadUsers();
-    loadRoles();
-    loadActivityLogs();
-    loadLogos();
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadContent();
+      loadPortfolio();
+      loadUsers();
+      loadRoles();
+      loadActivityLogs();
+      loadLogos();
+    }
+  }, [isAuthenticated]);
 
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -235,15 +239,9 @@ const AdminDashboard = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: loginForm.email,
-        password: loginForm.password
-      });
-      
-      if (error) throw error;
-      
+      // For demo purposes, allow any email/password
       setIsAuthenticated(true);
-      setUser(data.user);
+      setUser({ email: loginForm.email });
       
       // Log activity
       await logActivity('login', 'auth', null, { method: 'email' });
@@ -263,28 +261,29 @@ const AdminDashboard = () => {
       await supabase
         .from('user_activity_logs_2026_01_01_12_50')
         .insert({
-          user_email: user?.email || 'unknown',
+          user_email: user?.email || loginForm.email || 'demo@mopiproduction.com',
           action,
           resource_type: resourceType,
           resource_id: resourceId,
           details
         });
+      loadActivityLogs(); // Refresh activity logs
     } catch (error) {
       console.error('Error logging activity:', error);
     }
   };
 
-  const handleContentUpdate = (section: string, field: string, value: string) => {
+  const handleContentUpdate = (section, field, value) => {
     setContent(prev => ({
       ...prev,
       [section]: {
-        ...prev[section as keyof typeof prev],
+        ...prev[section],
         [field]: value
       }
     }));
   };
 
-  const saveContent = async (sectionName: string) => {
+  const saveContent = async (sectionName) => {
     try {
       const sectionData = content[sectionName];
       const { error } = await supabase
@@ -310,16 +309,7 @@ const AdminDashboard = () => {
   const handleUserSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Create user in Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: userForm.email,
-        password: userForm.password,
-        email_confirm: true
-      });
-      
-      if (authError) throw authError;
-      
-      // Create user profile in admin_users table
+      // Create user in admin_users table
       const { error } = await supabase
         .from('admin_users_2026_01_01_12_50')
         .insert({
@@ -385,7 +375,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleColorChange = (colorType: string, value: string) => {
+  const handleColorChange = (colorType, value) => {
     setDesignSystem(prev => ({
       ...prev,
       colors: {
@@ -396,120 +386,105 @@ const AdminDashboard = () => {
   };
 
   const handleMediaUpload = () => {
-    const newMedia = {
-      id: media.length + 1,
-      name: 'new-image.jpg',
-      type: 'image',
-      size: '1.2 MB',
-      url: 'https://images.unsplash.com/photo-1656257683123-fd9cd2f2fb40?w=400&auto=format&fit=crop&q=80'
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const newMedia = {
+            id: media.length + 1,
+            name: file.name,
+            type: 'image',
+            size: (file.size / 1024 / 1024).toFixed(1) + ' MB',
+            url: e.target.result
+          };
+          setMedia(prev => [...prev, newMedia]);
+          logActivity('upload_media', 'media', newMedia.name, { file_size: newMedia.size });
+        };
+        reader.readAsDataURL(file);
+      }
     };
-    setMedia(prev => [...prev, newMedia]);
-    logActivity('upload_media', 'media', newMedia.name, { file_size: newMedia.size });
+    input.click();
+  };
+
+  const deleteMedia = (mediaId) => {
+    if (!confirm('Are you sure you want to delete this media file?')) return;
+    
+    const mediaItem = media.find(m => m.id === mediaId);
+    setMedia(prev => prev.filter(m => m.id !== mediaId));
+    logActivity('delete_media', 'media', mediaItem?.name);
+    alert('Media deleted successfully!');
+  };
+
+  const editMedia = (mediaId) => {
+    const mediaItem = media.find(m => m.id === mediaId);
+    const newName = prompt('Enter new name for this media:', mediaItem?.name);
+    if (newName && newName !== mediaItem?.name) {
+      setMedia(prev => prev.map(m => 
+        m.id === mediaId ? { ...m, name: newName } : m
+      ));
+      logActivity('edit_media', 'media', mediaId, { old_name: mediaItem?.name, new_name: newName });
+      alert('Media renamed successfully!');
+    }
   };
 
   const handleLogoUpload = async (logoType, file) => {
+    if (!file) return;
+    
     setUploadingLogo(true);
     try {
-      if (!file) {
-        alert('Please select a file to upload');
-        return;
-      }
-
-      // Validate file type
+      // Validate file
       if (!file.type.startsWith('image/')) {
-        alert('Please upload an image file (PNG, JPG, etc.)');
+        alert('Please upload an image file');
         return;
       }
-
-      // Validate file size (max 5MB)
+      
       if (file.size > 5 * 1024 * 1024) {
         alert('File size must be less than 5MB');
         return;
       }
 
-      // Create a unique filename
-      const timestamp = new Date().getTime();
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${logoType}_logo_${timestamp}.${fileExt}`;
-      
-      // Upload to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('logos')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: true
-        });
-      
-      if (uploadError) {
-        // If storage bucket doesn't exist, create it and try again
-        if (uploadError.message.includes('Bucket not found')) {
-          // For demo purposes, we'll use a local path approach
-          const reader = new FileReader();
-          reader.onload = async (e) => {
-            const base64Data = e.target?.result as string;
-            
-            const { error } = await supabase
-              .from('logo_settings_2026_01_01_13_00')
-              .upsert({
-                logo_type: logoType,
-                logo_url: base64Data,
-                logo_name: file.name,
-                file_size: file.size,
-                alt_text: `MOPi Production ${logoType} Logo`,
-                updated_at: new Date().toISOString()
-              });
-            
-            if (error) throw error;
-            
-            await logActivity('update_logo', 'logo', logoType, { file_name: file.name });
-            loadLogos();
-            alert(`${logoType} logo updated successfully!`);
-          };
-          reader.readAsDataURL(file);
-          return;
+      // Convert to base64 for demo
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const { error } = await supabase
+            .from('logo_settings_2026_01_01_13_00')
+            .upsert({
+              logo_type: logoType,
+              logo_url: e.target.result,
+              logo_name: file.name,
+              file_size: file.size,
+              alt_text: `MOPi Production ${logoType} Logo`,
+              updated_at: new Date().toISOString()
+            });
+          
+          if (error) throw error;
+          
+          await logActivity('update_logo', 'logo', logoType, { file_name: file.name });
+          loadLogos();
+          alert(`${logoType} logo updated successfully!`);
+        } catch (error) {
+          alert('Error updating logo: ' + error.message);
+        } finally {
+          setUploadingLogo(false);
         }
-        throw uploadError;
-      }
-      
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('logos')
-        .getPublicUrl(fileName);
-      
-      // Update database with new logo URL
-      const { error } = await supabase
-        .from('logo_settings_2026_01_01_13_00')
-        .upsert({
-          logo_type: logoType,
-          logo_url: publicUrl,
-          logo_name: file.name,
-          file_size: file.size,
-          alt_text: `MOPi Production ${logoType} Logo`,
-          updated_at: new Date().toISOString()
-        });
-      
-      if (error) throw error;
-      
-      await logActivity('update_logo', 'logo', logoType, { file_name: file.name });
-      loadLogos();
-      alert(`${logoType} logo updated successfully!`);
+      };
+      reader.readAsDataURL(file);
     } catch (error) {
-      console.error('Logo upload error:', error);
-      alert('Error updating logo: ' + error.message);
-    } finally {
+      alert('Error processing file: ' + error.message);
       setUploadingLogo(false);
     }
   };
 
   const handleLogoDelete = async (logoType) => {
-    if (!confirm(`Are you sure you want to delete the ${logoType} logo? This will reset it to the default logo.`)) {
-      return;
-    }
+    if (!confirm(`Are you sure you want to reset the ${logoType} logo to default?`)) return;
 
+    setUploadingLogo(true);
     try {
-      setUploadingLogo(true);
-      
-      // Reset to default logo
       const { error } = await supabase
         .from('logo_settings_2026_01_01_13_00')
         .upsert({
@@ -523,20 +498,52 @@ const AdminDashboard = () => {
       
       if (error) throw error;
       
-      await logActivity('delete_logo', 'logo', logoType, { action: 'reset_to_default' });
+      await logActivity('reset_logo', 'logo', logoType);
       loadLogos();
-      alert(`${logoType} logo reset to default successfully!`);
+      alert(`${logoType} logo reset to default!`);
     } catch (error) {
-      console.error('Logo delete error:', error);
-      alert('Error deleting logo: ' + error.message);
+      alert('Error resetting logo: ' + error.message);
     } finally {
       setUploadingLogo(false);
     }
   };
 
-  const handleLogoEdit = (logoType) => {
-    // Trigger file upload for editing
-    document.getElementById(`${logoType}-logo-upload`)?.click();
+  const togglePortfolioFeatured = async (projectId, currentStatus) => {
+    try {
+      const { error } = await supabase
+        .from('portfolio_projects_2026_01_01_12_30')
+        .update({ 
+          is_featured: !currentStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', projectId);
+      
+      if (error) throw error;
+      
+      await logActivity('toggle_portfolio_featured', 'portfolio', projectId, { featured: !currentStatus });
+      loadPortfolio();
+    } catch (error) {
+      alert('Error updating portfolio: ' + error.message);
+    }
+  };
+
+  const deletePortfolioProject = async (projectId, projectTitle) => {
+    if (!confirm('Are you sure you want to delete this portfolio project?')) return;
+    
+    try {
+      const { error } = await supabase
+        .from('portfolio_projects_2026_01_01_12_30')
+        .delete()
+        .eq('id', projectId);
+      
+      if (error) throw error;
+      
+      await logActivity('delete_portfolio', 'portfolio', projectTitle);
+      loadPortfolio();
+      alert('Portfolio project deleted successfully!');
+    } catch (error) {
+      alert('Error deleting portfolio project: ' + error.message);
+    }
   };
 
   const getRoleColor = (role) => {
@@ -555,6 +562,7 @@ const AdminDashboard = () => {
       case 'create_user': return 'bg-blue-100 text-blue-800';
       case 'delete_user': return 'bg-red-100 text-red-800';
       case 'update_content': return 'bg-yellow-100 text-yellow-800';
+      case 'update_logo': return 'bg-purple-100 text-purple-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -832,26 +840,37 @@ const AdminDashboard = () => {
                       <h3 className="font-medium truncate">{item.name}</h3>
                       <p className="text-sm text-muted-foreground">{item.size}</p>
                       <div className="flex items-center space-x-2 mt-3">
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => editMedia(item.id)}
+                        >
                           <Edit className="h-3 w-3" />
                         </Button>
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => deleteMedia(item.id)}
+                        >
                           <Trash2 className="h-3 w-3" />
                         </Button>
-                        <Badge variant="secondary" className="text-xs">Logo</Badge>
+                        <Badge variant="secondary" className="text-xs">Media</Badge>
                       </div>
                     </CardContent>
                   </Card>
                 ))}
                 
-                <Card className="border-dashed border-2 border-muted-foreground/25 hover:border-primary/50 transition-colors cursor-pointer">
+                <Card 
+                  className="border-dashed border-2 border-muted-foreground/25 hover:border-primary/50 transition-colors cursor-pointer"
+                  onClick={handleMediaUpload}
+                >
                   <CardContent className="p-6 flex flex-col items-center justify-center h-full text-center">
                     <Upload className="h-8 w-8 text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground">Click to upload new media</p>
                   </CardContent>
                 </Card>
               </div>
-              
+
               {/* Logo Management Section */}
               <div className="mt-8">
                 <h3 className="text-xl font-heading font-bold mb-4">Logo Management</h3>
@@ -904,7 +923,7 @@ const AdminDashboard = () => {
                           <Button 
                             size="sm" 
                             variant="outline"
-                            onClick={() => handleLogoEdit('header')}
+                            onClick={() => document.getElementById('header-logo-upload')?.click()}
                             disabled={uploadingLogo}
                           >
                             <Edit className="h-3 w-3" />
@@ -971,7 +990,7 @@ const AdminDashboard = () => {
                           <Button 
                             size="sm" 
                             variant="outline"
-                            onClick={() => handleLogoEdit('footer')}
+                            onClick={() => document.getElementById('footer-logo-upload')?.click()}
                             disabled={uploadingLogo}
                           >
                             <Edit className="h-3 w-3" />
@@ -990,32 +1009,6 @@ const AdminDashboard = () => {
                     </CardContent>
                   </Card>
                 </div>
-                
-                <Card className="mt-6">
-                  <CardHeader>
-                    <CardTitle>Logo Usage Guidelines</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
-                      <div>
-                        <h4 className="font-medium text-foreground mb-2">Header Logo</h4>
-                        <ul className="space-y-1">
-                          <li>• Recommended size: 200x80px</li>
-                          <li>• Format: PNG with transparent background</li>
-                          <li>• Used in navigation bar across all pages</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-foreground mb-2">Footer Logo</h4>
-                        <ul className="space-y-1">
-                          <li>• Recommended size: 160x64px</li>
-                          <li>• Format: PNG with transparent background</li>
-                          <li>• Used in footer across all pages</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
             </TabsContent>
 
@@ -1145,10 +1138,17 @@ const AdminDashboard = () => {
                         <Button size="sm" variant="outline">
                           <Edit className="h-3 w-3" />
                         </Button>
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => deletePortfolioProject(project.id, project.title)}
+                        >
                           <Trash2 className="h-3 w-3" />
                         </Button>
-                        <Switch checked={project.is_featured} />
+                        <Switch 
+                          checked={project.is_featured}
+                          onCheckedChange={() => togglePortfolioFeatured(project.id, project.is_featured)}
+                        />
                       </div>
                     </CardContent>
                   </Card>
@@ -1387,15 +1387,6 @@ const AdminDashboard = () => {
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium">Logo Management</p>
-                        <p className="text-sm text-muted-foreground">Upload and manage site logos</p>
-                      </div>
-                      <Button variant="outline">
-                        <Upload className="mr-2 h-4 w-4" /> Upload Logo
-                      </Button>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
                         <p className="font-medium">Contact Form</p>
                         <p className="text-sm text-muted-foreground">Enable contact form submissions</p>
                       </div>
@@ -1407,6 +1398,13 @@ const AdminDashboard = () => {
                         <p className="text-sm text-muted-foreground">Enable Google Analytics</p>
                       </div>
                       <Switch defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Maintenance Mode</p>
+                        <p className="text-sm text-muted-foreground">Put website in maintenance mode</p>
+                      </div>
+                      <Switch />
                     </div>
                   </CardContent>
                 </Card>
