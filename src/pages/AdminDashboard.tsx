@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import Navigation from '@/components/Navigation';
 import { 
   Settings, 
@@ -28,10 +29,16 @@ import {
   Monitor,
   Smartphone,
   Tablet,
-  LogOut
+  LogOut,
+  UserPlus,
+  Shield,
+  Activity,
+  Clock,
+  CheckCircle,
+  XCircle
 } from 'lucide-react';
 
-const Admin = () => {
+const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('content');
   const [previewMode, setPreviewMode] = useState('desktop');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -76,11 +83,29 @@ const Admin = () => {
   // Portfolio Management State
   const [portfolio, setPortfolio] = useState([]);
 
+  // User Management State
+  const [users, setUsers] = useState([]);
+  const [roles, setRoles] = useState([]);
+  const [activityLogs, setActivityLogs] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [userForm, setUserForm] = useState({
+    email: '',
+    full_name: '',
+    role: 'editor',
+    department: '',
+    phone: '',
+    is_active: true
+  });
+
   // Load content from database
   useEffect(() => {
     checkAuth();
     loadContent();
     loadPortfolio();
+    loadUsers();
+    loadRoles();
+    loadActivityLogs();
   }, []);
 
   const checkAuth = async () => {
@@ -128,6 +153,52 @@ const Admin = () => {
     }
   };
 
+  const loadUsers = async () => {
+    try {
+      const { data: usersData } = await supabase
+        .from('admin_users_2026_01_01_12_50')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (usersData) {
+        setUsers(usersData);
+      }
+    } catch (error) {
+      console.error('Error loading users:', error);
+    }
+  };
+
+  const loadRoles = async () => {
+    try {
+      const { data: rolesData } = await supabase
+        .from('user_roles_2026_01_01_12_50')
+        .select('*')
+        .order('role_name');
+      
+      if (rolesData) {
+        setRoles(rolesData);
+      }
+    } catch (error) {
+      console.error('Error loading roles:', error);
+    }
+  };
+
+  const loadActivityLogs = async () => {
+    try {
+      const { data: logsData } = await supabase
+        .from('user_activity_logs_2026_01_01_12_50')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+      
+      if (logsData) {
+        setActivityLogs(logsData);
+      }
+    } catch (error) {
+      console.error('Error loading activity logs:', error);
+    }
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -140,6 +211,9 @@ const Admin = () => {
       
       setIsAuthenticated(true);
       setUser(data.user);
+      
+      // Log activity
+      await logActivity('login', 'auth', null, { method: 'email' });
     } catch (error) {
       alert('Login failed: ' + error.message);
     }
@@ -149,6 +223,22 @@ const Admin = () => {
     await supabase.auth.signOut();
     setIsAuthenticated(false);
     setUser(null);
+  };
+
+  const logActivity = async (action, resourceType = null, resourceId = null, details = null) => {
+    try {
+      await supabase
+        .from('user_activity_logs_2026_01_01_12_50')
+        .insert({
+          user_email: user?.email || 'unknown',
+          action,
+          resource_type: resourceType,
+          resource_id: resourceId,
+          details
+        });
+    } catch (error) {
+      console.error('Error logging activity:', error);
+    }
   };
 
   const handleContentUpdate = (section: string, field: string, value: string) => {
@@ -176,9 +266,78 @@ const Admin = () => {
         });
       
       if (error) throw error;
+      
+      await logActivity('update_content', 'content', sectionName, { section: sectionName });
       alert('Content saved successfully!');
     } catch (error) {
       alert('Error saving content: ' + error.message);
+    }
+  };
+
+  const handleUserSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const { error } = await supabase
+        .from('admin_users_2026_01_01_12_50')
+        .insert({
+          ...userForm,
+          updated_at: new Date().toISOString()
+        });
+      
+      if (error) throw error;
+      
+      await logActivity('create_user', 'user', userForm.email, { role: userForm.role });
+      setShowUserModal(false);
+      setUserForm({
+        email: '',
+        full_name: '',
+        role: 'editor',
+        department: '',
+        phone: '',
+        is_active: true
+      });
+      loadUsers();
+      alert('User created successfully!');
+    } catch (error) {
+      alert('Error creating user: ' + error.message);
+    }
+  };
+
+  const toggleUserStatus = async (userId, currentStatus) => {
+    try {
+      const { error } = await supabase
+        .from('admin_users_2026_01_01_12_50')
+        .update({ 
+          is_active: !currentStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
+      
+      if (error) throw error;
+      
+      await logActivity('toggle_user_status', 'user', userId, { new_status: !currentStatus });
+      loadUsers();
+    } catch (error) {
+      alert('Error updating user status: ' + error.message);
+    }
+  };
+
+  const deleteUser = async (userId, userEmail) => {
+    if (!confirm('Are you sure you want to delete this user?')) return;
+    
+    try {
+      const { error } = await supabase
+        .from('admin_users_2026_01_01_12_50')
+        .delete()
+        .eq('id', userId);
+      
+      if (error) throw error;
+      
+      await logActivity('delete_user', 'user', userEmail);
+      loadUsers();
+      alert('User deleted successfully!');
+    } catch (error) {
+      alert('Error deleting user: ' + error.message);
     }
   };
 
@@ -193,7 +352,6 @@ const Admin = () => {
   };
 
   const handleMediaUpload = () => {
-    // Simulate file upload
     const newMedia = {
       id: media.length + 1,
       name: 'new-image.jpg',
@@ -202,6 +360,27 @@ const Admin = () => {
       url: 'https://images.unsplash.com/photo-1656257683123-fd9cd2f2fb40?w=400&auto=format&fit=crop&q=80'
     };
     setMedia(prev => [...prev, newMedia]);
+    logActivity('upload_media', 'media', newMedia.name, { file_size: newMedia.size });
+  };
+
+  const getRoleColor = (role) => {
+    switch (role) {
+      case 'super_admin': return 'bg-red-100 text-red-800';
+      case 'admin': return 'bg-blue-100 text-blue-800';
+      case 'editor': return 'bg-green-100 text-green-800';
+      case 'viewer': return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getActionColor = (action) => {
+    switch (action) {
+      case 'login': return 'bg-green-100 text-green-800';
+      case 'create_user': return 'bg-blue-100 text-blue-800';
+      case 'delete_user': return 'bg-red-100 text-red-800';
+      case 'update_content': return 'bg-yellow-100 text-yellow-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
   // Login form for non-authenticated users
@@ -275,7 +454,7 @@ const Admin = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-heading font-bold mb-2">Admin Dashboard</h1>
-              <p className="text-muted-foreground">Manage your website content, design, and settings</p>
+              <p className="text-muted-foreground">Manage your website content, users, design, and settings</p>
             </div>
             <div className="flex items-center space-x-4">
               <Badge className="gradient-primary text-white">
@@ -296,7 +475,7 @@ const Admin = () => {
       <section className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="content" className="flex items-center space-x-2">
                 <FileText className="h-4 w-4" />
                 <span>Content</span>
@@ -312,6 +491,10 @@ const Admin = () => {
               <TabsTrigger value="portfolio" className="flex items-center space-x-2">
                 <BarChart3 className="h-4 w-4" />
                 <span>Portfolio</span>
+              </TabsTrigger>
+              <TabsTrigger value="users" className="flex items-center space-x-2">
+                <Users className="h-4 w-4" />
+                <span>Users</span>
               </TabsTrigger>
               <TabsTrigger value="settings" className="flex items-center space-x-2">
                 <Settings className="h-4 w-4" />
@@ -631,6 +814,186 @@ const Admin = () => {
               </div>
             </TabsContent>
 
+            {/* User Management */}
+            <TabsContent value="users" className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-heading font-bold">User Management</h2>
+                <Dialog open={showUserModal} onOpenChange={setShowUserModal}>
+                  <DialogTrigger asChild>
+                    <Button className="gradient-primary text-white">
+                      <UserPlus className="mr-2 h-4 w-4" /> Add New User
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New User</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleUserSubmit} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Email *</label>
+                          <Input
+                            type="email"
+                            value={userForm.email}
+                            onChange={(e) => setUserForm(prev => ({ ...prev, email: e.target.value }))}
+                            placeholder="user@mopiproduction.com"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Full Name</label>
+                          <Input
+                            value={userForm.full_name}
+                            onChange={(e) => setUserForm(prev => ({ ...prev, full_name: e.target.value }))}
+                            placeholder="John Doe"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Role</label>
+                          <Select value={userForm.role} onValueChange={(value) => setUserForm(prev => ({ ...prev, role: value }))}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {roles.map((role) => (
+                                <SelectItem key={role.id} value={role.role_name}>
+                                  {role.role_name.replace('_', ' ').toUpperCase()}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Department</label>
+                          <Input
+                            value={userForm.department}
+                            onChange={(e) => setUserForm(prev => ({ ...prev, department: e.target.value }))}
+                            placeholder="Marketing"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Phone</label>
+                        <Input
+                          value={userForm.phone}
+                          onChange={(e) => setUserForm(prev => ({ ...prev, phone: e.target.value }))}
+                          placeholder="+1 (555) 123-4567"
+                        />
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Switch 
+                          checked={userForm.is_active}
+                          onCheckedChange={(checked) => setUserForm(prev => ({ ...prev, is_active: checked }))}
+                        />
+                        <label className="text-sm font-medium">Active User</label>
+                      </div>
+                      <Button type="submit" className="w-full gradient-primary text-white">
+                        <Save className="mr-2 h-4 w-4" /> Create User
+                      </Button>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              {/* Users Table */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Users className="h-5 w-5" />
+                    <span>All Users ({users.length})</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {users.map((user) => (
+                      <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                            <Users className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="font-medium">{user.full_name || user.email}</h3>
+                            <p className="text-sm text-muted-foreground">{user.email}</p>
+                            <div className="flex items-center space-x-2 mt-1">
+                              <Badge className={getRoleColor(user.role)}>
+                                {user.role.replace('_', ' ').toUpperCase()}
+                              </Badge>
+                              {user.department && (
+                                <Badge variant="outline" className="text-xs">
+                                  {user.department}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-2">
+                            {user.is_active ? (
+                              <CheckCircle className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <XCircle className="h-4 w-4 text-red-500" />
+                            )}
+                            <span className="text-sm text-muted-foreground">
+                              {user.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => toggleUserStatus(user.id, user.is_active)}
+                          >
+                            {user.is_active ? 'Deactivate' : 'Activate'}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => deleteUser(user.id, user.email)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Activity Logs */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Activity className="h-5 w-5" />
+                    <span>Recent Activity</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {activityLogs.slice(0, 10).map((log) => (
+                      <div key={log.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <Badge className={getActionColor(log.action)}>
+                            {log.action.replace('_', ' ').toUpperCase()}
+                          </Badge>
+                          <div>
+                            <p className="text-sm font-medium">{log.user_email}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {log.resource_type && `${log.resource_type}: ${log.resource_id}`}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          <span>{new Date(log.created_at).toLocaleString()}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
             {/* Settings */}
             <TabsContent value="settings" className="space-y-6">
               <h2 className="text-2xl font-heading font-bold">Website Settings</h2>
@@ -712,4 +1075,4 @@ const Admin = () => {
   );
 };
 
-export default Admin;
+export default AdminDashboard;
