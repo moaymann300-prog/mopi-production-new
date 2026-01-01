@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
+import LogoComponent from '@/components/LogoComponent';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,10 +24,10 @@ const Navigation = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <img 
-              src="./images/mopi_logo_20260101_112924.png" 
-              alt="MOPi Production" 
+            <LogoComponent 
+              type="header" 
               className="h-20 w-auto"
+              alt="MOPi Production"
             />
           </Link>
 

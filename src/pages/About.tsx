@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Navigation from '@/components/Navigation';
+import LogoComponent from '@/components/LogoComponent';
 import { 
   Award, 
   Users, 
@@ -361,10 +362,10 @@ const About = () => {
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
               <div className="flex items-center mb-4">
-                <img 
-                  src="./images/mopi_logo_20260101_112924.png" 
-                  alt="MOPi Production" 
+                <LogoComponent 
+                  type="footer" 
                   className="h-16 w-auto"
+                  alt="MOPi Production"
                 />
               </div>
               <p className="text-gray-300 mb-6 max-w-md">

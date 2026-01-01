@@ -99,6 +99,14 @@ const AdminDashboard = () => {
     is_active: true
   });
 
+  // Logo Management State
+  const [logos, setLogos] = useState({
+    header: { url: './images/mopi_logo_20260101_112924.png', alt: 'MOPi Production' },
+    footer: { url: './images/mopi_logo_20260101_112924.png', alt: 'MOPi Production' }
+  });
+  const [showLogoUpload, setShowLogoUpload] = useState(false);
+  const [logoType, setLogoType] = useState('header');
+
   // Load content from database
   useEffect(() => {
     checkAuth();
@@ -107,6 +115,7 @@ const AdminDashboard = () => {
     loadUsers();
     loadRoles();
     loadActivityLogs();
+    loadLogos();
   }, []);
 
   const checkAuth = async () => {
@@ -197,6 +206,28 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error('Error loading activity logs:', error);
+    }
+  };
+
+  const loadLogos = async () => {
+    try {
+      const { data: logoData } = await supabase
+        .from('logo_settings_2026_01_01_13_00')
+        .select('*');
+      
+      if (logoData) {
+        const logoSettings = {};
+        logoData.forEach(logo => {
+          logoSettings[logo.logo_type] = {
+            url: logo.logo_url,
+            alt: logo.alt_text,
+            name: logo.logo_name
+          };
+        });
+        setLogos(logoSettings);
+      }
+    } catch (error) {
+      console.error('Error loading logos:', error);
     }
   };
 
@@ -373,6 +404,33 @@ const AdminDashboard = () => {
     };
     setMedia(prev => [...prev, newMedia]);
     logActivity('upload_media', 'media', newMedia.name, { file_size: newMedia.size });
+  };
+
+  const handleLogoUpload = async (logoType, file) => {
+    try {
+      // In a real implementation, you would upload the file to storage
+      // For demo purposes, we'll simulate the upload
+      const newLogoUrl = URL.createObjectURL(file);
+      
+      const { error } = await supabase
+        .from('logo_settings_2026_01_01_13_00')
+        .upsert({
+          logo_type: logoType,
+          logo_url: newLogoUrl,
+          logo_name: file.name,
+          file_size: file.size,
+          alt_text: `MOPi Production ${logoType} Logo`,
+          updated_at: new Date().toISOString()
+        });
+      
+      if (error) throw error;
+      
+      await logActivity('update_logo', 'logo', logoType, { file_name: file.name });
+      loadLogos();
+      alert(`${logoType} logo updated successfully!`);
+    } catch (error) {
+      alert('Error updating logo: ' + error.message);
+    }
   };
 
   const getRoleColor = (role) => {
@@ -684,6 +742,114 @@ const AdminDashboard = () => {
                   <CardContent className="p-6 flex flex-col items-center justify-center h-full text-center">
                     <Upload className="h-8 w-8 text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground">Click to upload new media</p>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              {/* Logo Management Section */}
+              <div className="mt-8">
+                <h3 className="text-xl font-heading font-bold mb-4">Logo Management</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Header Logo */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <Image className="h-5 w-5" />
+                        <span>Header Logo</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+                        <img 
+                          src={logos.header?.url || './images/mopi_logo_20260101_112924.png'} 
+                          alt={logos.header?.alt || 'Header Logo'}
+                          className="max-h-20 w-auto"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">Current: {logos.header?.name || 'mopi_logo_header.png'}</p>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleLogoUpload('header', file);
+                          }}
+                          className="hidden"
+                          id="header-logo-upload"
+                        />
+                        <Button 
+                          onClick={() => document.getElementById('header-logo-upload')?.click()}
+                          className="w-full gradient-primary text-white"
+                        >
+                          <Upload className="mr-2 h-4 w-4" /> Upload Header Logo
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Footer Logo */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <Image className="h-5 w-5" />
+                        <span>Footer Logo</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+                        <img 
+                          src={logos.footer?.url || './images/mopi_logo_20260101_112924.png'} 
+                          alt={logos.footer?.alt || 'Footer Logo'}
+                          className="max-h-20 w-auto"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">Current: {logos.footer?.name || 'mopi_logo_footer.png'}</p>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleLogoUpload('footer', file);
+                          }}
+                          className="hidden"
+                          id="footer-logo-upload"
+                        />
+                        <Button 
+                          onClick={() => document.getElementById('footer-logo-upload')?.click()}
+                          className="w-full gradient-primary text-white"
+                        >
+                          <Upload className="mr-2 h-4 w-4" /> Upload Footer Logo
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                <Card className="mt-6">
+                  <CardHeader>
+                    <CardTitle>Logo Usage Guidelines</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
+                      <div>
+                        <h4 className="font-medium text-foreground mb-2">Header Logo</h4>
+                        <ul className="space-y-1">
+                          <li>• Recommended size: 200x80px</li>
+                          <li>• Format: PNG with transparent background</li>
+                          <li>• Used in navigation bar across all pages</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-foreground mb-2">Footer Logo</h4>
+                        <ul className="space-y-1">
+                          <li>• Recommended size: 160x64px</li>
+                          <li>• Format: PNG with transparent background</li>
+                          <li>• Used in footer across all pages</li>
+                        </ul>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
