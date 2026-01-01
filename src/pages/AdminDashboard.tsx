@@ -239,12 +239,24 @@ const AdminDashboard = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      // For demo purposes, allow any email/password
+      // For demo purposes, create a session-like authentication
+      const demoUser = {
+        id: 'demo-user-' + Date.now(),
+        email: loginForm.email || 'demo@mopiproduction.com'
+      };
+      
       setIsAuthenticated(true);
-      setUser({ email: loginForm.email });
+      setUser(demoUser);
+      
+      // Create a demo session in Supabase for RLS
+      try {
+        await supabase.auth.signInAnonymously();
+      } catch (authError) {
+        console.log('Anonymous auth not available, continuing with demo mode');
+      }
       
       // Log activity
-      await logActivity('login', 'auth', null, { method: 'email' });
+      await logActivity('login', 'auth', null, { method: 'demo' });
     } catch (error) {
       alert('Login failed: ' + error.message);
     }
@@ -458,16 +470,41 @@ const AdminDashboard = () => {
         try {
           const base64Data = e.target.result;
           
-          const { error } = await supabase
+          // First try to update existing record, then insert if not exists
+          const { data: existingLogo } = await supabase
             .from('logo_settings_2026_01_01_13_00')
-            .upsert({
-              logo_type: logoType,
-              logo_url: base64Data,
-              logo_name: file.name,
-              file_size: file.size,
-              alt_text: `MOPi Production ${logoType} Logo`,
-              updated_at: new Date().toISOString()
-            });
+            .select('id')
+            .eq('logo_type', logoType)
+            .single();
+          
+          let error;
+          if (existingLogo) {
+            // Update existing record
+            const { error: updateError } = await supabase
+              .from('logo_settings_2026_01_01_13_00')
+              .update({
+                logo_url: base64Data,
+                logo_name: file.name,
+                file_size: file.size,
+                alt_text: `MOPi Production ${logoType} Logo`,
+                updated_at: new Date().toISOString()
+              })
+              .eq('logo_type', logoType);
+            error = updateError;
+          } else {
+            // Insert new record
+            const { error: insertError } = await supabase
+              .from('logo_settings_2026_01_01_13_00')
+              .insert({
+                logo_type: logoType,
+                logo_url: base64Data,
+                logo_name: file.name,
+                file_size: file.size,
+                alt_text: `MOPi Production ${logoType} Logo`,
+                updated_at: new Date().toISOString()
+              });
+            error = insertError;
+          }
           
           if (error) {
             console.error('Database error:', error);
