@@ -432,51 +432,85 @@ const AdminDashboard = () => {
   };
 
   const handleLogoUpload = async (logoType, file) => {
-    if (!file) return;
+    if (!file) {
+      alert('No file selected');
+      return;
+    }
     
     setUploadingLogo(true);
     try {
       // Validate file
       if (!file.type.startsWith('image/')) {
-        alert('Please upload an image file');
+        alert('Please upload an image file (PNG, JPG, etc.)');
+        setUploadingLogo(false);
         return;
       }
       
       if (file.size > 5 * 1024 * 1024) {
         alert('File size must be less than 5MB');
+        setUploadingLogo(false);
         return;
       }
 
-      // Convert to base64 for demo
+      // Convert to base64 and update database
       const reader = new FileReader();
       reader.onload = async (e) => {
         try {
+          const base64Data = e.target.result;
+          
           const { error } = await supabase
             .from('logo_settings_2026_01_01_13_00')
             .upsert({
               logo_type: logoType,
-              logo_url: e.target.result,
+              logo_url: base64Data,
               logo_name: file.name,
               file_size: file.size,
               alt_text: `MOPi Production ${logoType} Logo`,
               updated_at: new Date().toISOString()
             });
           
-          if (error) throw error;
+          if (error) {
+            console.error('Database error:', error);
+            throw error;
+          }
+          
+          // Update local state
+          setLogos(prev => ({
+            ...prev,
+            [logoType]: {
+              url: base64Data,
+              alt: `MOPi Production ${logoType} Logo`,
+              name: file.name
+            }
+          }));
           
           await logActivity('update_logo', 'logo', logoType, { file_name: file.name });
-          loadLogos();
           alert(`${logoType} logo updated successfully!`);
         } catch (error) {
+          console.error('Logo upload error:', error);
           alert('Error updating logo: ' + error.message);
         } finally {
           setUploadingLogo(false);
         }
       };
+      
+      reader.onerror = () => {
+        alert('Error reading file');
+        setUploadingLogo(false);
+      };
+      
       reader.readAsDataURL(file);
     } catch (error) {
+      console.error('File processing error:', error);
       alert('Error processing file: ' + error.message);
       setUploadingLogo(false);
+    }
+  };
+
+  const handleLogoEdit = (logoType) => {
+    const input = document.getElementById(`${logoType}-logo-upload`);
+    if (input) {
+      input.click();
     }
   };
 
@@ -485,11 +519,13 @@ const AdminDashboard = () => {
 
     setUploadingLogo(true);
     try {
+      const defaultUrl = './images/mopi_logo_20260101_112924.png';
+      
       const { error } = await supabase
         .from('logo_settings_2026_01_01_13_00')
         .upsert({
           logo_type: logoType,
-          logo_url: './images/mopi_logo_20260101_112924.png',
+          logo_url: defaultUrl,
           logo_name: `mopi_logo_${logoType}_default.png`,
           file_size: null,
           alt_text: `MOPi Production ${logoType} Logo`,
@@ -498,13 +534,69 @@ const AdminDashboard = () => {
       
       if (error) throw error;
       
+      // Update local state
+      setLogos(prev => ({
+        ...prev,
+        [logoType]: {
+          url: defaultUrl,
+          alt: `MOPi Production ${logoType} Logo`,
+          name: `mopi_logo_${logoType}_default.png`
+        }
+      }));
+      
       await logActivity('reset_logo', 'logo', logoType);
-      loadLogos();
-      alert(`${logoType} logo reset to default!`);
+      alert(`${logoType} logo reset to default successfully!`);
     } catch (error) {
+      console.error('Logo delete error:', error);
       alert('Error resetting logo: ' + error.message);
     } finally {
       setUploadingLogo(false);
+    }
+  };
+
+  const editPortfolioProject = (projectId) => {
+    const project = portfolio.find(p => p.id === projectId);
+    if (!project) return;
+    
+    const newTitle = prompt('Enter new project title:', project.title);
+    if (newTitle && newTitle !== project.title) {
+      // Update in database
+      supabase
+        .from('portfolio_projects_2026_01_01_12_30')
+        .update({ 
+          title: newTitle,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', projectId)
+        .then(({ error }) => {
+          if (error) {
+            alert('Error updating project: ' + error.message);
+          } else {
+            loadPortfolio();
+            logActivity('edit_portfolio', 'portfolio', projectId, { old_title: project.title, new_title: newTitle });
+            alert('Project updated successfully!');
+          }
+        });
+    }
+  };
+
+  const deletePortfolioProject = async (projectId, projectTitle) => {
+    if (!confirm(`Are you sure you want to delete "${projectTitle}"?`)) return;
+    
+    try {
+      const { error } = await supabase
+        .from('portfolio_projects_2026_01_01_12_30')
+        .delete()
+        .eq('id', projectId);
+      
+      if (error) throw error;
+      
+      await logActivity('delete_portfolio', 'portfolio', projectTitle);
+      loadPortfolio();
+      alert('Portfolio project deleted successfully!');
+    } catch (error) {
+      console.error('Portfolio delete error:', error);
+      alert('Error deleting portfolio project: ' + error.message);
     }
   };
 
@@ -523,28 +615,11 @@ const AdminDashboard = () => {
       await logActivity('toggle_portfolio_featured', 'portfolio', projectId, { featured: !currentStatus });
       loadPortfolio();
     } catch (error) {
+      console.error('Portfolio toggle error:', error);
       alert('Error updating portfolio: ' + error.message);
     }
   };
 
-  const deletePortfolioProject = async (projectId, projectTitle) => {
-    if (!confirm('Are you sure you want to delete this portfolio project?')) return;
-    
-    try {
-      const { error } = await supabase
-        .from('portfolio_projects_2026_01_01_12_30')
-        .delete()
-        .eq('id', projectId);
-      
-      if (error) throw error;
-      
-      await logActivity('delete_portfolio', 'portfolio', projectTitle);
-      loadPortfolio();
-      alert('Portfolio project deleted successfully!');
-    } catch (error) {
-      alert('Error deleting portfolio project: ' + error.message);
-    }
-  };
 
   const getRoleColor = (role) => {
     switch (role) {
@@ -1135,7 +1210,11 @@ const AdminDashboard = () => {
                       <p className="text-sm text-muted-foreground mb-2">{project.client}</p>
                       <p className="text-xs text-muted-foreground mb-3">{project.location}</p>
                       <div className="flex items-center space-x-2">
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => editPortfolioProject(project.id)}
+                        >
                           <Edit className="h-3 w-3" />
                         </Button>
                         <Button 
