@@ -501,6 +501,44 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleLogoDelete = async (logoType) => {
+    if (!confirm(`Are you sure you want to delete the ${logoType} logo? This will reset it to the default logo.`)) {
+      return;
+    }
+
+    try {
+      setUploadingLogo(true);
+      
+      // Reset to default logo
+      const { error } = await supabase
+        .from('logo_settings_2026_01_01_13_00')
+        .upsert({
+          logo_type: logoType,
+          logo_url: './images/mopi_logo_20260101_112924.png',
+          logo_name: `mopi_logo_${logoType}_default.png`,
+          file_size: null,
+          alt_text: `MOPi Production ${logoType} Logo`,
+          updated_at: new Date().toISOString()
+        });
+      
+      if (error) throw error;
+      
+      await logActivity('delete_logo', 'logo', logoType, { action: 'reset_to_default' });
+      loadLogos();
+      alert(`${logoType} logo reset to default successfully!`);
+    } catch (error) {
+      console.error('Logo delete error:', error);
+      alert('Error deleting logo: ' + error.message);
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const handleLogoEdit = (logoType) => {
+    // Trigger file upload for editing
+    document.getElementById(`${logoType}-logo-upload`)?.click();
+  };
+
   const getRoleColor = (role) => {
     switch (role) {
       case 'super_admin': return 'bg-red-100 text-red-800';
@@ -862,6 +900,25 @@ const AdminDashboard = () => {
                             </>
                           )}
                         </Button>
+                        <div className="flex items-center space-x-2 mt-3">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleLogoEdit('header')}
+                            disabled={uploadingLogo}
+                          >
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleLogoDelete('header')}
+                            disabled={uploadingLogo}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                          <Badge variant="secondary" className="text-xs">Header</Badge>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -910,6 +967,25 @@ const AdminDashboard = () => {
                             </>
                           )}
                         </Button>
+                        <div className="flex items-center space-x-2 mt-3">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleLogoEdit('footer')}
+                            disabled={uploadingLogo}
+                          >
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleLogoDelete('footer')}
+                            disabled={uploadingLogo}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                          <Badge variant="secondary" className="text-xs">Footer</Badge>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
