@@ -420,13 +420,12 @@ const Contact = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
-              <div className="flex items-center space-x-2 mb-4">
+              <div className="flex items-center mb-4">
                 <img 
                   src="./images/mopi_logo_20260101_112924.png" 
                   alt="MOPi Production" 
-                  className="h-8 w-auto"
+                  className="h-16 w-auto"
                 />
-                <span className="font-heading text-xl font-bold">MOPi Production</span>
               </div>
               <p className="text-gray-300 mb-6 max-w-md">
                 Creating exceptional exhibition experiences and memorable events 

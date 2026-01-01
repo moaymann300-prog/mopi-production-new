@@ -92,6 +92,7 @@ const AdminDashboard = () => {
   const [userForm, setUserForm] = useState({
     email: '',
     full_name: '',
+    password: '',
     role: 'editor',
     department: '',
     phone: '',
@@ -277,6 +278,16 @@ const AdminDashboard = () => {
   const handleUserSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Create user in Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email: userForm.email,
+        password: userForm.password,
+        email_confirm: true
+      });
+      
+      if (authError) throw authError;
+      
+      // Create user profile in admin_users table
       const { error } = await supabase
         .from('admin_users_2026_01_01_12_50')
         .insert({
@@ -291,6 +302,7 @@ const AdminDashboard = () => {
       setUserForm({
         email: '',
         full_name: '',
+        password: '',
         role: 'editor',
         department: '',
         phone: '',
@@ -848,6 +860,17 @@ const AdminDashboard = () => {
                             placeholder="John Doe"
                           />
                         </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Password *</label>
+                        <Input
+                          type="password"
+                          value={userForm.password}
+                          onChange={(e) => setUserForm(prev => ({ ...prev, password: e.target.value }))}
+                          placeholder="Enter secure password"
+                          required
+                          minLength={6}
+                        />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
