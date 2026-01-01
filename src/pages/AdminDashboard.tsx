@@ -106,6 +106,7 @@ const AdminDashboard = () => {
   });
   const [showLogoUpload, setShowLogoUpload] = useState(false);
   const [logoType, setLogoType] = useState('header');
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   // Load content from database
   useEffect(() => {
@@ -407,16 +408,80 @@ const AdminDashboard = () => {
   };
 
   const handleLogoUpload = async (logoType, file) => {
+    setUploadingLogo(true);
     try {
-      // In a real implementation, you would upload the file to storage
-      // For demo purposes, we'll simulate the upload
-      const newLogoUrl = URL.createObjectURL(file);
+      if (!file) {
+        alert('Please select a file to upload');
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please upload an image file (PNG, JPG, etc.)');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        return;
+      }
+
+      // Create a unique filename
+      const timestamp = new Date().getTime();
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${logoType}_logo_${timestamp}.${fileExt}`;
       
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('logos')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+      
+      if (uploadError) {
+        // If storage bucket doesn't exist, create it and try again
+        if (uploadError.message.includes('Bucket not found')) {
+          // For demo purposes, we'll use a local path approach
+          const reader = new FileReader();
+          reader.onload = async (e) => {
+            const base64Data = e.target?.result as string;
+            
+            const { error } = await supabase
+              .from('logo_settings_2026_01_01_13_00')
+              .upsert({
+                logo_type: logoType,
+                logo_url: base64Data,
+                logo_name: file.name,
+                file_size: file.size,
+                alt_text: `MOPi Production ${logoType} Logo`,
+                updated_at: new Date().toISOString()
+              });
+            
+            if (error) throw error;
+            
+            await logActivity('update_logo', 'logo', logoType, { file_name: file.name });
+            loadLogos();
+            alert(`${logoType} logo updated successfully!`);
+          };
+          reader.readAsDataURL(file);
+          return;
+        }
+        throw uploadError;
+      }
+      
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('logos')
+        .getPublicUrl(fileName);
+      
+      // Update database with new logo URL
       const { error } = await supabase
         .from('logo_settings_2026_01_01_13_00')
         .upsert({
           logo_type: logoType,
-          logo_url: newLogoUrl,
+          logo_url: publicUrl,
           logo_name: file.name,
           file_size: file.size,
           alt_text: `MOPi Production ${logoType} Logo`,
@@ -429,7 +494,10 @@ const AdminDashboard = () => {
       loadLogos();
       alert(`${logoType} logo updated successfully!`);
     } catch (error) {
+      console.error('Logo upload error:', error);
       alert('Error updating logo: ' + error.message);
+    } finally {
+      setUploadingLogo(false);
     }
   };
 
@@ -781,8 +849,18 @@ const AdminDashboard = () => {
                         <Button 
                           onClick={() => document.getElementById('header-logo-upload')?.click()}
                           className="w-full gradient-primary text-white"
+                          disabled={uploadingLogo}
                         >
-                          <Upload className="mr-2 h-4 w-4" /> Upload Header Logo
+                          {uploadingLogo ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                              Uploading...
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="mr-2 h-4 w-4" /> Upload Header Logo
+                            </>
+                          )}
                         </Button>
                       </div>
                     </CardContent>
@@ -819,8 +897,18 @@ const AdminDashboard = () => {
                         <Button 
                           onClick={() => document.getElementById('footer-logo-upload')?.click()}
                           className="w-full gradient-primary text-white"
+                          disabled={uploadingLogo}
                         >
-                          <Upload className="mr-2 h-4 w-4" /> Upload Footer Logo
+                          {uploadingLogo ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                              Uploading...
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="mr-2 h-4 w-4" /> Upload Footer Logo
+                            </>
+                          )}
                         </Button>
                       </div>
                     </CardContent>
