@@ -27,12 +27,17 @@ import {
   FileText,
   Monitor,
   Smartphone,
-  Tablet
+  Tablet,
+  LogOut
 } from 'lucide-react';
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState('content');
   const [previewMode, setPreviewMode] = useState('desktop');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
 
   // Content Management State
   const [content, setContent] = useState({
@@ -69,45 +74,82 @@ const Admin = () => {
   });
 
   // Portfolio Management State
-  const [portfolio, setPortfolio] = useState([
-    {
-      id: 1,
-      title: 'Tech Innovation Expo 2024',
-      category: 'Exhibition',
-      client: 'TechCorp International',
-      location: 'Las Vegas, USA',
-      image: 'https://images.unsplash.com/photo-1703849222937-8a050e8a0607?w=400&auto=format&fit=crop&q=80',
-      featured: true
-    },
-    {
-      id: 2,
-      title: 'Global Healthcare Summit',
-      category: 'Event',
-      client: 'MedTech Solutions',
-      location: 'Geneva, Switzerland',
-      image: 'https://images.unsplash.com/photo-1761618291331-535983ae4296?w=400&auto=format&fit=crop&q=80',
-      featured: false
-    }
-  ]);
+  const [portfolio, setPortfolio] = useState([]);
 
-  // Analytics State
-  const [analytics] = useState({
-    visitors: {
-      total: 12547,
-      thisMonth: 3421,
-      growth: '+15.3%'
-    },
-    inquiries: {
-      total: 89,
-      thisMonth: 23,
-      growth: '+28.5%'
-    },
-    projects: {
-      active: 12,
-      completed: 487,
-      growth: '+12.1%'
+  // Load content from database
+  useEffect(() => {
+    checkAuth();
+    loadContent();
+    loadPortfolio();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    setIsAuthenticated(!!session);
+    setUser(session?.user || null);
+    setLoading(false);
+  };
+
+  const loadContent = async () => {
+    try {
+      const { data: sections } = await supabase
+        .from('content_sections_2026_01_01_12_30')
+        .select('*');
+      
+      if (sections) {
+        const contentData = {};
+        sections.forEach(section => {
+          contentData[section.section_name] = {
+            title: section.title,
+            subtitle: section.subtitle,
+            description: section.description,
+            ctaText: section.cta_text
+          };
+        });
+        setContent(prev => ({ ...prev, ...contentData }));
+      }
+    } catch (error) {
+      console.error('Error loading content:', error);
     }
-  });
+  };
+
+  const loadPortfolio = async () => {
+    try {
+      const { data: projects } = await supabase
+        .from('portfolio_projects_2026_01_01_12_30')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (projects) {
+        setPortfolio(projects);
+      }
+    } catch (error) {
+      console.error('Error loading portfolio:', error);
+    }
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: loginForm.email,
+        password: loginForm.password
+      });
+      
+      if (error) throw error;
+      
+      setIsAuthenticated(true);
+      setUser(data.user);
+    } catch (error) {
+      alert('Login failed: ' + error.message);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setIsAuthenticated(false);
+    setUser(null);
+  };
 
   const handleContentUpdate = (section: string, field: string, value: string) => {
     setContent(prev => ({
@@ -117,6 +159,27 @@ const Admin = () => {
         [field]: value
       }
     }));
+  };
+
+  const saveContent = async (sectionName: string) => {
+    try {
+      const sectionData = content[sectionName];
+      const { error } = await supabase
+        .from('content_sections_2026_01_01_12_30')
+        .upsert({
+          section_name: sectionName,
+          title: sectionData.title,
+          subtitle: sectionData.subtitle,
+          description: sectionData.description,
+          cta_text: sectionData.ctaText,
+          updated_at: new Date().toISOString()
+        });
+      
+      if (error) throw error;
+      alert('Content saved successfully!');
+    } catch (error) {
+      alert('Error saving content: ' + error.message);
+    }
   };
 
   const handleColorChange = (colorType: string, value: string) => {
@@ -141,6 +204,67 @@ const Admin = () => {
     setMedia(prev => [...prev, newMedia]);
   };
 
+  // Login form for non-authenticated users
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <section className="pt-16 pb-20">
+          <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-center">Admin Login</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Email</label>
+                    <Input
+                      type="email"
+                      value={loginForm.email}
+                      onChange={(e) => setLoginForm(prev => ({ ...prev, email: e.target.value }))}
+                      placeholder="admin@mopiproduction.com"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Password</label>
+                    <Input
+                      type="password"
+                      value={loginForm.password}
+                      onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
+                      placeholder="Enter password"
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full gradient-primary text-white">
+                    Login to Admin Dashboard
+                  </Button>
+                </form>
+                <div className="mt-4 p-4 bg-muted rounded-lg">
+                  <p className="text-sm text-muted-foreground text-center">
+                    Demo Access: Use any email/password to access the dashboard
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -155,10 +279,13 @@ const Admin = () => {
             </div>
             <div className="flex items-center space-x-4">
               <Badge className="gradient-primary text-white">
-                <Settings className="mr-1 h-3 w-3" /> Admin Access
+                <Settings className="mr-1 h-3 w-3" /> Admin Access - {user?.email}
               </Badge>
               <Button className="gradient-primary text-white">
                 <Eye className="mr-2 h-4 w-4" /> Preview Site
+              </Button>
+              <Button onClick={handleLogout} variant="outline">
+                <LogOut className="mr-2 h-4 w-4" /> Logout
               </Button>
             </div>
           </div>
@@ -169,7 +296,7 @@ const Admin = () => {
       <section className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="content" className="flex items-center space-x-2">
                 <FileText className="h-4 w-4" />
                 <span>Content</span>
@@ -185,10 +312,6 @@ const Admin = () => {
               <TabsTrigger value="portfolio" className="flex items-center space-x-2">
                 <BarChart3 className="h-4 w-4" />
                 <span>Portfolio</span>
-              </TabsTrigger>
-              <TabsTrigger value="analytics" className="flex items-center space-x-2">
-                <BarChart3 className="h-4 w-4" />
-                <span>Analytics</span>
               </TabsTrigger>
               <TabsTrigger value="settings" className="flex items-center space-x-2">
                 <Settings className="h-4 w-4" />
@@ -211,7 +334,7 @@ const Admin = () => {
                       <div>
                         <label className="block text-sm font-medium mb-2">Main Title</label>
                         <Input
-                          value={content.hero.title}
+                          value={content.hero?.title || ''}
                           onChange={(e) => handleContentUpdate('hero', 'title', e.target.value)}
                           placeholder="Enter hero title"
                         />
@@ -219,7 +342,7 @@ const Admin = () => {
                       <div>
                         <label className="block text-sm font-medium mb-2">Subtitle</label>
                         <Textarea
-                          value={content.hero.subtitle}
+                          value={content.hero?.subtitle || ''}
                           onChange={(e) => handleContentUpdate('hero', 'subtitle', e.target.value)}
                           placeholder="Enter hero subtitle"
                           rows={3}
@@ -228,12 +351,15 @@ const Admin = () => {
                       <div>
                         <label className="block text-sm font-medium mb-2">CTA Button Text</label>
                         <Input
-                          value={content.hero.ctaText}
+                          value={content.hero?.ctaText || ''}
                           onChange={(e) => handleContentUpdate('hero', 'ctaText', e.target.value)}
                           placeholder="Enter button text"
                         />
                       </div>
-                      <Button className="w-full gradient-primary text-white">
+                      <Button 
+                        onClick={() => saveContent('hero')}
+                        className="w-full gradient-primary text-white"
+                      >
                         <Save className="mr-2 h-4 w-4" /> Save Hero Content
                       </Button>
                     </CardContent>
@@ -250,7 +376,7 @@ const Admin = () => {
                       <div>
                         <label className="block text-sm font-medium mb-2">Section Title</label>
                         <Input
-                          value={content.about.title}
+                          value={content.about?.title || ''}
                           onChange={(e) => handleContentUpdate('about', 'title', e.target.value)}
                           placeholder="Enter about title"
                         />
@@ -258,13 +384,16 @@ const Admin = () => {
                       <div>
                         <label className="block text-sm font-medium mb-2">Description</label>
                         <Textarea
-                          value={content.about.description}
+                          value={content.about?.description || ''}
                           onChange={(e) => handleContentUpdate('about', 'description', e.target.value)}
                           placeholder="Enter about description"
                           rows={4}
                         />
                       </div>
-                      <Button className="w-full gradient-primary text-white">
+                      <Button 
+                        onClick={() => saveContent('about')}
+                        className="w-full gradient-primary text-white"
+                      >
                         <Save className="mr-2 h-4 w-4" /> Save About Content
                       </Button>
                     </CardContent>
@@ -310,9 +439,9 @@ const Admin = () => {
                         previewMode === 'tablet' ? 'max-w-2xl mx-auto' : 'w-full'
                       }`}>
                         <div className="text-center space-y-4">
-                          <h2 className="text-2xl font-heading font-bold">{content.hero.title}</h2>
-                          <p className="text-muted-foreground">{content.hero.subtitle}</p>
-                          <Button className="gradient-primary text-white">{content.hero.ctaText}</Button>
+                          <h2 className="text-2xl font-heading font-bold">{content.hero?.title}</h2>
+                          <p className="text-muted-foreground">{content.hero?.subtitle}</p>
+                          <Button className="gradient-primary text-white">{content.hero?.ctaText}</Button>
                         </div>
                       </div>
                     </CardContent>
@@ -350,6 +479,7 @@ const Admin = () => {
                         <Button size="sm" variant="outline">
                           <Trash2 className="h-3 w-3" />
                         </Button>
+                        <Badge variant="secondary" className="text-xs">Logo</Badge>
                       </div>
                     </CardContent>
                   </Card>
@@ -471,7 +601,7 @@ const Admin = () => {
                   <Card key={project.id} className="overflow-hidden">
                     <div className="aspect-video">
                       <img 
-                        src={project.image} 
+                        src={project.image_url} 
                         alt={project.title}
                         className="w-full h-full object-cover"
                       />
@@ -479,7 +609,7 @@ const Admin = () => {
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-2">
                         <Badge variant="secondary">{project.category}</Badge>
-                        {project.featured && (
+                        {project.is_featured && (
                           <Badge className="gradient-primary text-white">Featured</Badge>
                         )}
                       </div>
@@ -493,57 +623,11 @@ const Admin = () => {
                         <Button size="sm" variant="outline">
                           <Trash2 className="h-3 w-3" />
                         </Button>
-                        <Switch checked={project.featured} />
+                        <Switch checked={project.is_featured} />
                       </div>
                     </CardContent>
                   </Card>
                 ))}
-              </div>
-            </TabsContent>
-
-            {/* Analytics */}
-            <TabsContent value="analytics" className="space-y-6">
-              <h2 className="text-2xl font-heading font-bold">Website Analytics</h2>
-              
-              <div className="grid md:grid-cols-3 gap-6">
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Total Visitors</p>
-                        <p className="text-2xl font-bold">{analytics.visitors.total.toLocaleString()}</p>
-                        <p className="text-sm text-green-600">{analytics.visitors.growth}</p>
-                      </div>
-                      <Users className="h-8 w-8 text-primary" />
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Inquiries</p>
-                        <p className="text-2xl font-bold">{analytics.inquiries.total}</p>
-                        <p className="text-sm text-green-600">{analytics.inquiries.growth}</p>
-                      </div>
-                      <Mail className="h-8 w-8 text-primary" />
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Active Projects</p>
-                        <p className="text-2xl font-bold">{analytics.projects.active}</p>
-                        <p className="text-sm text-green-600">{analytics.projects.growth}</p>
-                      </div>
-                      <BarChart3 className="h-8 w-8 text-primary" />
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
             </TabsContent>
 
@@ -587,10 +671,12 @@ const Admin = () => {
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium">Maintenance Mode</p>
-                        <p className="text-sm text-muted-foreground">Enable to show maintenance page</p>
+                        <p className="font-medium">Logo Management</p>
+                        <p className="text-sm text-muted-foreground">Upload and manage site logos</p>
                       </div>
-                      <Switch />
+                      <Button variant="outline">
+                        <Upload className="mr-2 h-4 w-4" /> Upload Logo
+                      </Button>
                     </div>
                     <div className="flex items-center justify-between">
                       <div>
