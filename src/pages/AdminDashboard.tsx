@@ -101,9 +101,12 @@ const AdminDashboard = () => {
   });
 
   // Logo Management State
-  const [logos, setLogos] = useState({
-    header: { url: './images/mopi_logo_20260101_112924.png', alt: 'MOPi Production' },
-    footer: { url: './images/mopi_logo_20260101_112924.png', alt: 'MOPi Production' }
+  const [logos, setLogos] = useState<{
+    header: { url: string; alt: string; name?: string };
+    footer: { url: string; alt: string; name?: string };
+  }>({
+    header: { url: './images/mopi_logo_20260101_112924.png', alt: 'MOPi Production', name: 'mopi_logo_header.png' },
+    footer: { url: './images/mopi_logo_20260101_112924.png', alt: 'MOPi Production', name: 'mopi_logo_footer.png' }
   });
   const [uploadingLogo, setUploadingLogo] = useState(false);
 
@@ -221,7 +224,7 @@ const AdminDashboard = () => {
         .select('*');
       
       if (logoData) {
-        const logoSettings = {};
+        const logoSettings: any = {};
         logoData.forEach(logo => {
           logoSettings[logo.logo_type] = {
             url: logo.logo_url,
@@ -402,7 +405,7 @@ const AdminDashboard = () => {
     input.type = 'file';
     input.accept = 'image/*';
     input.onchange = (e) => {
-      const file = e.target.files[0];
+      const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -411,7 +414,7 @@ const AdminDashboard = () => {
             name: file.name,
             type: 'image',
             size: (file.size / 1024 / 1024).toFixed(1) + ' MB',
-            url: e.target.result
+            url: e.target?.result as string
           };
           setMedia(prev => [...prev, newMedia]);
           logActivity('upload_media', 'media', newMedia.name, { file_size: newMedia.size });

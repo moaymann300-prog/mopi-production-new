@@ -23,10 +23,10 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-18 py-2">
           {/* Logo */}
-          <Link to="/" className="flex items-center py-1">
+          <Link to="/" className="flex items-center py-1 transition-transform hover:scale-105 duration-300">
             <LogoComponent 
               type="header" 
-              className="h-16 w-auto mx-2"
+              className="h-20 w-auto mx-2"
               alt="MOPi Production"
             />
           </Link>
@@ -37,7 +37,7 @@ const Navigation = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`text-sm font-medium transition-smooth hover:text-primary ${
+                className={`text-sm font-medium transition-all duration-300 hover:text-primary hover:scale-110 ${
                   isActive(item.path) 
                     ? 'text-primary border-b-2 border-primary' 
                     : 'text-muted-foreground'
@@ -46,9 +46,11 @@ const Navigation = () => {
                 {item.name}
               </Link>
             ))}
-            <Button className="gradient-primary text-white font-medium shadow-elegant hover:shadow-glow transition-smooth">
-              Get Quote
-            </Button>
+            <Link to="/contact">
+              <Button className="gradient-primary text-white font-medium shadow-elegant hover:shadow-glow hover:scale-105 transition-all duration-300">
+                Get Quote
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
