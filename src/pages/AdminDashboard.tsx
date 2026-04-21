@@ -587,33 +587,57 @@ export default function AdminDashboard() {
     </div>
   );
 
-  const renderLogos = () => (
+const renderLogos = () => (
     <div>
-      <h2 className="text-2xl font-black text-white mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>Logo Management</h2>
+      <h2 className="text-2xl font-black text-white mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>Logo Management</h2>
+      <p className="text-sm mb-6" style={{ color: '#6b7280' }}>Upload logos for the header, footer, and favicon (browser tab icon).</p>
       <div className="grid md:grid-cols-2 gap-5">
         {logos.map(logo => (
-          <div key={logo.id} className="p-6 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+          <div key={logo.id} className="p-6 rounded-xl" style={{ background: '#111827', border: logo.placement === 'favicon' ? '1px solid rgba(244,163,0,0.4)' : '1px solid #1f2937' }}>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="font-bold text-white">{logo.name}</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-white">{logo.name}</h3>
+                  {logo.placement === 'favicon' && (
+                    <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: 'rgba(244,163,0,0.15)', color: '#F4A300', border: '1px solid rgba(244,163,0,0.3)' }}>Browser Tab Icon</span>
+                  )}
+                </div>
                 <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(244,163,0,0.1)', color: '#F4A300' }}>{logo.placement}</span>
               </div>
               <Toggle checked={logo.is_active} onChange={v => setLogos(prev => prev.map(x => x.id === logo.id ? { ...x, is_active: v } : x))} />
             </div>
-            {/* Current logo preview */}
-            <div className="mb-4 p-4 rounded-lg flex items-center justify-center" style={{ background: '#000', border: '1px solid #374151', minHeight: 90 }}>
-              {logo.url ? <img src={logo.url} alt={logo.alt_text} className="max-h-16 max-w-full object-contain" /> : <span className="text-xs" style={{ color: '#4b5563' }}>No logo set</span>}
-            </div>
+
+            {/* Preview — favicon gets a small tab-style preview, others get normal */}
+            {logo.placement === 'favicon' ? (
+              <div className="mb-4 space-y-2">
+                <div className="p-3 rounded-lg flex items-center justify-center" style={{ background: '#000', border: '1px solid #374151', minHeight: 70 }}>
+                  {logo.url
+                    ? <img src={logo.url} alt={logo.alt_text} className="object-contain" style={{ width: 32, height: 32 }} />
+                    : <span className="text-xs" style={{ color: '#4b5563' }}>No favicon set</span>}
+                </div>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: '#1f2937' }}>
+                  <div className="w-4 h-4 rounded-sm overflow-hidden shrink-0" style={{ background: '#374151' }}>
+                    {logo.url && <img src={logo.url} alt="" className="w-full h-full object-contain" />}
+                  </div>
+                  <span className="text-xs truncate" style={{ color: '#9ca3af' }}>mopiproduction.com — Browser tab preview</span>
+                </div>
+              </div>
+            ) : (
+              <div className="mb-4 p-4 rounded-lg flex items-center justify-center" style={{ background: '#000', border: '1px solid #374151', minHeight: 90 }}>
+                {logo.url ? <img src={logo.url} alt={logo.alt_text} className="max-h-16 max-w-full object-contain" /> : <span className="text-xs" style={{ color: '#4b5563' }}>No logo set</span>}
+              </div>
+            )}
+
             <div className="space-y-3">
-              <Field label="Upload New Logo">
+              <Field label={logo.placement === 'favicon' ? 'Upload Favicon (PNG/ICO/SVG recommended 32×32 or 64×64)' : 'Upload New Logo'}>
                 <ImageUploader currentUrl="" onUploaded={url => setLogos(prev => prev.map(x => x.id === logo.id ? { ...x, url } : x))} label="Click or drag to upload" folder="logos" />
               </Field>
               <Field label="Alt Text">
-                <Input value={logo.alt_text} onChange={e => setLogos(prev => prev.map(x => x.id === logo.id ? { ...x, alt_text: e.target.value } : x))} placeholder="Logo description" />
+                <Input value={logo.alt_text} onChange={e => setLogos(prev => prev.map(x => x.id === logo.id ? { ...x, alt_text: e.target.value } : x))} placeholder={logo.placement === 'favicon' ? 'Site favicon' : 'Logo description'} />
               </Field>
               <button onClick={() => saveLogo(logo)} className="w-full py-2.5 rounded-lg text-white font-bold text-sm transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
                 style={{ background: '#F4A300' }}>
-                <Save className="h-4 w-4" />Save Logo
+                <Save className="h-4 w-4" />{logo.placement === 'favicon' ? 'Save Favicon' : 'Save Logo'}
               </button>
             </div>
           </div>

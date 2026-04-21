@@ -18,6 +18,7 @@ export interface CMSData {
   socials: CMSSocialLink[];
   headerLogo: CMSLogo | null;
   footerLogo: CMSLogo | null;
+  faviconLogo: CMSLogo | null;
   heroes: Record<string, CMSHero>;
   stats: CMSStat[];
   services: CMSService[];
@@ -42,9 +43,10 @@ const [settings, setSettings] = useState<Record<string, string>>({
     address: 'Cairo, Egypt',
     whatsapp_number: '201000000000',
   });
-  const [socials, setSocials] = useState<CMSSocialLink[]>([]);
+const [socials, setSocials] = useState<CMSSocialLink[]>([]);
   const [headerLogo, setHeaderLogo] = useState<CMSLogo | null>(null);
   const [footerLogo, setFooterLogo] = useState<CMSLogo | null>(null);
+  const [faviconLogo, setFaviconLogo] = useState<CMSLogo | null>(null);
   const [heroes, setHeroes] = useState<Record<string, CMSHero>>({});
   const [stats, setStats] = useState<CMSStat[]>([]);
   const [services, setServices] = useState<CMSService[]>([]);
@@ -83,12 +85,14 @@ const [settings, setSettings] = useState<Record<string, string>>({
         // Socials
         if (socialsRes.data) setSocials(socialsRes.data);
 
-        // Logos
+// Logos
         if (logosRes.data) {
           const header = logosRes.data.find((l: CMSLogo) => l.placement === 'header');
           const footer = logosRes.data.find((l: CMSLogo) => l.placement === 'footer');
+          const favicon = logosRes.data.find((l: CMSLogo) => l.placement === 'favicon');
           setHeaderLogo(header || null);
           setFooterLogo(footer || null);
+          setFaviconLogo(favicon || null);
         }
 
         // Heroes → page:hero map
@@ -129,11 +133,12 @@ const [settings, setSettings] = useState<Record<string, string>>({
     fetchAll();
   }, []);
 
-  return {
+return {
     settings,
     socials,
     headerLogo,
     footerLogo,
+    faviconLogo,
     heroes,
     stats,
     services,
