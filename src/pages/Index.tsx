@@ -160,13 +160,14 @@ const Index = () => {
     setFormData({ name: '', email: '', phone: '', service: '', message: '' });
   };
 
-  const navLinks = [
-    { label: 'Home', href: '#hero' },
-    { label: 'About', href: '#about' },
-    { label: 'Services', href: '#services' },
-    { label: 'Portfolio', href: '#portfolio' },
-    { label: 'Why Us', href: '#why' },
-    { label: 'Contact', href: '#contact' },
+// anchor = same-page scroll, to = navigate to separate page
+  const navLinks: { label: string; href?: string; to?: string }[] = [
+    { label: 'Home',      href: '#hero' },
+    { label: 'About',     to: '/about' },
+    { label: 'Services',  to: '/services' },
+    { label: 'Portfolio', to: '/portfolio' },
+    { label: 'Why Us',    href: '#why' },
+    { label: 'Contact',   to: '/contact' },
   ];
 
   const services = [
@@ -235,20 +236,28 @@ const Index = () => {
           boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.4)' : 'none',
         }}>
         <div className="max-w-7xl mx-auto px-5 lg:px-8 flex items-center justify-between">
-          <a href="#hero">
-            <img src="/images/mopi_logo_20260101_112924.png" alt="MOPi Production"
+<a href="#hero">
+            <img src={logoUrl} alt={companyName}
               className="h-11 w-auto object-contain transition-opacity duration-300 hover:opacity-75" />
           </a>
 
-          <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map(l => (
-              <a key={l.href} href={l.href}
+<nav className="hidden md:flex items-center gap-8">
+            {navLinks.map(l => l.href ? (
+              <a key={l.label} href={l.href}
+                className="nav-link text-sm font-medium tracking-wide transition-colors duration-200"
+                style={{ color: l.href === '#why' ? '#F4A300' : '#d1d5db' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#ffffff')}
+                onMouseLeave={e => (e.currentTarget.style.color = l.href === '#why' ? '#F4A300' : '#d1d5db')}>
+                {l.label}
+              </a>
+            ) : (
+              <Link key={l.label} to={l.to!}
                 className="nav-link text-sm font-medium tracking-wide transition-colors duration-200"
                 style={{ color: '#d1d5db' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#ffffff')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#d1d5db')}>
                 {l.label}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -281,15 +290,24 @@ const Index = () => {
           style={{ maxHeight: menuOpen ? '400px' : '0', opacity: menuOpen ? 1 : 0 }}>
           <div style={{ background: 'rgba(0,0,0,0.98)', borderTop: '1px solid rgba(255,255,255,0.08)' }}
             className="px-6 py-5 space-y-1">
-            {navLinks.map(l => (
-              <a key={l.href} href={l.href} onClick={() => setMenuOpen(false)}
+{navLinks.map(l => l.href ? (
+              <a key={l.label} href={l.href} onClick={() => setMenuOpen(false)}
+                className="flex items-center justify-between py-3 text-sm font-medium transition-colors"
+                style={{ color: l.href === '#why' ? '#F4A300' : '#9ca3af', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#F4A300')}
+                onMouseLeave={e => (e.currentTarget.style.color = l.href === '#why' ? '#F4A300' : '#9ca3af')}>
+                {l.label}
+                <ChevronRight className="h-4 w-4 opacity-50" />
+              </a>
+            ) : (
+              <Link key={l.label} to={l.to!} onClick={() => setMenuOpen(false)}
                 className="flex items-center justify-between py-3 text-sm font-medium transition-colors"
                 style={{ color: '#9ca3af', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#F4A300')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#9ca3af')}>
                 {l.label}
                 <ChevronRight className="h-4 w-4 opacity-50" />
-              </a>
+              </Link>
             ))}
             <div className="flex gap-3 pt-4">
 <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
@@ -671,7 +689,7 @@ const Index = () => {
           style={{ width: 140, height: 140, border: '1.5px solid #F4A300', opacity: 0.07, transform: 'rotate(45deg)' }} />
 
         <div className="max-w-7xl mx-auto">
-          <Reveal className="text-center mb-16">
+<div className="text-center mb-16">
             <SectionLabel text="Why Choose Us" />
             <h2 className="font-black mb-3" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000000', fontFamily: "'Poppins', sans-serif" }}>
               The MOPi Difference
@@ -679,11 +697,11 @@ const Index = () => {
             <p className="text-lg max-w-xl mx-auto" style={{ color: '#555555' }}>
               We don't just build booths — we build brands
             </p>
-          </Reveal>
+          </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {whyUs.map((w, i) => (
-              <Reveal key={i} delay={i * 65}>
+              <div key={i}>
                 <div className="group p-7 rounded-2xl cursor-default transition-all duration-400 hover:-translate-y-1.5"
                   style={{
                     background: '#FFFFFF',
@@ -709,7 +727,7 @@ const Index = () => {
                     </div>
                   </div>
                 </div>
-              </Reveal>
+              </div>
             ))}
           </div>
         </div>
