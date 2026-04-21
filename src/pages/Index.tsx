@@ -132,8 +132,8 @@ const Index = () => {
   const cmsEmail = cms.settings.email || 'info@mopiproduction.com';
   const cmsAddress = cms.settings.address || 'Cairo, Egypt';
   const logoUrl = getLogoUrl(cms.headerLogo);
-  const whatsappUrl = cms.settings.whatsapp
-    ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}`
+const whatsappUrl = cms.settings.whatsapp_number
+    ? `https://wa.me/${cms.settings.whatsapp_number.replace(/[^0-9]/g, '')}`
     : 'https://wa.me/201000000000';
   const phoneHref = `tel:${cmsPhone.replace(/\s/g, '')}`;
   const emailHref = `mailto:${cmsEmail}`;

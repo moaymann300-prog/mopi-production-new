@@ -42,7 +42,7 @@ const phone = cms.settings.phone_1 || '+20 100 000 0000';
   const address = cms.settings.address || 'Cairo, Egypt';
   const tagline = cms.settings.footer_tagline || cms.settings.tagline || "Cairo's leading exhibition booth design and event production company.";
   const logoUrl = getLogoUrl(cms.footerLogo || cms.headerLogo);
-  const whatsappUrl = cms.settings.whatsapp ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
+const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings.whatsapp_number.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
   return (
   <footer style={{ background: '#000000', borderTop: '3px solid #F4A300' }} className="py-14 px-5">
     <div className="max-w-7xl mx-auto">
@@ -163,7 +163,7 @@ const _phone = cms.settings.phone_1 || '+20 100 000 0000';
   const _address = cms.settings.address || 'Cairo, Egypt';
   const logoUrl = getLogoUrl(cms.headerLogo);
   const _footerLogoUrl = getLogoUrl(cms.footerLogo);
-  const whatsappUrl = cms.settings.whatsapp ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
+const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings.whatsapp_number.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
   const hero = cms.heroes['about'];
 
   // About CMS content

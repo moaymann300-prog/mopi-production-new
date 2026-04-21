@@ -39,7 +39,7 @@ const companyName = cms.settings.company_name || 'MOPi Production';
   const address = cms.settings.address || 'Cairo, Egypt';
   const tagline = cms.settings.footer_tagline || cms.settings.tagline || "Cairo's leading exhibition booth design and event production company.";
   const logoUrl = getLogoUrl(cms.footerLogo || cms.headerLogo);
-  const whatsappUrl = cms.settings.whatsapp ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
+const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings.whatsapp_number.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
   return (
   <footer style={{ background: '#000000', borderTop: '3px solid #F4A300' }} className="py-14 px-5">
     <div className="max-w-7xl mx-auto">
@@ -127,7 +127,7 @@ const Contact = () => {
 // CMS data
   const companyNameContact = cms.settings.company_name || 'MOPi Production';
   const logoUrlContact = getLogoUrl(cms.headerLogo);
-  const whatsappUrlContact = cms.settings.whatsapp ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
+const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings.whatsapp_number.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
   const phoneContact = cms.settings.phone_1 || '+20 100 000 0000';
   const phone2Contact = cms.settings.phone_2 || '';
   const emailContact = cms.settings.email || 'info@mopiproduction.com';

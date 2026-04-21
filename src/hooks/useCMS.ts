@@ -40,6 +40,7 @@ const [settings, setSettings] = useState<Record<string, string>>({
     phone_1: '+20 100 000 0000',
     phone_2: '',
     address: 'Cairo, Egypt',
+    whatsapp_number: '201000000000',
   });
   const [socials, setSocials] = useState<CMSSocialLink[]>([]);
   const [headerLogo, setHeaderLogo] = useState<CMSLogo | null>(null);

@@ -59,7 +59,7 @@ const phone = cms.settings.phone_1 || '+20 100 000 0000';
   const address = cms.settings.address || 'Cairo, Egypt';
   const tagline = cms.settings.footer_tagline || cms.settings.tagline || "Cairo's leading exhibition booth design and event production company.";
   const logoUrl = getLogoUrl(cms.footerLogo || cms.headerLogo);
-  const whatsappUrl = cms.settings.whatsapp ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
+const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings.whatsapp_number.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
   return (
   <footer style={{ background: '#000000', borderTop: '3px solid #F4A300' }} className="py-14 px-5">
     <div className="max-w-7xl mx-auto">
@@ -160,7 +160,7 @@ const Portfolio = () => {
   // CMS data with fallbacks
   const companyNamePortfolio = cms.settings.company_name || 'MOPi Production';
   const logoUrlPortfolio = getLogoUrl(cms.headerLogo);
-  const whatsappUrlPortfolio = cms.settings.whatsapp ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
+const whatsappUrlPortfolio = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings.whatsapp_number.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
   const heroPortfolio = cms.heroes['portfolio'];
 
   return (
@@ -385,7 +385,7 @@ const Portfolio = () => {
               onMouseLeave={e => (e.currentTarget.style.background = '#F4A300')}>
               Start Your Project <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+<a href={whatsappUrlPortfolio} target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-3 text-white font-bold text-lg px-10 py-5 rounded-full transition-all hover:scale-105"
               style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.15)' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#16a34a'); (e.currentTarget.style.borderColor = '#16a34a'); }}
