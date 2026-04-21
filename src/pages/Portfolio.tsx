@@ -132,6 +132,9 @@ const [menuOpen, setMenuOpen] = useState(false);
     title: string; cat: string; client: string; location: string;
     date: string; visitors: string; image: string; award: string | null; desc: string;
   }>(null);
+  const [spotlightIndex, setSpotlightIndex] = useState(0);
+  const [spotlightTransition, setSpotlightTransition] = useState(false);
+  const spotlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const cms = useCMS();
 
   useEffect(() => {
@@ -169,10 +172,12 @@ const whatsappUrlPortfolio = cms.settings.whatsapp_number ? `https://wa.me/${cms
 
   return (
     <div className="overflow-x-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
-      <style>{`
-        @keyframes slowZoom { from{transform:scale(1.05)} to{transform:scale(1.13)} }
-        @keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes fadeUp   { from{opacity:0;transform:translateY(20px)}  to{opacity:1;transform:translateY(0)} }
+<style>{`
+        @keyframes slowZoom  { from{transform:scale(1.05)} to{transform:scale(1.13)} }
+        @keyframes fadeDown  { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes fadeUp    { from{opacity:0;transform:translateY(20px)}  to{opacity:1;transform:translateY(0)} }
+        @keyframes slideInRight { from{opacity:0;transform:translateX(32px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes slideInLeft  { from{opacity:0;transform:translateX(-32px)} to{opacity:1;transform:translateX(0)} }
         .nav-link::after { content:''; display:block; height:2px; width:0; background:#F4A300; transition:width 0.3s ease; margin-top:2px; }
         .nav-link:hover::after { width:100%; }
         .port-img { transition: transform 0.7s ease; }
@@ -258,8 +263,8 @@ const whatsappUrlPortfolio = cms.settings.whatsapp_number ? `https://wa.me/${cms
         </div>
       </section>
 
-      {/* ══ § 3 · PORTFOLIO GRID — WHITE ══ */}
-      <section className="py-28 px-5 relative overflow-hidden" style={{ background: '#FFFFFF' }}>
+{/* ══ § 3 · PORTFOLIO GRID — WHITE ══ */}
+      <section id="portfolio-grid" className="py-28 px-5 relative overflow-hidden" style={{ background: '#FFFFFF' }}>
         <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent, #F4A300, transparent)' }} />
 
         <div className="max-w-7xl mx-auto">
@@ -403,7 +408,7 @@ const whatsappUrlPortfolio = cms.settings.whatsapp_number ? `https://wa.me/${cms
         </div>
       )}
 
-      {/* ══ § 4 · FEATURED SPOTLIGHT — BLACK ══ */}
+{/* ══ § 4 · FEATURED SPOTLIGHT — BLACK ══ */}
       <section className="py-28 px-5 relative overflow-hidden" style={{ background: '#000000' }}>
         <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent, #F4A300, transparent)' }} />
         <div className="absolute top-16 right-16 pointer-events-none" style={{ width: 130, height: 130, border: '1px solid #F4A300', opacity: 0.06, transform: 'rotate(45deg)' }} />
@@ -414,35 +419,129 @@ const whatsappUrlPortfolio = cms.settings.whatsapp_number ? `https://wa.me/${cms
             <h2 className="font-black mb-4 text-white" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontFamily: "'Poppins', sans-serif" }}>
               Featured Project <span style={{ color: '#F4A300' }}>Spotlight</span>
             </h2>
+            <p className="text-sm" style={{ color: '#6b7280' }}>Hover over any project card above to preview it here</p>
           </Reveal>
 
           <Reveal delay={100}>
-            <div className="grid md:grid-cols-2 gap-0 overflow-hidden rounded-2xl" style={{ border: '1.5px solid rgba(255,255,255,0.08)' }}>
-              <div className="relative overflow-hidden group">
-                <img src={projects[0].image} alt={projects[0].title} className="w-full h-full object-cover min-h-72 transition-transform duration-700 group-hover:scale-105" />
-                <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, transparent, rgba(0,0,0,0.3))' }} />
+            {/* Main spotlight card — layout fixed, only content slides */}
+            <div className="grid md:grid-cols-2 gap-0 overflow-hidden rounded-2xl" style={{ border: '1.5px solid rgba(255,255,255,0.08)', minHeight: 340 }}>
+
+              {/* Left — image slides in */}
+              <div className="relative overflow-hidden" style={{ minHeight: 300 }}>
+                <img
+                  key={`img-${spotlightIndex}`}
+                  src={projects[spotlightIndex].image}
+                  alt={projects[spotlightIndex].title}
+                  className="w-full h-full object-cover absolute inset-0"
+                  style={{ animation: 'slideInLeft 0.45s ease both' }}
+                />
+                <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, transparent, rgba(0,0,0,0.35))' }} />
                 <div className="absolute bottom-0 left-0 right-0 h-[3px]" style={{ background: '#F4A300' }} />
+                {/* Index dots */}
+                <div className="absolute bottom-5 left-5 flex gap-1.5">
+                  {projects.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        setSpotlightTransition(true);
+                        setSpotlightIndex(i);
+                        setTimeout(() => setSpotlightTransition(false), 450);
+                      }}
+                      style={{
+                        width: i === spotlightIndex ? 20 : 7,
+                        height: 7,
+                        borderRadius: 4,
+                        background: i === spotlightIndex ? '#F4A300' : 'rgba(255,255,255,0.35)',
+                        transition: 'all 0.3s ease',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: 0,
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
-              <div className="p-10 lg:p-12" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                <Badge text={projects[0].cat} />
-                <h3 className="text-2xl font-black text-white mt-4 mb-3" style={{ fontFamily: "'Poppins', sans-serif" }}>{projects[0].title}</h3>
-                <p className="leading-relaxed mb-6 text-sm" style={{ color: '#9ca3af' }}>{projects[0].desc}</p>
+
+              {/* Right — details slide in */}
+              <div
+                key={`info-${spotlightIndex}`}
+                className="p-10 lg:p-12"
+                style={{ background: 'rgba(255,255,255,0.03)', animation: 'slideInRight 0.45s ease both' }}>
+                <Badge text={projects[spotlightIndex].cat} />
+                {projects[spotlightIndex].award && (
+                  <div className="flex items-center gap-1.5 mt-2 mb-1">
+                    <Award className="h-3.5 w-3.5" style={{ color: '#F4A300' }} />
+                    <span className="text-xs font-bold" style={{ color: '#F4A300' }}>{projects[spotlightIndex].award}</span>
+                  </div>
+                )}
+                <h3 className="text-2xl font-black text-white mt-3 mb-3" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                  {projects[spotlightIndex].title}
+                </h3>
+                <p className="leading-relaxed mb-6 text-sm" style={{ color: '#9ca3af' }}>{projects[spotlightIndex].desc}</p>
                 <div className="grid grid-cols-2 gap-4 mb-6">
-                  {[['Client', projects[0].client], ['Location', projects[0].location], ['Date', projects[0].date], ['Visitors', projects[0].visitors]].map(([k, v]) => (
+                  {[['Client', projects[spotlightIndex].client], ['Location', projects[spotlightIndex].location], ['Date', projects[spotlightIndex].date], ['Visitors', projects[spotlightIndex].visitors]].map(([k, v]) => (
                     <div key={k}>
                       <div className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#6b7280' }}>{k}</div>
                       <div className="text-sm font-semibold text-white">{v}</div>
                     </div>
                   ))}
                 </div>
-                <Link to="/contact"
-                  className="group inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-full transition-all hover:scale-105"
-                  style={{ background: '#F4A300', color: '#fff' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#e09200')}
-                  onMouseLeave={e => (e.currentTarget.style.background = '#F4A300')}>
-                  Start a Similar Project <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
+                {/* Buttons row */}
+                <div className="flex flex-wrap gap-3">
+                  <Link to="/contact"
+                    className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-full transition-all hover:scale-105"
+                    style={{ background: '#F4A300', color: '#fff' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = '#e09200')}
+                    onMouseLeave={e => (e.currentTarget.style.background = '#F4A300')}>
+                    Start a Similar Project <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  {/* Back to All Projects button */}
+                  <a
+                    href="#portfolio-grid"
+                    className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-full transition-all hover:scale-105"
+                    style={{ background: 'rgba(255,255,255,0.07)', color: '#d1d5db', border: '1.5px solid rgba(255,255,255,0.15)' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = '#F4A300'; (e.currentTarget as HTMLAnchorElement).style.color = '#F4A300'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(255,255,255,0.15)'; (e.currentTarget as HTMLAnchorElement).style.color = '#d1d5db'; }}>
+                    <ArrowRight className="h-4 w-4 rotate-180" /> Back to All Projects
+                  </a>
+                </div>
               </div>
+            </div>
+
+            {/* Mini project strip — hover to change spotlight */}
+            <div className="flex gap-3 mt-5 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+              {projects.map((p, i) => (
+                <button
+                  key={p.title}
+                  onClick={() => {
+                    if (spotlightTimerRef.current) clearTimeout(spotlightTimerRef.current);
+                    setSpotlightIndex(i);
+                  }}
+                  onMouseEnter={() => {
+                    if (spotlightTimerRef.current) clearTimeout(spotlightTimerRef.current);
+                    spotlightTimerRef.current = setTimeout(() => setSpotlightIndex(i), 120);
+                  }}
+                  onMouseLeave={() => {
+                    if (spotlightTimerRef.current) clearTimeout(spotlightTimerRef.current);
+                  }}
+                  className="relative shrink-0 overflow-hidden rounded-xl transition-all duration-300"
+                  style={{
+                    width: 110, height: 70,
+                    border: i === spotlightIndex ? '2px solid #F4A300' : '2px solid rgba(255,255,255,0.08)',
+                    boxShadow: i === spotlightIndex ? '0 0 14px rgba(244,163,0,0.4)' : 'none',
+                    transform: i === spotlightIndex ? 'scale(1.06)' : 'scale(1)',
+                    padding: 0, background: 'none', cursor: 'pointer',
+                  }}>
+                  <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 flex items-end p-1.5"
+                    style={{ background: i === spotlightIndex ? 'rgba(0,0,0,0.25)' : 'rgba(0,0,0,0.5)' }}>
+                    <span className="text-white text-[9px] font-bold leading-tight line-clamp-2 text-left">{p.title}</span>
+                  </div>
+                  {i === spotlightIndex && (
+                    <div className="absolute bottom-0 left-0 right-0 h-[2.5px]" style={{ background: '#F4A300' }} />
+                  )}
+                </button>
+              ))}
             </div>
           </Reveal>
         </div>
