@@ -595,13 +595,13 @@ const navLinks: { label: string; to: string }[] = [
             </div>
           </Reveal>
 
-          {/* Grid */}
+{/* Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {filtered.map((p, i) => (
-              <div key={`${p.title}-${i}`}
+              <Link key={`${p.title}-${i}`} to="/portfolio"
                 className={`portfolio-card group relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-500
                   ${i === 0 || i === 5 ? 'sm:col-span-2 h-72' : 'h-60'}`}
-                style={{ animation: `fadeUp 0.5s ease ${i * 55}ms both`, boxShadow: '0 4px 16px rgba(0,0,0,0.4)' }}>
+                style={{ animation: `fadeUp 0.5s ease ${i * 55}ms both`, boxShadow: '0 4px 16px rgba(0,0,0,0.4)', textDecoration: 'none' }}>
 
                 <img src={p.image} alt={p.title} className="w-full h-full object-cover port-img" />
 
@@ -633,7 +633,7 @@ const navLinks: { label: string; to: string }[] = [
                 {/* Bottom orange line on hover */}
                 <div className="absolute bottom-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-400"
                   style={{ background: 'linear-gradient(to right, transparent, #F4A300, transparent)' }} />
-              </div>
+              </Link>
             ))}
           </div>
 

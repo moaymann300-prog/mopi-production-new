@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { IMAGES } from '@/assets/images';
 import { useCMS, getLogoUrl } from '@/hooks/useCMS';
 import {
-  ArrowRight, Phone, Mail, MapPin, MessageCircle,
-  Menu, X, ChevronRight, ExternalLink, Award,
+ArrowRight, Phone, Mail, MapPin, MessageCircle,
+  Menu, X, ChevronRight, ExternalLink, Award, Users, Calendar, Eye, XCircle,
 } from 'lucide-react';
 
 const Reveal = ({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) => {
@@ -125,9 +125,13 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
 
 /* ════════════════ PORTFOLIO PAGE ════════════════ */
 const Portfolio = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
+const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
+  const [selectedProject, setSelectedProject] = useState<null | {
+    title: string; cat: string; client: string; location: string;
+    date: string; visitors: string; image: string; award: string | null; desc: string;
+  }>(null);
   const cms = useCMS();
 
   useEffect(() => {
@@ -285,9 +289,10 @@ const whatsappUrlPortfolio = cms.settings.whatsapp_number ? `https://wa.me/${cms
           {/* Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filtered.map((p, i) => (
-              <div key={`${p.title}-${i}`}
+<div key={`${p.title}-${i}`}
                 className="port-card group overflow-hidden rounded-2xl cursor-pointer transition-all duration-400 hover:-translate-y-2"
                 style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.1)', animation: `fadeUp 0.5s ease ${i * 55}ms both`, border: '1.5px solid #e5e7eb' }}
+                onClick={() => setSelectedProject(p)}
                 onMouseEnter={e => { (e.currentTarget.style.borderColor = '#F4A300'); (e.currentTarget.style.boxShadow = '0 16px 40px rgba(244,163,0,0.12)'); }}
                 onMouseLeave={e => { (e.currentTarget.style.borderColor = '#e5e7eb'); (e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)'); }}>
 
@@ -322,6 +327,81 @@ const whatsappUrlPortfolio = cms.settings.whatsapp_number ? `https://wa.me/${cms
           </div>
         </div>
       </section>
+
+      {/* ── Project Detail Modal ── */}
+      {selectedProject && (
+        <div
+          className="fixed inset-0 z-[9998] flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(8px)', animation: 'fadeUp 0.25s ease both' }}
+          onClick={() => setSelectedProject(null)}>
+          <div
+            className="relative w-full max-w-2xl rounded-2xl overflow-hidden"
+            style={{ background: '#111827', border: '1.5px solid rgba(244,163,0,0.3)', maxHeight: '90vh', overflowY: 'auto', animation: 'fadeUp 0.3s ease both' }}
+            onClick={e => e.stopPropagation()}>
+
+            {/* Hero image */}
+            <div className="relative h-64 overflow-hidden">
+              <img src={selectedProject.image} alt={selectedProject.title} className="w-full h-full object-cover" />
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(17,24,39,1) 0%, rgba(17,24,39,0.2) 60%, transparent 100%)' }} />
+              {selectedProject.award && (
+                <div className="absolute top-4 left-4">
+                  <span className="inline-flex items-center gap-1.5 text-white text-xs font-bold px-3 py-1.5 rounded-full" style={{ background: 'rgba(244,163,0,0.9)' }}>
+                    <Award className="h-3.5 w-3.5" />{selectedProject.award}
+                  </span>
+                </div>
+              )}
+              <button
+                onClick={() => setSelectedProject(null)}
+                className="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.15)' }}>
+                <XCircle className="h-5 w-5 text-white" />
+              </button>
+              <div className="absolute bottom-4 left-4">
+                <Badge text={selectedProject.cat} />
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="p-7">
+              <h2 className="text-2xl font-black text-white mb-3" style={{ fontFamily: "'Poppins', sans-serif" }}>{selectedProject.title}</h2>
+              <p className="text-sm leading-relaxed mb-6" style={{ color: '#9ca3af' }}>{selectedProject.desc}</p>
+
+              <div className="grid grid-cols-2 gap-4 mb-7 p-5 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                {[
+                  { icon: Users, label: 'Client', value: selectedProject.client },
+                  { icon: MapPin, label: 'Location', value: selectedProject.location },
+                  { icon: Calendar, label: 'Date', value: selectedProject.date },
+                  { icon: Eye, label: 'Visitors', value: selectedProject.visitors },
+                ].map(({ icon: Icon, label, value }) => (
+                  <div key={label}>
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#6b7280' }}>
+                      <Icon className="h-3 w-3" style={{ color: '#F4A300' }} />{label}
+                    </div>
+                    <div className="text-sm font-semibold text-white">{value}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-3">
+                <Link to="/contact"
+                  onClick={() => setSelectedProject(null)}
+                  className="flex-1 inline-flex items-center justify-center gap-2 text-white font-bold text-sm py-3.5 rounded-full transition-all hover:scale-[1.02]"
+                  style={{ background: '#F4A300' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#e09200')}
+                  onMouseLeave={e => (e.currentTarget.style.background = '#F4A300')}>
+                  Start a Similar Project <ArrowRight className="h-4 w-4" />
+                </Link>
+                <button
+                  onClick={() => setSelectedProject(null)}
+                  className="px-6 py-3.5 rounded-full text-sm font-bold transition-all hover:scale-[1.02]"
+                  style={{ background: 'rgba(255,255,255,0.06)', color: '#9ca3af', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ══ § 4 · FEATURED SPOTLIGHT — BLACK ══ */}
       <section className="py-28 px-5 relative overflow-hidden" style={{ background: '#000000' }}>
