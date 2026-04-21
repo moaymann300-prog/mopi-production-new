@@ -5,7 +5,7 @@ import { useCMS, getLogoUrl } from '@/hooks/useCMS';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
   ChevronDown, CheckCircle, Zap, Clock,
-  Shield, Award, Users, Layers, Palette, Wrench,
+  Award, Layers, Palette, Wrench,
   Menu, X, ExternalLink, ChevronRight, MoveRight,
 } from 'lucide-react';
 
@@ -160,13 +160,11 @@ const Index = () => {
     setFormData({ name: '', email: '', phone: '', service: '', message: '' });
   };
 
-// anchor = same-page scroll, to = navigate to separate page
-  const navLinks: { label: string; href?: string; to?: string }[] = [
-    { label: 'Home',      href: '#hero' },
+const navLinks: { label: string; to: string }[] = [
+    { label: 'Home',      to: '/' },
     { label: 'About',     to: '/about' },
     { label: 'Services',  to: '/services' },
     { label: 'Portfolio', to: '/portfolio' },
-    { label: 'Why Us',    href: '#why' },
     { label: 'Contact',   to: '/contact' },
   ];
 
@@ -191,15 +189,6 @@ const Index = () => {
 
   const categories = ['All', 'Exhibition', 'Event', 'Booth', 'Activation'];
   const filtered = activeFilter === 'All' ? portfolioItems : portfolioItems.filter(p => p.cat === activeFilter);
-
-  const whyUs = [
-    { icon: Palette, title: 'Creative & Innovative', desc: 'Unique designs that make your brand impossible to ignore on any show floor.' },
-    { icon: Shield, title: 'Premium Execution', desc: 'Uncompromising quality in every material, finish, and structural detail.' },
-    { icon: Clock, title: 'On-Time Delivery', desc: 'We meet every deadline — no excuses, no exceptions, no surprises.' },
-    { icon: Layers, title: 'A-to-Z Service', desc: 'Concept, logistics, hotel, setup, management — all under one roof.' },
-    { icon: Users, title: 'Expert Team', desc: '8+ years of dedicated specialists in design, production, and live events.' },
-    { icon: Award, title: 'Proven Track Record', desc: '500+ successful projects delivered across Egypt and the MENA region.' },
-  ];
 
   /* ── shared input style for light bg form ── */
   const inputCls = `w-full border rounded-xl px-4 py-3 text-sm transition-all duration-300 focus:outline-none focus:ring-2
@@ -242,16 +231,8 @@ const Index = () => {
           </a>
 
 <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map(l => l.href ? (
-              <a key={l.label} href={l.href}
-                className="nav-link text-sm font-medium tracking-wide transition-colors duration-200"
-                style={{ color: l.href === '#why' ? '#F4A300' : '#d1d5db' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#ffffff')}
-                onMouseLeave={e => (e.currentTarget.style.color = l.href === '#why' ? '#F4A300' : '#d1d5db')}>
-                {l.label}
-              </a>
-            ) : (
-              <Link key={l.label} to={l.to!}
+            {navLinks.map(l => (
+              <Link key={l.label} to={l.to}
                 className="nav-link text-sm font-medium tracking-wide transition-colors duration-200"
                 style={{ color: '#d1d5db' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#ffffff')}
@@ -290,17 +271,8 @@ const Index = () => {
           style={{ maxHeight: menuOpen ? '400px' : '0', opacity: menuOpen ? 1 : 0 }}>
           <div style={{ background: 'rgba(0,0,0,0.98)', borderTop: '1px solid rgba(255,255,255,0.08)' }}
             className="px-6 py-5 space-y-1">
-{navLinks.map(l => l.href ? (
-              <a key={l.label} href={l.href} onClick={() => setMenuOpen(false)}
-                className="flex items-center justify-between py-3 text-sm font-medium transition-colors"
-                style={{ color: l.href === '#why' ? '#F4A300' : '#9ca3af', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#F4A300')}
-                onMouseLeave={e => (e.currentTarget.style.color = l.href === '#why' ? '#F4A300' : '#9ca3af')}>
-                {l.label}
-                <ChevronRight className="h-4 w-4 opacity-50" />
-              </a>
-            ) : (
-              <Link key={l.label} to={l.to!} onClick={() => setMenuOpen(false)}
+{navLinks.map(l => (
+              <Link key={l.label} to={l.to} onClick={() => setMenuOpen(false)}
                 className="flex items-center justify-between py-3 text-sm font-medium transition-colors"
                 style={{ color: '#9ca3af', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#F4A300')}
@@ -676,60 +648,6 @@ const Index = () => {
               </a>
             </div>
           </Reveal>
-        </div>
-      </section>
-
-      {/* ══════════════════ § 6 · WHY US — WHITE ══════════════════ */}
-      <section id="why" className="py-28 px-5 relative overflow-hidden" style={{ background: '#FFFFFF' }}>
-        <div className="absolute top-0 left-0 right-0 h-[3px]"
-          style={{ background: 'linear-gradient(to right, transparent, #F4A300, transparent)' }} />
-
-        {/* Geo accents */}
-        <div className="absolute bottom-20 right-20 pointer-events-none"
-          style={{ width: 140, height: 140, border: '1.5px solid #F4A300', opacity: 0.07, transform: 'rotate(45deg)' }} />
-
-        <div className="max-w-7xl mx-auto">
-<div className="text-center mb-16">
-            <SectionLabel text="Why Choose Us" />
-            <h2 className="font-black mb-3" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000000', fontFamily: "'Poppins', sans-serif" }}>
-              The MOPi Difference
-            </h2>
-            <p className="text-lg max-w-xl mx-auto" style={{ color: '#555555' }}>
-              We don't just build booths — we build brands
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {whyUs.map((w, i) => (
-              <div key={i}>
-                <div className="group p-7 rounded-2xl cursor-default transition-all duration-400 hover:-translate-y-1.5"
-                  style={{
-                    background: '#FFFFFF',
-                    border: '1.5px solid #e5e7eb',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                  }}
-                  onMouseEnter={e => { (e.currentTarget.style.borderColor = '#F4A300'); (e.currentTarget.style.boxShadow = '0 12px 30px rgba(244,163,0,0.12), 0 2px 8px rgba(0,0,0,0.06)'); (e.currentTarget.style.background = '#fffef9'); }}
-                  onMouseLeave={e => { (e.currentTarget.style.borderColor = '#e5e7eb'); (e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)'); (e.currentTarget.style.background = '#FFFFFF'); }}>
-
-                  <div className="flex items-start gap-5">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110"
-                      style={{ background: 'rgba(244,163,0,0.1)', border: '1.5px solid rgba(244,163,0,0.25)' }}
-                      onMouseEnter={() => { }}
-                    >
-                      <w.icon className="h-5 w-5" style={{ color: '#F4A300' }} />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-base mb-2 transition-colors duration-300 group-hover:text-[#F4A300]"
-                        style={{ color: '#000000', fontFamily: "'Poppins', sans-serif" }}>
-                        {w.title}
-                      </h3>
-                      <p className="text-sm leading-relaxed" style={{ color: '#555555' }}>{w.desc}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
