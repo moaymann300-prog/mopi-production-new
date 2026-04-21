@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { IMAGES } from '@/assets/images';
+import { useCMS, getLogoUrl } from '@/hooks/useCMS';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
   ChevronDown, CheckCircle, Zap, Clock,
@@ -122,6 +123,20 @@ const GeoDiamond = ({ cls = '' }: { cls?: string }) => (
    MAIN PAGE
 ═══════════════════════════════════════════════════════ */
 const Index = () => {
+  const cms = useCMS();
+
+  // CMS-driven contact info with fallbacks
+  const companyName = cms.settings.company_name || 'MOPi Production';
+  const cmsPhone = cms.settings.phone || '+20 100 000 0000';
+  const cmsEmail = cms.settings.email || 'info@mopiproduction.com';
+  const cmsAddress = cms.settings.address || 'Cairo, Egypt';
+  const logoUrl = getLogoUrl(cms.headerLogo);
+  const whatsappUrl = cms.settings.whatsapp
+    ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}`
+    : 'https://wa.me/201000000000';
+  const phoneHref = `tel:${cmsPhone.replace(/\s/g, '')}`;
+  const emailHref = `mailto:${cmsEmail}`;
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
@@ -238,7 +253,7 @@ const Index = () => {
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
-            <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+<a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 text-white text-sm font-semibold px-4 py-2 rounded-full transition-all duration-300 hover:scale-105"
               style={{ background: '#16a34a' }}
               onMouseEnter={e => (e.currentTarget.style.background = '#15803d')}
@@ -277,7 +292,7 @@ const Index = () => {
               </a>
             ))}
             <div className="flex gap-3 pt-4">
-              <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+<a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
                 className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full"
                 style={{ background: '#16a34a' }}>WhatsApp</a>
               <a href="#contact"
@@ -348,7 +363,7 @@ const Index = () => {
               onMouseLeave={e => { (e.currentTarget.style.background = '#F4A300'); (e.currentTarget.style.boxShadow = '0 10px 30px rgba(244,163,0,0.3)'); }}>
               Get a Free Quote <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1.5" />
             </a>
-            <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+<a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
               className="group flex items-center gap-3 text-white font-bold text-base px-9 py-4 rounded-full transition-all duration-300 hover:scale-105"
               style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.2)' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#16a34a'); (e.currentTarget.style.borderColor = '#16a34a'); }}
@@ -735,7 +750,7 @@ const Index = () => {
               onMouseLeave={e => { (e.currentTarget.style.background = '#F4A300'); (e.currentTarget.style.boxShadow = '0 12px 30px rgba(244,163,0,0.3)'); }}>
               Request a Quote <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1.5" />
             </a>
-            <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+<a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
               className="group flex items-center justify-center gap-3 text-white font-bold text-lg px-10 py-5 rounded-full transition-all duration-300 hover:scale-105"
               style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.15)' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#16a34a'); (e.currentTarget.style.borderColor = '#16a34a'); }}
@@ -766,10 +781,10 @@ const Index = () => {
 
             <div className="space-y-4">
               {[
-                { icon: Phone, label: 'Phone', value: '+20 100 000 0000', href: 'tel:+201000000000' },
-                { icon: Mail, label: 'Email', value: 'info@mopiproduction.com', href: 'mailto:info@mopiproduction.com' },
-                { icon: MapPin, label: 'Location', value: 'Cairo, Egypt', href: '#' },
-                { icon: MessageCircle, label: 'WhatsApp', value: 'Chat directly with us', href: 'https://wa.me/201000000000' },
+{ icon: Phone, label: 'Phone', value: cmsPhone, href: phoneHref },
+                { icon: Mail, label: 'Email', value: cmsEmail, href: emailHref },
+                { icon: MapPin, label: 'Location', value: cmsAddress, href: '#' },
+                { icon: MessageCircle, label: 'WhatsApp', value: 'Chat directly with us', href: whatsappUrl },
               ].map(c => (
                 <a key={c.label} href={c.href}
                   target={c.href.startsWith('http') ? '_blank' : undefined}
@@ -862,7 +877,7 @@ const Index = () => {
                   </button>
 
                   <div className="text-center">
-                    <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+<a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-sm font-medium transition-colors"
                       style={{ color: '#16a34a' }}
                       onMouseEnter={e => (e.currentTarget.style.color = '#15803d')}
@@ -884,21 +899,21 @@ const Index = () => {
 
             {/* Brand */}
             <div className="md:col-span-2">
-              <img src="/images/mopi_logo_20260101_112924.png" alt="MOPi Production"
+<img src={logoUrl} alt={companyName}
                 className="h-12 w-auto object-contain mb-4 hover:opacity-80 transition-opacity" />
               <p className="text-sm leading-relaxed max-w-xs mb-5" style={{ color: '#6b7280' }}>
                 Cairo's leading exhibition booth design and event production company.
                 Building experiences that stand out since 2016.
               </p>
               <div className="flex gap-3">
-                <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+<a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 hover:scale-105"
                   style={{ background: 'rgba(22,163,74,0.15)', border: '1px solid rgba(22,163,74,0.25)', color: '#4ade80' }}
                   onMouseEnter={e => { (e.currentTarget.style.background = '#16a34a'); (e.currentTarget.style.color = '#fff'); }}
                   onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(22,163,74,0.15)'); (e.currentTarget.style.color = '#4ade80'); }}>
                   <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
                 </a>
-                <a href="mailto:info@mopiproduction.com"
+                <a href={emailHref}
                   className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 hover:scale-105"
                   style={{ background: 'rgba(244,163,0,0.1)', border: '1px solid rgba(244,163,0,0.25)', color: '#F4A300' }}
                   onMouseEnter={e => { (e.currentTarget.style.background = '#F4A300'); (e.currentTarget.style.color = '#fff'); }}
@@ -931,25 +946,25 @@ const Index = () => {
             <div>
               <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">Contact</h4>
               <ul className="space-y-3">
-                <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}>
-                  <MapPin className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> Cairo, Egypt
+<li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}>
+                  <MapPin className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {cmsAddress}
                 </li>
                 <li>
-                  <a href="tel:+201000000000"
+                  <a href={phoneHref}
                     className="flex items-center gap-2.5 text-sm transition-colors duration-200"
                     style={{ color: '#6b7280' }}
                     onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
                     onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
-                    <Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> +20 100 000 0000
+                    <Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {cmsPhone}
                   </a>
                 </li>
                 <li>
-                  <a href="mailto:info@mopiproduction.com"
+                  <a href={emailHref}
                     className="flex items-center gap-2.5 text-sm transition-colors duration-200"
                     style={{ color: '#6b7280' }}
                     onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
                     onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
-                    <Mail className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> info@mopiproduction.com
+                    <Mail className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {cmsEmail}
                   </a>
                 </li>
               </ul>
@@ -965,7 +980,7 @@ const Index = () => {
 
           <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4"
             style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-            <p className="text-sm" style={{ color: '#374151' }}>© 2026 MOPi Production. All rights reserved. Cairo, Egypt.</p>
+<p className="text-sm" style={{ color: '#374151' }}>© 2026 {companyName}. All rights reserved. {cmsAddress}.</p>
             <p className="text-xs tracking-wide" style={{ color: '#1f2937' }}>Exhibition Booths · Brand Activations · Event Production</p>
           </div>
         </div>

@@ -126,6 +126,7 @@ const Contact = () => {
   const whatsappUrlContact = cms.settings.whatsapp ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
   const phoneContact = cms.settings.phone || '+20 100 000 0000';
   const emailContact = cms.settings.email || 'info@mopiproduction.com';
+  const cmsAddress = cms.settings.address || 'Cairo, Egypt';
   const heroContact = cms.heroes['contact'];
   const instagramUrl = getSocialUrl(cms.socials, 'instagram');
   const facebookUrl = getSocialUrl(cms.socials, 'facebook');
@@ -322,10 +323,10 @@ const Contact = () => {
               <SectionLabel text="Contact Details" />
               <h2 className="font-black mb-6" style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', color: '#000', fontFamily: "'Poppins', sans-serif" }}>Find Us Anywhere</h2>
 
-              {[
-                { icon: MapPin, label: 'Office Address', lines: ['Cairo, Egypt', 'MENA Region Operations'] },
-                { icon: Phone, label: 'Phone Numbers', lines: ['+20 100 000 0000', '+20 100 000 0001'] },
-                { icon: Mail, label: 'Email Addresses', lines: ['info@mopiproduction.com', 'projects@mopiproduction.com'] },
+{[
+                { icon: MapPin, label: 'Office Address', lines: [cmsAddress, 'MENA Region Operations'] },
+                { icon: Phone, label: 'Phone Numbers', lines: [phoneContact, phoneContact] },
+                { icon: Mail, label: 'Email Addresses', lines: [emailContact, emailContact] },
                 { icon: Clock, label: 'Business Hours', lines: ['Mon–Sat: 9:00 AM – 6:00 PM', 'EET (Egypt Standard Time)'] },
               ].map((c, i) => (
                 <div key={i} className="group flex items-start gap-4 p-5 rounded-xl transition-all duration-300 hover:-translate-y-0.5"
@@ -416,7 +417,7 @@ const Contact = () => {
             Your Exhibition<br /><span style={{ color: '#F4A300' }}>Awaits</span>
           </h2>
           <p className="text-base mb-9" style={{ color: '#9ca3af' }}>Don't miss your next event opportunity. Contact us today for a free consultation.</p>
-          <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+<a href={whatsappUrlContact} target="_blank" rel="noopener noreferrer"
             className="inline-flex items-center gap-3 text-white font-bold text-lg px-10 py-5 rounded-full transition-all hover:scale-105"
             style={{ background: '#16a34a', boxShadow: '0 10px 30px rgba(22,163,74,0.3)' }}
             onMouseEnter={e => (e.currentTarget.style.background = '#15803d')}
