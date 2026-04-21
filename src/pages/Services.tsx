@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { IMAGES } from '@/assets/images';
+import { useCMS, getLogoUrl } from '@/hooks/useCMS';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
   Menu, X, ChevronRight, CheckCircle, MoveRight,
@@ -29,22 +30,31 @@ const SectionLabel = ({ text }: { text: string }) => (
   </div>
 );
 
-const SharedFooter = () => (
+const SharedFooter = () => {
+  const cms = useCMS();
+  const companyName = cms.settings.company_name || 'MOPi Production';
+  const email = cms.settings.email || 'info@mopiproduction.com';
+  const phone = cms.settings.phone || '+20 100 000 0000';
+  const address = cms.settings.address || 'Cairo, Egypt';
+  const tagline = cms.settings.footer_tagline || cms.settings.tagline || "Cairo's leading exhibition booth design and event production company.";
+  const logoUrl = getLogoUrl(cms.footerLogo || cms.headerLogo);
+  const whatsappUrl = cms.settings.whatsapp ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
+  return (
   <footer style={{ background: '#000000', borderTop: '3px solid #F4A300' }} className="py-14 px-5">
     <div className="max-w-7xl mx-auto">
       <div className="grid md:grid-cols-4 gap-10 mb-10">
         <div className="md:col-span-2">
-          <img src="/images/mopi_logo_20260101_112924.png" alt="MOPi Production" className="h-12 w-auto object-contain mb-4 hover:opacity-80 transition-opacity" />
-          <p className="text-sm leading-relaxed max-w-xs mb-5" style={{ color: '#6b7280' }}>Cairo's leading exhibition booth design and event production company.</p>
+          <img src={logoUrl} alt={companyName} className="h-12 w-auto object-contain mb-4 hover:opacity-80 transition-opacity" />
+          <p className="text-sm leading-relaxed max-w-xs mb-5" style={{ color: '#6b7280' }}>{tagline}</p>
           <div className="flex gap-3">
-            <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full transition-all hover:scale-105"
               style={{ background: 'rgba(22,163,74,0.15)', border: '1px solid rgba(22,163,74,0.25)', color: '#4ade80' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#16a34a'); (e.currentTarget.style.color = '#fff'); }}
               onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(22,163,74,0.15)'); (e.currentTarget.style.color = '#4ade80'); }}>
               <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
             </a>
-            <a href="mailto:info@mopiproduction.com"
+            <a href={`mailto:${email}`}
               className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full transition-all hover:scale-105"
               style={{ background: 'rgba(244,163,0,0.1)', border: '1px solid rgba(244,163,0,0.25)', color: '#F4A300' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#F4A300'); (e.currentTarget.style.color = '#fff'); }}
@@ -68,13 +78,13 @@ const SharedFooter = () => (
         <div>
           <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">Contact</h4>
           <ul className="space-y-3">
-            <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}><MapPin className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> Cairo, Egypt</li>
-            <li><a href="tel:+201000000000" className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
+            <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}><MapPin className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {address}</li>
+            <li><a href={`tel:${phone.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}><Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> +20 100 000 0000</a></li>
-            <li><a href="mailto:info@mopiproduction.com" className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
+              onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}><Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {phone}</a></li>
+            <li><a href={`mailto:${email}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}><Mail className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> info@mopiproduction.com</a></li>
+              onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}><Mail className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {email}</a></li>
           </ul>
           <Link to="/admin" className="inline-flex items-center gap-1 mt-7 text-xs transition-colors" style={{ color: '#374151' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#6b7280')}
@@ -82,18 +92,20 @@ const SharedFooter = () => (
         </div>
       </div>
       <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-        <p className="text-sm" style={{ color: '#374151' }}>© 2026 MOPi Production. All rights reserved. Cairo, Egypt.</p>
+        <p className="text-sm" style={{ color: '#374151' }}>© 2026 {companyName}. All rights reserved. {address}.</p>
         <p className="text-xs tracking-wide" style={{ color: '#1f2937' }}>Exhibition Booths · Brand Activations · Event Production</p>
       </div>
     </div>
   </footer>
-);
+  );
+};
 
 /* ════════════════ SERVICES PAGE ════════════════ */
 const Services = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const cms = useCMS();
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60);
@@ -153,6 +165,16 @@ const Services = () => {
 
   const industries = ['Technology & IT', 'Healthcare & Pharma', 'Automotive', 'Financial Services', 'Consumer Goods', 'Energy & Utilities', 'Education', 'Government & Public'];
 
+  // CMS-driven data with fallbacks
+  const companyName = cms.settings.company_name || 'MOPi Production';
+  const logoUrl = getLogoUrl(cms.headerLogo);
+  const whatsappUrl = cms.settings.whatsapp ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
+  const phoneDisplay = cms.settings.phone || '+20 100 000 0000';
+  const hero = cms.heroes['services'];
+
+  // CMS services (available for future dynamic service cards)
+  const _cmsServices = cms.services;
+
   return (
     <div className="overflow-x-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
       <style>{`
@@ -168,7 +190,7 @@ const Services = () => {
       <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
         style={{ background: scrolled ? 'rgba(0,0,0,0.97)' : 'rgba(0,0,0,0.92)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.07)', padding: scrolled ? '10px 0' : '14px 0', boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.4)' : 'none' }}>
         <div className="max-w-7xl mx-auto px-5 lg:px-8 flex items-center justify-between">
-          <Link to="/"><img src="/images/mopi_logo_20260101_112924.png" alt="MOPi Production" className="h-11 w-auto object-contain transition-opacity hover:opacity-75" /></Link>
+          <Link to="/"><img src={logoUrl} alt={companyName} className="h-11 w-auto object-contain transition-opacity hover:opacity-75" /></Link>
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map(l => (
               <Link key={l.to} to={l.to} className="nav-link text-sm font-medium tracking-wide transition-colors duration-200"
@@ -176,7 +198,7 @@ const Services = () => {
             ))}
           </nav>
           <div className="hidden md:flex items-center gap-3">
-            <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 text-white text-sm font-semibold px-4 py-2 rounded-full transition-all hover:scale-105" style={{ background: '#16a34a' }}>
               <MessageCircle className="h-4 w-4" /> WhatsApp
             </a>
@@ -195,7 +217,7 @@ const Services = () => {
               </Link>
             ))}
             <div className="flex gap-3 pt-4">
-              <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
                 className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#16a34a' }}>WhatsApp</a>
               <Link to="/contact" className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#F4A300' }}>Get a Quote</Link>
             </div>
@@ -206,7 +228,7 @@ const Services = () => {
       {/* ══ § 1 · HERO — BLACK ══ */}
       <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden pt-20" style={{ background: '#000000' }}>
         <div className="absolute inset-0">
-          <img src={IMAGES.BOOTH_4} alt="" className="w-full h-full object-cover" style={{ opacity: 0.28, animation: 'slowZoom 22s ease-in-out infinite alternate' }} />
+          <img src={hero?.bg_image_url || IMAGES.BOOTH_4} alt="" className="w-full h-full object-cover" style={{ opacity: 0.28, animation: 'slowZoom 22s ease-in-out infinite alternate' }} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,1) 100%)' }} />
         </div>
         <div className="absolute left-0 inset-y-0 w-[3px]" style={{ background: 'linear-gradient(to bottom, transparent, #F4A300, transparent)', opacity: 0.6 }} />
@@ -215,14 +237,14 @@ const Services = () => {
         <div className="relative z-10 text-center px-5 max-w-4xl mx-auto py-24">
           <div className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase px-4 py-2 rounded-full mb-8"
             style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#F4A300', animation: 'fadeDown 0.8s ease 0.2s both' }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F4A300' }} />End-to-End Solutions
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F4A300' }} />{hero?.badge_text || 'End-to-End Solutions'}
           </div>
           <h1 className="font-black leading-tight text-white mb-6"
             style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both', fontFamily: "'Poppins', sans-serif" }}>
-            Comprehensive<br /><span style={{ color: '#F4A300' }}>Exhibition Solutions</span>
+            {hero?.heading ? <span dangerouslySetInnerHTML={{ __html: hero.heading }} /> : <>Comprehensive<br /><span style={{ color: '#F4A300' }}>Exhibition Solutions</span></>}
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both' }}>
-            From concept to completion — we provide end-to-end services that transform your brand vision into powerful, engaging experiences.
+            {hero?.subheading || 'From concept to completion — we provide end-to-end services that transform your brand vision into powerful, engaging experiences.'}
           </p>
           <Link to="/contact"
             className="inline-flex items-center gap-3 text-white font-bold text-base px-9 py-4 rounded-full transition-all hover:scale-105"
@@ -422,12 +444,12 @@ const Services = () => {
               onMouseLeave={e => (e.currentTarget.style.background = '#F4A300')}>
               Free Consultation <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
-            <a href="tel:+201000000000"
+            <a href={`tel:${phoneDisplay.replace(/\s/g, '')}`}
               className="inline-flex items-center justify-center gap-3 text-white font-bold text-lg px-10 py-5 rounded-full transition-all hover:scale-105"
               style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.15)' }}
               onMouseEnter={e => { (e.currentTarget.style.background = 'rgba(255,255,255,0.12)'); (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'); }}
               onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(255,255,255,0.07)'); (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'); }}>
-              <Phone className="h-5 w-5" /> +20 100 000 0000
+              <Phone className="h-5 w-5" /> {phoneDisplay}
             </a>
           </div>
         </Reveal>

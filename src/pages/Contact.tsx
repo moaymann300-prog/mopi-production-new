@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { IMAGES } from '@/assets/images';
 import { supabase } from '@/integrations/supabase/client';
+import { useCMS, getLogoUrl, getSocialUrl } from '@/hooks/useCMS';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
   Menu, X, ChevronRight, CheckCircle, Clock, Send,
@@ -29,22 +30,31 @@ const SectionLabel = ({ text }: { text: string }) => (
   </div>
 );
 
-const SharedFooter = () => (
+const SharedFooter = () => {
+  const cms = useCMS();
+  const companyName = cms.settings.company_name || 'MOPi Production';
+  const email = cms.settings.email || 'info@mopiproduction.com';
+  const phone = cms.settings.phone || '+20 100 000 0000';
+  const address = cms.settings.address || 'Cairo, Egypt';
+  const tagline = cms.settings.footer_tagline || cms.settings.tagline || "Cairo's leading exhibition booth design and event production company.";
+  const logoUrl = getLogoUrl(cms.footerLogo || cms.headerLogo);
+  const whatsappUrl = cms.settings.whatsapp ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
+  return (
   <footer style={{ background: '#000000', borderTop: '3px solid #F4A300' }} className="py-14 px-5">
     <div className="max-w-7xl mx-auto">
       <div className="grid md:grid-cols-4 gap-10 mb-10">
         <div className="md:col-span-2">
-          <img src="/images/mopi_logo_20260101_112924.png" alt="MOPi Production" className="h-12 w-auto object-contain mb-4 hover:opacity-80 transition-opacity" />
-          <p className="text-sm leading-relaxed max-w-xs mb-5" style={{ color: '#6b7280' }}>Cairo's leading exhibition booth design and event production company.</p>
+          <img src={logoUrl} alt={companyName} className="h-12 w-auto object-contain mb-4 hover:opacity-80 transition-opacity" />
+          <p className="text-sm leading-relaxed max-w-xs mb-5" style={{ color: '#6b7280' }}>{tagline}</p>
           <div className="flex gap-3">
-            <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full transition-all hover:scale-105"
               style={{ background: 'rgba(22,163,74,0.15)', border: '1px solid rgba(22,163,74,0.25)', color: '#4ade80' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#16a34a'); (e.currentTarget.style.color = '#fff'); }}
               onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(22,163,74,0.15)'); (e.currentTarget.style.color = '#4ade80'); }}>
               <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
             </a>
-            <a href="mailto:info@mopiproduction.com"
+            <a href={`mailto:${email}`}
               className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full transition-all hover:scale-105"
               style={{ background: 'rgba(244,163,0,0.1)', border: '1px solid rgba(244,163,0,0.25)', color: '#F4A300' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#F4A300'); (e.currentTarget.style.color = '#fff'); }}
@@ -68,25 +78,26 @@ const SharedFooter = () => (
         <div>
           <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">Contact</h4>
           <ul className="space-y-3">
-            <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}><MapPin className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> Cairo, Egypt</li>
-            <li><a href="tel:+201000000000" className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
+            <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}><MapPin className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {address}</li>
+            <li><a href={`tel:${phone.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#fff')} onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
-              <Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> +20 100 000 0000</a></li>
-            <li><a href="mailto:info@mopiproduction.com" className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
+              <Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {phone}</a></li>
+            <li><a href={`mailto:${email}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#fff')} onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
-              <Mail className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> info@mopiproduction.com</a></li>
+              <Mail className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {email}</a></li>
           </ul>
           <Link to="/admin" className="inline-flex items-center gap-1 mt-7 text-xs" style={{ color: '#374151' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#6b7280')} onMouseLeave={e => (e.currentTarget.style.color = '#374151')}>Admin Dashboard →</Link>
         </div>
       </div>
       <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-        <p className="text-sm" style={{ color: '#374151' }}>© 2026 MOPi Production. All rights reserved. Cairo, Egypt.</p>
+        <p className="text-sm" style={{ color: '#374151' }}>© 2026 {companyName}. All rights reserved. {address}.</p>
         <p className="text-xs tracking-wide" style={{ color: '#1f2937' }}>Exhibition Booths · Brand Activations · Event Production</p>
       </div>
     </div>
   </footer>
-);
+  );
+};
 
 /* ════════════════ CONTACT PAGE ════════════════ */
 const Contact = () => {
@@ -95,6 +106,7 @@ const Contact = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone: '', company: '', service: '', message: '' });
+  const cms = useCMS();
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60);
@@ -107,6 +119,18 @@ const Contact = () => {
     { label: 'Services', to: '/services' }, { label: 'Portfolio', to: '/portfolio' },
     { label: 'Contact', to: '/contact' },
   ];
+
+  // CMS data
+  const companyNameContact = cms.settings.company_name || 'MOPi Production';
+  const logoUrlContact = getLogoUrl(cms.headerLogo);
+  const whatsappUrlContact = cms.settings.whatsapp ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
+  const phoneContact = cms.settings.phone || '+20 100 000 0000';
+  const emailContact = cms.settings.email || 'info@mopiproduction.com';
+  const heroContact = cms.heroes['contact'];
+  const instagramUrl = getSocialUrl(cms.socials, 'instagram');
+  const facebookUrl = getSocialUrl(cms.socials, 'facebook');
+  const youtubeUrl = getSocialUrl(cms.socials, 'youtube');
+  const linkedinUrl = getSocialUrl(cms.socials, 'linkedin');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,12 +163,12 @@ const Contact = () => {
       <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
         style={{ background: scrolled ? 'rgba(0,0,0,0.97)' : 'rgba(0,0,0,0.92)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.07)', padding: scrolled ? '10px 0' : '14px 0', boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.4)' : 'none' }}>
         <div className="max-w-7xl mx-auto px-5 lg:px-8 flex items-center justify-between">
-          <Link to="/"><img src="/images/mopi_logo_20260101_112924.png" alt="MOPi Production" className="h-11 w-auto object-contain transition-opacity hover:opacity-75" /></Link>
+          <Link to="/"><img src={logoUrlContact} alt={companyNameContact} className="h-11 w-auto object-contain transition-opacity hover:opacity-75" /></Link>
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map(l => <Link key={l.to} to={l.to} className="nav-link text-sm font-medium tracking-wide" style={{ color: l.to === '/contact' ? '#ffffff' : '#d1d5db' }}>{l.label}</Link>)}
           </nav>
           <div className="hidden md:flex items-center gap-3">
-            <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+            <a href={whatsappUrlContact} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 text-white text-sm font-semibold px-4 py-2 rounded-full transition-all hover:scale-105" style={{ background: '#16a34a' }}>
               <MessageCircle className="h-4 w-4" /> WhatsApp
             </a>
@@ -160,7 +184,7 @@ const Contact = () => {
               className="flex items-center justify-between py-3 text-sm font-medium" style={{ color: '#9ca3af', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               {l.label} <ChevronRight className="h-4 w-4 opacity-50" /></Link>)}
             <div className="flex gap-3 pt-4">
-              <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+              <a href={whatsappUrlContact} target="_blank" rel="noopener noreferrer"
                 className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#16a34a' }}>WhatsApp</a>
               <Link to="/contact" className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#F4A300' }}>Get a Quote</Link>
             </div>
@@ -171,7 +195,7 @@ const Contact = () => {
       {/* ══ § 1 · HERO — BLACK ══ */}
       <section className="relative min-h-[65vh] flex items-center justify-center overflow-hidden pt-20" style={{ background: '#000000' }}>
         <div className="absolute inset-0">
-          <img src={IMAGES.BOOTH_5} alt="" className="w-full h-full object-cover" style={{ opacity: 0.22, animation: 'slowZoom 22s ease-in-out infinite alternate' }} />
+          <img src={heroContact?.bg_image_url || IMAGES.BOOTH_5} alt="" className="w-full h-full object-cover" style={{ opacity: 0.22, animation: 'slowZoom 22s ease-in-out infinite alternate' }} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,1) 100%)' }} />
         </div>
         <div className="absolute left-0 inset-y-0 w-[3px]" style={{ background: 'linear-gradient(to bottom, transparent, #F4A300, transparent)', opacity: 0.6 }} />
@@ -180,14 +204,14 @@ const Contact = () => {
         <div className="relative z-10 text-center px-5 max-w-4xl mx-auto py-20">
           <div className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase px-4 py-2 rounded-full mb-8"
             style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#F4A300', animation: 'fadeDown 0.8s ease 0.2s both' }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F4A300' }} />Always Ready to Help
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F4A300' }} />{heroContact?.badge_text || 'Always Ready to Help'}
           </div>
           <h1 className="font-black leading-tight text-white mb-6"
             style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both', fontFamily: "'Poppins', sans-serif" }}>
-            Let's Build<br /><span style={{ color: '#F4A300' }}>Something Amazing</span>
+            {heroContact?.heading ? <span dangerouslySetInnerHTML={{ __html: heroContact.heading }} /> : <>Let's Build<br /><span style={{ color: '#F4A300' }}>Something Amazing</span></>}
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both' }}>
-            Get in touch with our team for a free consultation. We'll discuss your project and create a custom proposal within 24 hours.
+            {heroContact?.subheading || "Get in touch with our team for a free consultation. We'll discuss your project and create a custom proposal within 24 hours."}
           </p>
         </div>
       </section>
@@ -196,9 +220,9 @@ const Contact = () => {
       <section style={{ background: '#F2F2F2', borderTop: '3px solid #F4A300' }}>
         <div className="max-w-6xl mx-auto px-5 py-14 grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { icon: Phone, label: 'Call Us', value: '+20 100 000 0000', href: 'tel:+201000000000', sub: 'Mon–Sat 9AM–6PM EET' },
-            { icon: Mail, label: 'Email Us', value: 'info@mopiproduction.com', href: 'mailto:info@mopiproduction.com', sub: 'Reply within 24 hours' },
-            { icon: MessageCircle, label: 'WhatsApp', value: '+20 100 000 0000', href: 'https://wa.me/201000000000', sub: 'Fastest response method' },
+            { icon: Phone, label: 'Call Us', value: phoneContact, href: `tel:${phoneContact.replace(/\s/g, '')}`, sub: 'Mon–Sat 9AM–6PM EET' },
+            { icon: Mail, label: 'Email Us', value: emailContact, href: `mailto:${emailContact}`, sub: 'Reply within 24 hours' },
+            { icon: MessageCircle, label: 'WhatsApp', value: phoneContact, href: whatsappUrlContact, sub: 'Fastest response method' },
           ].map((c, i) => (
             <Reveal key={i} delay={i * 80}>
               <a href={c.href} target={c.icon === MessageCircle ? '_blank' : undefined} rel="noopener noreferrer"
@@ -326,10 +350,10 @@ const Contact = () => {
                 <div className="text-[11px] font-bold tracking-widest uppercase mb-4" style={{ color: '#9ca3af' }}>Follow Us</div>
                 <div className="flex gap-3">
                   {[
-                    { icon: Instagram, href: '#', label: 'Instagram' },
-                    { icon: Facebook, href: '#', label: 'Facebook' },
-                    { icon: Linkedin, href: '#', label: 'LinkedIn' },
-                    { icon: Youtube, href: '#', label: 'YouTube' },
+                    { icon: Instagram, href: instagramUrl || '#', label: 'Instagram' },
+                    { icon: Facebook, href: facebookUrl || '#', label: 'Facebook' },
+                    { icon: Linkedin, href: linkedinUrl || '#', label: 'LinkedIn' },
+                    { icon: Youtube, href: youtubeUrl || '#', label: 'YouTube' },
                   ].map(s => (
                     <a key={s.label} href={s.href} aria-label={s.label}
                       className="w-10 h-10 rounded-lg flex items-center justify-center transition-all hover:scale-110"

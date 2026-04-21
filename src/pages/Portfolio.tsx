@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { IMAGES } from '@/assets/images';
+import { useCMS, getLogoUrl } from '@/hooks/useCMS';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
   Menu, X, ChevronRight, ExternalLink, Award,
@@ -49,22 +50,31 @@ const Counter = ({ target, suffix = '' }: { target: number; suffix?: string }) =
   return <span ref={ref} style={{ color: '#F4A300' }}>{count}{suffix}</span>;
 };
 
-const SharedFooter = () => (
+const SharedFooter = () => {
+  const cms = useCMS();
+  const companyName = cms.settings.company_name || 'MOPi Production';
+  const email = cms.settings.email || 'info@mopiproduction.com';
+  const phone = cms.settings.phone || '+20 100 000 0000';
+  const address = cms.settings.address || 'Cairo, Egypt';
+  const tagline = cms.settings.footer_tagline || cms.settings.tagline || "Cairo's leading exhibition booth design and event production company.";
+  const logoUrl = getLogoUrl(cms.footerLogo || cms.headerLogo);
+  const whatsappUrl = cms.settings.whatsapp ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
+  return (
   <footer style={{ background: '#000000', borderTop: '3px solid #F4A300' }} className="py-14 px-5">
     <div className="max-w-7xl mx-auto">
       <div className="grid md:grid-cols-4 gap-10 mb-10">
         <div className="md:col-span-2">
-          <img src="/images/mopi_logo_20260101_112924.png" alt="MOPi Production" className="h-12 w-auto object-contain mb-4 hover:opacity-80 transition-opacity" />
-          <p className="text-sm leading-relaxed max-w-xs mb-5" style={{ color: '#6b7280' }}>Cairo's leading exhibition booth design and event production company.</p>
+          <img src={logoUrl} alt={companyName} className="h-12 w-auto object-contain mb-4 hover:opacity-80 transition-opacity" />
+          <p className="text-sm leading-relaxed max-w-xs mb-5" style={{ color: '#6b7280' }}>{tagline}</p>
           <div className="flex gap-3">
-            <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full transition-all hover:scale-105"
               style={{ background: 'rgba(22,163,74,0.15)', border: '1px solid rgba(22,163,74,0.25)', color: '#4ade80' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#16a34a'); (e.currentTarget.style.color = '#fff'); }}
               onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(22,163,74,0.15)'); (e.currentTarget.style.color = '#4ade80'); }}>
               <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
             </a>
-            <a href="mailto:info@mopiproduction.com"
+            <a href={`mailto:${email}`}
               className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full transition-all hover:scale-105"
               style={{ background: 'rgba(244,163,0,0.1)', border: '1px solid rgba(244,163,0,0.25)', color: '#F4A300' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#F4A300'); (e.currentTarget.style.color = '#fff'); }}
@@ -88,31 +98,33 @@ const SharedFooter = () => (
         <div>
           <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">Contact</h4>
           <ul className="space-y-3">
-            <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}><MapPin className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> Cairo, Egypt</li>
-            <li><a href="tel:+201000000000" className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
+            <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}><MapPin className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {address}</li>
+            <li><a href={`tel:${phone.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#fff')} onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
-              <Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> +20 100 000 0000</a></li>
-            <li><a href="mailto:info@mopiproduction.com" className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
+              <Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {phone}</a></li>
+            <li><a href={`mailto:${email}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#fff')} onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
-              <Mail className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> info@mopiproduction.com</a></li>
+              <Mail className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {email}</a></li>
           </ul>
           <Link to="/admin" className="inline-flex items-center gap-1 mt-7 text-xs" style={{ color: '#374151' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#6b7280')} onMouseLeave={e => (e.currentTarget.style.color = '#374151')}>Admin Dashboard →</Link>
         </div>
       </div>
       <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-        <p className="text-sm" style={{ color: '#374151' }}>© 2026 MOPi Production. All rights reserved. Cairo, Egypt.</p>
+        <p className="text-sm" style={{ color: '#374151' }}>© 2026 {companyName}. All rights reserved. {address}.</p>
         <p className="text-xs tracking-wide" style={{ color: '#1f2937' }}>Exhibition Booths · Brand Activations · Event Production</p>
       </div>
     </div>
   </footer>
-);
+  );
+};
 
 /* ════════════════ PORTFOLIO PAGE ════════════════ */
 const Portfolio = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
+  const cms = useCMS();
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60);
@@ -141,6 +153,12 @@ const Portfolio = () => {
 
   const filtered = activeFilter === 'All' ? projects : projects.filter(p => p.cat === activeFilter);
 
+  // CMS data with fallbacks
+  const companyNamePortfolio = cms.settings.company_name || 'MOPi Production';
+  const logoUrlPortfolio = getLogoUrl(cms.headerLogo);
+  const whatsappUrlPortfolio = cms.settings.whatsapp ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
+  const heroPortfolio = cms.heroes['portfolio'];
+
   return (
     <div className="overflow-x-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
       <style>{`
@@ -157,12 +175,12 @@ const Portfolio = () => {
       <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
         style={{ background: scrolled ? 'rgba(0,0,0,0.97)' : 'rgba(0,0,0,0.92)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.07)', padding: scrolled ? '10px 0' : '14px 0', boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.4)' : 'none' }}>
         <div className="max-w-7xl mx-auto px-5 lg:px-8 flex items-center justify-between">
-          <Link to="/"><img src="/images/mopi_logo_20260101_112924.png" alt="MOPi Production" className="h-11 w-auto object-contain transition-opacity hover:opacity-75" /></Link>
+          <Link to="/"><img src={logoUrlPortfolio} alt={companyNamePortfolio} className="h-11 w-auto object-contain transition-opacity hover:opacity-75" /></Link>
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map(l => <Link key={l.to} to={l.to} className="nav-link text-sm font-medium tracking-wide" style={{ color: l.to === '/portfolio' ? '#ffffff' : '#d1d5db' }}>{l.label}</Link>)}
           </nav>
           <div className="hidden md:flex items-center gap-3">
-            <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+            <a href={whatsappUrlPortfolio} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 text-white text-sm font-semibold px-4 py-2 rounded-full transition-all hover:scale-105" style={{ background: '#16a34a' }}>
               <MessageCircle className="h-4 w-4" /> WhatsApp
             </a>
@@ -178,7 +196,7 @@ const Portfolio = () => {
               className="flex items-center justify-between py-3 text-sm font-medium" style={{ color: '#9ca3af', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               {l.label} <ChevronRight className="h-4 w-4 opacity-50" /></Link>)}
             <div className="flex gap-3 pt-4">
-              <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
+              <a href={whatsappUrlPortfolio} target="_blank" rel="noopener noreferrer"
                 className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#16a34a' }}>WhatsApp</a>
               <Link to="/contact" className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#F4A300' }}>Get a Quote</Link>
             </div>
@@ -189,7 +207,7 @@ const Portfolio = () => {
       {/* ══ § 1 · HERO — BLACK ══ */}
       <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden pt-20" style={{ background: '#000000' }}>
         <div className="absolute inset-0">
-          <img src={IMAGES.BOOTH_8} alt="" className="w-full h-full object-cover" style={{ opacity: 0.3, animation: 'slowZoom 22s ease-in-out infinite alternate' }} />
+          <img src={heroPortfolio?.bg_image_url || IMAGES.BOOTH_8} alt="" className="w-full h-full object-cover" style={{ opacity: 0.3, animation: 'slowZoom 22s ease-in-out infinite alternate' }} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,1) 100%)' }} />
         </div>
         <div className="absolute left-0 inset-y-0 w-[3px]" style={{ background: 'linear-gradient(to bottom, transparent, #F4A300, transparent)', opacity: 0.6 }} />
@@ -199,11 +217,11 @@ const Portfolio = () => {
         <div className="relative z-10 text-center px-5 max-w-4xl mx-auto py-24">
           <div className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase px-4 py-2 rounded-full mb-8"
             style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#F4A300', animation: 'fadeDown 0.8s ease 0.2s both' }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F4A300' }} />500+ Projects Delivered
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F4A300' }} />{heroPortfolio?.badge_text || '500+ Projects Delivered'}
           </div>
           <h1 className="font-black leading-tight text-white mb-6"
             style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both', fontFamily: "'Poppins', sans-serif" }}>
-            Showcasing <span style={{ color: '#F4A300' }}>Excellence</span><br />Across Industries
+            {heroPortfolio?.heading ? <span dangerouslySetInnerHTML={{ __html: heroPortfolio.heading }} /> : <>Showcasing <span style={{ color: '#F4A300' }}>Excellence</span><br />Across Industries</>}
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both' }}>
             Award-winning projects that have transformed brands and created memorable experiences across Egypt and the MENA region.
