@@ -37,7 +37,8 @@ const SharedFooter = () => {
   const cms = useCMS();
   const companyName = cms.settings.company_name || 'MOPi Production';
   const email = cms.settings.email || 'info@mopiproduction.com';
-  const phone = cms.settings.phone || '+20 100 000 0000';
+const phone = cms.settings.phone_1 || '+20 100 000 0000';
+  const phone2 = cms.settings.phone_2 || '';
   const address = cms.settings.address || 'Cairo, Egypt';
   const tagline = cms.settings.footer_tagline || cms.settings.tagline || "Cairo's leading exhibition booth design and event production company.";
   const logoUrl = getLogoUrl(cms.footerLogo || cms.headerLogo);
@@ -82,11 +83,16 @@ const SharedFooter = () => {
           <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">Contact</h4>
           <ul className="space-y-3">
             <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}><MapPin className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {address}</li>
-            <li><a href={`tel:${phone.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+<li><a href={`tel:${phone.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#F4A300')}
               onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
               <Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {phone}
             </a></li>
+            {phone2 && <li><a href={`tel:${phone2.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#F4A300')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
+              <Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {phone2}
+            </a></li>}
             <li><a href={`mailto:${email}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
               onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
@@ -153,7 +159,7 @@ const About = () => {
   // CMS-driven data with fallbacks
   const companyName = cms.settings.company_name || 'MOPi Production';
   const _email = cms.settings.email || 'info@mopiproduction.com';
-  const _phone = cms.settings.phone || '+20 100 000 0000';
+const _phone = cms.settings.phone_1 || '+20 100 000 0000';
   const _address = cms.settings.address || 'Cairo, Egypt';
   const logoUrl = getLogoUrl(cms.headerLogo);
   const _footerLogoUrl = getLogoUrl(cms.footerLogo);

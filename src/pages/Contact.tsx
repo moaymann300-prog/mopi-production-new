@@ -32,9 +32,10 @@ const SectionLabel = ({ text }: { text: string }) => (
 
 const SharedFooter = () => {
   const cms = useCMS();
-  const companyName = cms.settings.company_name || 'MOPi Production';
+const companyName = cms.settings.company_name || 'MOPi Production';
   const email = cms.settings.email || 'info@mopiproduction.com';
-  const phone = cms.settings.phone || '+20 100 000 0000';
+  const phone = cms.settings.phone_1 || '+20 100 000 0000';
+  const phone2 = cms.settings.phone_2 || '';
   const address = cms.settings.address || 'Cairo, Egypt';
   const tagline = cms.settings.footer_tagline || cms.settings.tagline || "Cairo's leading exhibition booth design and event production company.";
   const logoUrl = getLogoUrl(cms.footerLogo || cms.headerLogo);
@@ -79,9 +80,12 @@ const SharedFooter = () => {
           <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">Contact</h4>
           <ul className="space-y-3">
             <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}><MapPin className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {address}</li>
-            <li><a href={`tel:${phone.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
+<li><a href={`tel:${phone.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#fff')} onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
               <Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {phone}</a></li>
+            {phone2 && <li><a href={`tel:${phone2.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#fff')} onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
+              <Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {phone2}</a></li>}
             <li><a href={`mailto:${email}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#fff')} onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
               <Mail className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {email}</a></li>
@@ -120,11 +124,12 @@ const Contact = () => {
     { label: 'Contact', to: '/contact' },
   ];
 
-  // CMS data
+// CMS data
   const companyNameContact = cms.settings.company_name || 'MOPi Production';
   const logoUrlContact = getLogoUrl(cms.headerLogo);
   const whatsappUrlContact = cms.settings.whatsapp ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
-  const phoneContact = cms.settings.phone || '+20 100 000 0000';
+  const phoneContact = cms.settings.phone_1 || '+20 100 000 0000';
+  const phone2Contact = cms.settings.phone_2 || '';
   const emailContact = cms.settings.email || 'info@mopiproduction.com';
   const cmsAddress = cms.settings.address || 'Cairo, Egypt';
   const heroContact = cms.heroes['contact'];
@@ -221,7 +226,7 @@ const Contact = () => {
       <section style={{ background: '#F2F2F2', borderTop: '3px solid #F4A300' }}>
         <div className="max-w-6xl mx-auto px-5 py-14 grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { icon: Phone, label: 'Call Us', value: phoneContact, href: `tel:${phoneContact.replace(/\s/g, '')}`, sub: 'Mon–Sat 9AM–6PM EET' },
+{ icon: Phone, label: 'Call Us', value: phone2Contact ? `${phoneContact} / ${phone2Contact}` : phoneContact, href: `tel:${phoneContact.replace(/\s/g, '')}`, sub: 'Mon–Sat 9AM–6PM EET' },
             { icon: Mail, label: 'Email Us', value: emailContact, href: `mailto:${emailContact}`, sub: 'Reply within 24 hours' },
             { icon: MessageCircle, label: 'WhatsApp', value: phoneContact, href: whatsappUrlContact, sub: 'Fastest response method' },
           ].map((c, i) => (
@@ -325,7 +330,7 @@ const Contact = () => {
 
 {[
                 { icon: MapPin, label: 'Office Address', lines: [cmsAddress, 'MENA Region Operations'] },
-                { icon: Phone, label: 'Phone Numbers', lines: [phoneContact, phoneContact] },
+{ icon: Phone, label: 'Phone Numbers', lines: phone2Contact ? [phoneContact, phone2Contact] : [phoneContact] },
                 { icon: Mail, label: 'Email Addresses', lines: [emailContact, emailContact] },
                 { icon: Clock, label: 'Business Hours', lines: ['Mon–Sat: 9:00 AM – 6:00 PM', 'EET (Egypt Standard Time)'] },
               ].map((c, i) => (

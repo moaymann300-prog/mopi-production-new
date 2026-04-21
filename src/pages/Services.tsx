@@ -34,7 +34,8 @@ const SharedFooter = () => {
   const cms = useCMS();
   const companyName = cms.settings.company_name || 'MOPi Production';
   const email = cms.settings.email || 'info@mopiproduction.com';
-  const phone = cms.settings.phone || '+20 100 000 0000';
+const phone = cms.settings.phone_1 || '+20 100 000 0000';
+  const phone2 = cms.settings.phone_2 || '';
   const address = cms.settings.address || 'Cairo, Egypt';
   const tagline = cms.settings.footer_tagline || cms.settings.tagline || "Cairo's leading exhibition booth design and event production company.";
   const logoUrl = getLogoUrl(cms.footerLogo || cms.headerLogo);
@@ -79,9 +80,12 @@ const SharedFooter = () => {
           <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">Contact</h4>
           <ul className="space-y-3">
             <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}><MapPin className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {address}</li>
-            <li><a href={`tel:${phone.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
+<li><a href={`tel:${phone.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
               onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}><Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {phone}</a></li>
+            {phone2 && <li><a href={`tel:${phone2.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}><Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {phone2}</a></li>}
             <li><a href={`mailto:${email}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
               onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}><Mail className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {email}</a></li>
@@ -169,7 +173,8 @@ const Services = () => {
   const companyName = cms.settings.company_name || 'MOPi Production';
   const logoUrl = getLogoUrl(cms.headerLogo);
   const whatsappUrl = cms.settings.whatsapp ? `https://wa.me/${cms.settings.whatsapp.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
-  const phoneDisplay = cms.settings.phone || '+20 100 000 0000';
+const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
+  const phoneDisplay2 = cms.settings.phone_2 || '';
   const hero = cms.heroes['services'];
 
   // CMS services (available for future dynamic service cards)
@@ -444,12 +449,12 @@ const Services = () => {
               onMouseLeave={e => (e.currentTarget.style.background = '#F4A300')}>
               Free Consultation <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
-            <a href={`tel:${phoneDisplay.replace(/\s/g, '')}`}
+<a href={`tel:${phoneDisplay.replace(/\s/g, '')}`}
               className="inline-flex items-center justify-center gap-3 text-white font-bold text-lg px-10 py-5 rounded-full transition-all hover:scale-105"
               style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.15)' }}
               onMouseEnter={e => { (e.currentTarget.style.background = 'rgba(255,255,255,0.12)'); (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'); }}
               onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(255,255,255,0.07)'); (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'); }}>
-              <Phone className="h-5 w-5" /> {phoneDisplay}
+              <Phone className="h-5 w-5" /> {phoneDisplay}{phoneDisplay2 ? ` / ${phoneDisplay2}` : ''}
             </a>
           </div>
         </Reveal>

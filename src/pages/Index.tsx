@@ -125,9 +125,10 @@ const GeoDiamond = ({ cls = '' }: { cls?: string }) => (
 const Index = () => {
   const cms = useCMS();
 
-  // CMS-driven contact info with fallbacks
+// CMS-driven contact info with fallbacks
   const companyName = cms.settings.company_name || 'MOPi Production';
-  const cmsPhone = cms.settings.phone || '+20 100 000 0000';
+  const cmsPhone = cms.settings.phone_1 || '+20 100 000 0000';
+  const cmsPhone2 = cms.settings.phone_2 || '';
   const cmsEmail = cms.settings.email || 'info@mopiproduction.com';
   const cmsAddress = cms.settings.address || 'Cairo, Egypt';
   const logoUrl = getLogoUrl(cms.headerLogo);
@@ -717,7 +718,7 @@ const navLinks: { label: string; to: string }[] = [
 
             <div className="space-y-4">
               {[
-{ icon: Phone, label: 'Phone', value: cmsPhone, href: phoneHref },
+{ icon: Phone, label: 'Phone', value: cmsPhone2 ? `${cmsPhone} / ${cmsPhone2}` : cmsPhone, href: phoneHref },
                 { icon: Mail, label: 'Email', value: cmsEmail, href: emailHref },
                 { icon: MapPin, label: 'Location', value: cmsAddress, href: '#' },
                 { icon: MessageCircle, label: 'WhatsApp', value: 'Chat directly with us', href: whatsappUrl },
@@ -885,7 +886,7 @@ const navLinks: { label: string; to: string }[] = [
 <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}>
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {cmsAddress}
                 </li>
-                <li>
+<li>
                   <a href={phoneHref}
                     className="flex items-center gap-2.5 text-sm transition-colors duration-200"
                     style={{ color: '#6b7280' }}
@@ -894,6 +895,15 @@ const navLinks: { label: string; to: string }[] = [
                     <Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {cmsPhone}
                   </a>
                 </li>
+                {cmsPhone2 && <li>
+                  <a href={`tel:${cmsPhone2.replace(/\s/g, '')}`}
+                    className="flex items-center gap-2.5 text-sm transition-colors duration-200"
+                    style={{ color: '#6b7280' }}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+                    onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
+                    <Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {cmsPhone2}
+                  </a>
+                </li>}
                 <li>
                   <a href={emailHref}
                     className="flex items-center gap-2.5 text-sm transition-colors duration-200"

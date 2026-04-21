@@ -33,12 +33,13 @@ const DEFAULT_LOGO = '/images/mopi_logo_20260101_112924.png';
 // ─── Main Hook ────────────────────────────────────────────────────────────────
 export function useCMS(): CMSData {
   const [loading, setLoading] = useState(true);
-  const [settings, setSettings] = useState<Record<string, string>>({
+const [settings, setSettings] = useState<Record<string, string>>({
     company_name: 'MOPi Production',
     tagline: 'Creating Extraordinary Events',
     email: 'info@mopiproduction.com',
-    phone: '+966 50 000 0000',
-    address: 'Riyadh, Saudi Arabia',
+    phone_1: '+20 100 000 0000',
+    phone_2: '',
+    address: 'Cairo, Egypt',
   });
   const [socials, setSocials] = useState<CMSSocialLink[]>([]);
   const [headerLogo, setHeaderLogo] = useState<CMSLogo | null>(null);
