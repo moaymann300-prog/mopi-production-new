@@ -1,1126 +1,1326 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Settings, Image, FileText, Users, LayoutDashboard,
-  LogOut, Save, Upload, Trash2, Edit, Plus, Eye,
-  Globe, Phone, Mail, MapPin, Star, Briefcase,
-  Home, Info, Wrench, FolderOpen, MessageSquare,
-  CheckCircle, AlertCircle, X, Menu, ChevronRight,
-  Facebook, Instagram, Linkedin, Twitter, RefreshCw,
-  ToggleLeft, ToggleRight, Move, ImageIcon
+  LayoutDashboard, Settings, Image, Globe, FileText, Briefcase,
+  Users, MessageSquare, Star, BarChart2, LogIn, LogOut, Eye,
+  EyeOff, Save, Plus, Trash2, Edit3, Upload, X, Check,
+  ChevronDown, ChevronRight, Menu, AlertCircle, Loader2,
+  Instagram, Facebook, Youtube, Linkedin, Phone, Mail, MapPin,
+  Hash, Link2, Layers, Zap, Award, Wrench, Palette, Package,
+  Home, Info, Server, RefreshCw, ExternalLink,
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-interface SiteSetting { key: string; value: string }
-interface HeroSection { id?: number; page: string; title: string; subtitle: string; description: string; button_primary_text: string; button_primary_link: string; button_secondary_text: string; button_secondary_link: string; background_image: string }
-interface ServiceItem { id?: number; title: string; subtitle: string; description: string; image: string; features: string[]; pricing: string; is_featured: boolean; sort_order: number; is_active: boolean }
-interface PortfolioItem { id?: number; title: string; category: string; client: string; location: string; project_date: string; description: string; image: string; award: string; is_featured: boolean; is_active: boolean }
-interface TeamMember { id?: number; name: string; role: string; bio: string; image: string; experience: string; sort_order: number; is_active: boolean }
-interface Testimonial { id?: number; client_name: string; client_title: string; client_company: string; client_image: string; testimonial: string; rating: number; is_featured: boolean; is_active: boolean }
-interface ContactSubmission { id: number; name: string; email: string; company: string; phone: string; service: string; message: string; status: string; created_at: string }
-interface MediaItem { id?: number; name: string; url: string; type: string; alt_text: string; section: string }
-interface LogoState { url: string; alt: string; name?: string }
+interface SiteSetting { id: number; key: string; value: string; label: string; group_name: string; }
+interface SocialLink { id: number; platform: string; url: string; icon: string; is_active: boolean; sort_order: number; }
+interface Logo { id: number; name: string; placement: string; url: string; alt_text: string; is_active: boolean; }
+interface HeroSection { id: number; page: string; badge_text: string; heading: string; subheading: string; cta_primary_label: string; cta_primary_url: string; cta_secondary_label: string; cta_secondary_url: string; bg_image_url: string; }
+interface Stat { id: number; label: string; value: number; suffix: string; sort_order: number; is_active: boolean; }
+interface Service { id: number; title: string; subtitle: string; description: string; icon: string; image_url: string; sort_order: number; is_active: boolean; is_featured: boolean; }
+interface Portfolio { id: number; title: string; category: string; client: string; location: string; project_date: string; visitors: string; description: string; image_url: string; award: string; is_featured: boolean; is_active: boolean; sort_order: number; }
+interface TeamMember { id: number; name: string; role: string; bio: string; image_url: string; email: string; linkedin_url: string; sort_order: number; is_active: boolean; }
+interface Testimonial { id: number; author_name: string; author_role: string; company: string; quote: string; rating: number; image_url: string; is_active: boolean; sort_order: number; }
+interface MediaItem { id: number; filename: string; url: string; alt_text: string; category: string; uploaded_at: string; }
+interface AboutContent { id: number; section: string; title: string; content: string; image_url: string; }
+interface ContactSubmission { id: number; name: string; email: string; phone: string; company: string; service: string; message: string; status: string; created_at: string; }
 
-// ─── Toast ───────────────────────────────────────────────────────────────────
-const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) => (
-  <div className={`fixed bottom-6 right-6 z-[9999] flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl text-white animate-in slide-in-from-bottom-4 duration-300 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
-    {type === 'success' ? <CheckCircle className="h-5 w-5 shrink-0" /> : <AlertCircle className="h-5 w-5 shrink-0" />}
-    <span className="text-sm font-medium">{message}</span>
-    <button onClick={onClose} className="ml-2 hover:opacity-70"><X className="h-4 w-4" /></button>
+type Section =
+  | 'dashboard' | 'site-settings' | 'social-links' | 'logos'
+  | 'hero-sections' | 'stats' | 'services' | 'portfolio'
+  | 'team' | 'testimonials' | 'media' | 'about' | 'inbox';
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+const Toast = ({ msg, type, onClose }: { msg: string; type: 'success' | 'error'; onClose: () => void }) => (
+  <div className="fixed bottom-6 right-6 z-[999] flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl text-sm font-semibold animate-[fadeUp_0.3s_ease]"
+    style={{ background: type === 'success' ? '#16a34a' : '#dc2626', color: '#fff', maxWidth: 320 }}>
+    {type === 'success' ? <Check className="h-4 w-4 shrink-0" /> : <AlertCircle className="h-4 w-4 shrink-0" />}
+    <span className="flex-1">{msg}</span>
+    <button onClick={onClose} className="ml-2 opacity-70 hover:opacity-100"><X className="h-4 w-4" /></button>
   </div>
 );
 
-// ─── Image Picker ─────────────────────────────────────────────────────────────
-const ImagePicker = ({ value, onChange, label }: { value: string; onChange: (url: string) => void; label?: string }) => {
-  const fileRef = useRef<HTMLInputElement>(null);
+// ─── ImageUploader ─────────────────────────────────────────────────────────────
+const ImageUploader = ({ currentUrl, onUploaded, label = 'Upload Image', folder = 'general' }: { currentUrl?: string; onUploaded: (url: string) => void; label?: string; folder?: string; }) => {
   const [uploading, setUploading] = useState(false);
+  const [preview, setPreview] = useState(currentUrl || '');
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
     if (!file.type.startsWith('image/')) return;
     setUploading(true);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      onChange(e.target?.result as string);
-      setUploading(false);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const ext = file.name.split('.').pop();
+      const filename = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from('cms-media').upload(filename, file, { upsert: true });
+      if (error) throw error;
+      const { data } = supabase.storage.from('cms-media').getPublicUrl(filename);
+      setPreview(data.publicUrl);
+      onUploaded(data.publicUrl);
+    } catch {
+      // Fallback to base64
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const url = e.target?.result as string;
+        setPreview(url);
+        onUploaded(url);
+      };
+      reader.readAsDataURL(file);
+    }
+    setUploading(false);
   };
 
   return (
-    <div className="space-y-2">
-      {label && <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{label}</label>}
-      <div className="flex gap-2">
-        <Input value={value} onChange={e => onChange(e.target.value)} placeholder="https://... or upload below" className="text-sm" />
-        <Button type="button" size="sm" variant="outline" disabled={uploading} onClick={() => fileRef.current?.click()} className="shrink-0">
-          {uploading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-        </Button>
+    <div>
+      <div
+        onClick={() => inputRef.current?.click()}
+        className="relative cursor-pointer rounded-xl overflow-hidden border-2 border-dashed transition-all hover:border-[#F4A300] group"
+        style={{ borderColor: '#374151', background: '#111827', minHeight: 100 }}
+        onDragOver={e => e.preventDefault()}
+        onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}>
+        {preview ? (
+          <img src={preview} alt="preview" className="w-full h-32 object-cover" />
+        ) : (
+          <div className="flex flex-col items-center justify-center h-24 gap-2">
+            <Upload className="h-6 w-6" style={{ color: '#6b7280' }} />
+            <span className="text-xs" style={{ color: '#6b7280' }}>{label}</span>
+          </div>
+        )}
+        {uploading && (
+          <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.7)' }}>
+            <Loader2 className="h-6 w-6 animate-spin text-white" />
+          </div>
+        )}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+          style={{ background: 'rgba(244,163,0,0.15)' }}>
+          <Upload className="h-5 w-5" style={{ color: '#F4A300' }} />
+        </div>
       </div>
-      {value && (
-        <div className="relative w-full h-32 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
-          <img src={value} alt="preview" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+      <input ref={inputRef} type="file" accept="image/*" className="hidden"
+        onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
+      {preview && (
+        <div className="mt-2 flex gap-2 items-center">
+          <input type="text" value={preview} readOnly className="flex-1 px-2 py-1.5 rounded text-xs" style={{ background: '#111827', border: '1px solid #374151', color: '#9ca3af' }} />
+          <button onClick={() => { setPreview(''); onUploaded(''); }} className="p-1.5 rounded hover:bg-red-900/30" style={{ color: '#ef4444' }}>
+            <X className="h-3.5 w-3.5" />
+          </button>
         </div>
       )}
-      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ''; }} />
     </div>
   );
 };
 
-// ─── Section Header ───────────────────────────────────────────────────────────
-const SectionHeader = ({ icon: Icon, title, subtitle }: { icon: React.ElementType; title: string; subtitle?: string }) => (
-  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-    <div className="p-2 rounded-lg bg-orange-50"><Icon className="h-5 w-5 text-orange-500" /></div>
-    <div>
-      <h2 className="text-lg font-bold text-gray-900">{title}</h2>
-      {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
-    </div>
+// ─── Field ────────────────────────────────────────────────────────────────────
+const Field = ({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) => (
+  <div>
+    <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>{label}</label>
+    {children}
+    {hint && <p className="text-xs mt-1" style={{ color: '#6b7280' }}>{hint}</p>}
   </div>
 );
 
-// ─── Main Component ───────────────────────────────────────────────────────────
-const AdminDashboard = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState('dashboard');
+const Input = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
+  <input {...props} className="w-full px-3 py-2.5 rounded-lg text-sm transition-all" style={{ background: '#111827', border: '1px solid #374151', color: '#f3f4f6', ...props.style }}
+    onFocus={e => (e.currentTarget.style.borderColor = '#F4A300')}
+    onBlur={e => (e.currentTarget.style.borderColor = '#374151')} />
+);
+
+const Textarea = (props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
+  <textarea {...props} className="w-full px-3 py-2.5 rounded-lg text-sm transition-all resize-none" rows={3}
+    style={{ background: '#111827', border: '1px solid #374151', color: '#f3f4f6', ...props.style }}
+    onFocus={e => (e.currentTarget.style.borderColor = '#F4A300')}
+    onBlur={e => (e.currentTarget.style.borderColor = '#374151')} />
+);
+
+const Toggle = ({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) => (
+  <button onClick={() => onChange(!checked)} className="relative inline-flex h-6 w-11 rounded-full transition-colors"
+    style={{ background: checked ? '#F4A300' : '#374151' }}>
+    <span className="inline-block h-5 w-5 rounded-full bg-white shadow transition-transform mt-0.5"
+      style={{ transform: checked ? 'translateX(22px)' : 'translateX(2px)' }} />
+  </button>
+);
+
+// ─── Main Admin Dashboard ──────────────────────────────────────────────────────
+export default function AdminDashboard() {
+  const [authed, setAuthed] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPwd, setLoginPwd] = useState('');
+  const [showPwd, setShowPwd] = useState(false);
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
+  const [section, setSection] = useState<Section>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Login form
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
-
-  // Data states
-  const [siteSettings, setSiteSettings] = useState<Record<string, string>>({
-    company_name: 'MOPi Production',
-    company_tagline: 'Creating Exceptional Exhibition Experiences',
-    company_description: 'We specialize in exhibition booth design, event production, and custom structures.',
-    company_email: 'info@mopiproduction.com',
-    company_phone: '+1 (555) 123-4567',
-    company_address: '123 Exhibition Boulevard, New York, NY 10001, USA',
-    company_facebook: 'https://facebook.com/mopiproduction',
-    company_instagram: 'https://instagram.com/mopiproduction',
-    company_linkedin: 'https://linkedin.com/company/mopiproduction',
-    company_twitter: 'https://twitter.com/mopiproduction',
-    stat_projects: '500+',
-    stat_experience: '15+',
-    stat_clients: '200+',
-    stat_countries: '50+',
-  });
-
-  const [heroSections, setHeroSections] = useState<Record<string, HeroSection>>({});
-  const [services, setServices] = useState<ServiceItem[]>([]);
-  const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
+  // Data state
+  const [settings, setSettings] = useState<SiteSetting[]>([]);
+  const [socials, setSocials] = useState<SocialLink[]>([]);
+  const [logos, setLogos] = useState<Logo[]>([]);
+  const [heroes, setHeroes] = useState<HeroSection[]>([]);
+  const [stats, setStats] = useState<Stat[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
+  const [portfolio, setPortfolio] = useState<Portfolio[]>([]);
   const [team, setTeam] = useState<TeamMember[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [contacts, setContacts] = useState<ContactSubmission[]>([]);
   const [media, setMedia] = useState<MediaItem[]>([]);
-  const [logos, setLogos] = useState<{ header: LogoState; footer: LogoState }>({
-    header: { url: '/images/mopi_logo_20260101_112924.png', alt: 'MOPi Production Header Logo' },
-    footer: { url: '/images/mopi_logo_20260101_112924.png', alt: 'MOPi Production Footer Logo' },
-  });
+  const [aboutContent, setAboutContent] = useState<AboutContent[]>([]);
+  const [inbox, setInbox] = useState<ContactSubmission[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
-  // Edit modals
-  const [editingService, setEditingService] = useState<ServiceItem | null>(null);
-  const [editingPortfolio, setEditingPortfolio] = useState<PortfolioItem | null>(null);
-  const [editingTeam, setEditingTeam] = useState<TeamMember | null>(null);
-  const [editingTestimonial, setEditingTestimonial] = useState<Testimonial | null>(null);
-  const [editingHero, setEditingHero] = useState<HeroSection | null>(null);
-
-  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
-    setToast({ message, type });
+  const notify = (msg: string, type: 'success' | 'error' = 'success') => {
+    setToast({ msg, type });
     setTimeout(() => setToast(null), 4000);
   };
 
-  // ─── Load all data ──────────────────────────────────────────────────────────
-  const loadAllData = async () => {
-    try {
-      const [siteRes, heroRes, servicesRes, portfolioRes, teamRes, testiRes, contactRes, mediaRes, logoRes] = await Promise.all([
-        supabase.from('site_settings_2026_04_20').select('*'),
-        supabase.from('hero_section_2026_04_20').select('*'),
-        supabase.from('services_2026_04_20').select('*').order('sort_order'),
-        supabase.from('portfolio_2026_04_20').select('*').order('sort_order'),
-        supabase.from('team_members_2026_04_20').select('*').order('sort_order'),
-        supabase.from('testimonials_2026_04_20').select('*').order('sort_order'),
-        supabase.from('contact_submissions_2026_04_20').select('*').order('created_at', { ascending: false }),
-        supabase.from('media_library_2026_04_20').select('*'),
-        supabase.from('logo_settings_2026_01_01_13_00').select('*'),
-      ]);
-
-      if (siteRes.data) {
-        const settings: Record<string, string> = {};
-        siteRes.data.forEach((s: SiteSetting) => { settings[s.key] = s.value || ''; });
-        setSiteSettings(prev => ({ ...prev, ...settings }));
-      }
-      if (heroRes.data) {
-        const heroes: Record<string, HeroSection> = {};
-        heroRes.data.forEach((h: HeroSection) => { heroes[h.page] = h; });
-        setHeroSections(heroes);
-      }
-      if (servicesRes.data) setServices(servicesRes.data);
-      if (portfolioRes.data) setPortfolio(portfolioRes.data);
-      if (teamRes.data) setTeam(teamRes.data);
-      if (testiRes.data) setTestimonials(testiRes.data);
-      if (contactRes.data) setContacts(contactRes.data);
-      if (mediaRes.data) setMedia(mediaRes.data);
-      if (logoRes.data) {
-        const logoData: Record<string, LogoState> = {};
-        logoRes.data.forEach((l: any) => {
-          logoData[l.logo_type] = { url: l.logo_url, alt: l.alt_text || '', name: l.logo_name };
-        });
-        if (logoData.header) setLogos(prev => ({ ...prev, header: logoData.header }));
-        if (logoData.footer) setLogos(prev => ({ ...prev, footer: logoData.footer }));
-      }
-    } catch (err) {
-      console.error('Error loading data:', err);
-    }
-  };
-
-  useEffect(() => { if (isAuthenticated) loadAllData(); }, [isAuthenticated]);
-
-  // ─── Auth ──────────────────────────────────────────────────────────────────
+  // ── Login ──
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loginForm.password.length < 4) { showToast('Please enter a valid password', 'error'); return; }
-    setIsAuthenticated(true);
-    showToast('Welcome back! Dashboard loaded.');
+    setLoginLoading(true); setLoginError('');
+    const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password: loginPwd });
+    if (error) {
+      setLoginError(error.message);
+    } else {
+      setAuthed(true);
+    }
+    setLoginLoading(false);
   };
 
-  const handleLogout = () => { setIsAuthenticated(false); setActiveTab('dashboard'); };
+  // Check session on mount
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) setAuthed(true);
+    });
+    supabase.auth.onAuthStateChange((_, session) => {
+      setAuthed(!!session);
+    });
+  }, []);
 
-  // ─── Save Site Settings ────────────────────────────────────────────────────
-  const saveSiteSettings = async () => {
+  // ── Fetch all data ──
+  const fetchAll = useCallback(async () => {
+    const [s, sl, lg, h, st, sv, pf, tm, ts, md, ab, ib] = await Promise.all([
+      supabase.from('cms_site_settings_2026_04_21').select('*').order('group_name').order('id'),
+      supabase.from('cms_social_links_2026_04_21').select('*').order('sort_order'),
+      supabase.from('cms_logos_2026_04_21').select('*').order('id'),
+      supabase.from('cms_hero_sections_2026_04_21').select('*').order('id'),
+      supabase.from('cms_stats_2026_04_21').select('*').order('sort_order'),
+      supabase.from('cms_services_2026_04_21').select('*').order('sort_order'),
+      supabase.from('cms_portfolio_2026_04_21').select('*').order('sort_order'),
+      supabase.from('cms_team_2026_04_21').select('*').order('sort_order'),
+      supabase.from('cms_testimonials_2026_04_21').select('*').order('sort_order'),
+      supabase.from('cms_media_2026_04_21').select('*').order('uploaded_at', { ascending: false }),
+      supabase.from('cms_about_content_2026_04_21').select('*').order('id'),
+      supabase.from('cms_contact_submissions_2026_04_21').select('*').order('created_at', { ascending: false }),
+    ]);
+    if (s.data) setSettings(s.data);
+    if (sl.data) setSocials(sl.data);
+    if (lg.data) setLogos(lg.data);
+    if (h.data) setHeroes(h.data);
+    if (st.data) setStats(st.data);
+    if (sv.data) setServices(sv.data);
+    if (pf.data) setPortfolio(pf.data);
+    if (tm.data) setTeam(tm.data);
+    if (ts.data) setTestimonials(ts.data);
+    if (md.data) setMedia(md.data);
+    if (ab.data) setAboutContent(ab.data);
+    if (ib.data) setInbox(ib.data);
+    setLoaded(true);
+  }, []);
+
+  useEffect(() => { if (authed) fetchAll(); }, [authed, fetchAll]);
+
+  const logout = async () => { await supabase.auth.signOut(); setAuthed(false); };
+
+  // ════════════════ SAVE HANDLERS ════════════════
+
+  // Settings
+  const saveSetting = async (item: SiteSetting) => {
     setSaving(true);
-    try {
-      const updates = Object.entries(siteSettings).map(([key, value]) => ({
-        key, value, updated_at: new Date().toISOString()
-      }));
-      const { error } = await supabase.from('site_settings_2026_04_20').upsert(updates, { onConflict: 'key' });
-      if (error) throw error;
-      showToast('Site settings saved successfully!');
-    } catch (err: any) {
-      showToast('Saved locally. Database: ' + (err?.message || 'check connection'), 'error');
-    } finally { setSaving(false); }
+    const { error } = await supabase.from('cms_site_settings_2026_04_21').update({ value: item.value, updated_at: new Date().toISOString() }).eq('id', item.id);
+    if (error) notify('Save failed: ' + error.message, 'error');
+    else notify('Setting saved!');
+    setSaving(false);
   };
 
-  // ─── Save Hero ─────────────────────────────────────────────────────────────
-  const saveHero = async (hero: HeroSection) => {
+  // Social
+  const saveSocial = async (item: SocialLink) => {
+    const { error } = item.id
+      ? await supabase.from('cms_social_links_2026_04_21').update({ url: item.url, is_active: item.is_active, updated_at: new Date().toISOString() }).eq('id', item.id)
+      : await supabase.from('cms_social_links_2026_04_21').insert([{ platform: item.platform, url: item.url, icon: item.icon, is_active: item.is_active, sort_order: item.sort_order }]);
+    if (error) notify('Save failed: ' + error.message, 'error');
+    else { notify('Saved!'); fetchAll(); }
+  };
+
+  // Logos
+  const saveLogo = async (item: Logo) => {
+    const { error } = await supabase.from('cms_logos_2026_04_21').update({ url: item.url, alt_text: item.alt_text, is_active: item.is_active, updated_at: new Date().toISOString() }).eq('id', item.id);
+    if (error) notify('Save failed: ' + error.message, 'error');
+    else notify('Logo updated!');
+  };
+
+  // Hero
+  const saveHero = async (item: HeroSection) => {
     setSaving(true);
-    try {
-      const { error } = hero.id
-        ? await supabase.from('hero_section_2026_04_20').update({ ...hero, updated_at: new Date().toISOString() }).eq('id', hero.id)
-        : await supabase.from('hero_section_2026_04_20').upsert({ ...hero, updated_at: new Date().toISOString() }, { onConflict: 'page' });
-      if (error) throw error;
-      setHeroSections(prev => ({ ...prev, [hero.page]: hero }));
-      setEditingHero(null);
-      showToast(`${hero.page} hero saved!`);
-    } catch (err: any) {
-      showToast('Error: ' + err?.message, 'error');
-    } finally { setSaving(false); }
+    const { error } = await supabase.from('cms_hero_sections_2026_04_21').update({ badge_text: item.badge_text, heading: item.heading, subheading: item.subheading, cta_primary_label: item.cta_primary_label, cta_primary_url: item.cta_primary_url, cta_secondary_label: item.cta_secondary_label, cta_secondary_url: item.cta_secondary_url, bg_image_url: item.bg_image_url, updated_at: new Date().toISOString() }).eq('id', item.id);
+    if (error) notify('Save failed: ' + error.message, 'error');
+    else notify('Hero section saved!');
+    setSaving(false);
   };
 
-  // ─── Save Service ──────────────────────────────────────────────────────────
-  const saveService = async (service: ServiceItem) => {
-    setSaving(true);
-    try {
-      if (service.id) {
-        const { error } = await supabase.from('services_2026_04_20').update({ ...service, updated_at: new Date().toISOString() }).eq('id', service.id);
-        if (error) throw error;
-        setServices(prev => prev.map(s => s.id === service.id ? service : s));
-      } else {
-        const { data, error } = await supabase.from('services_2026_04_20').insert({ ...service, updated_at: new Date().toISOString() }).select().single();
-        if (error) throw error;
-        setServices(prev => [...prev, data]);
-      }
-      setEditingService(null);
-      showToast('Service saved!');
-    } catch (err: any) {
-      showToast('Error: ' + err?.message, 'error');
-    } finally { setSaving(false); }
+  // Stats
+  const saveStat = async (item: Stat) => {
+    const payload = { label: item.label, value: item.value, suffix: item.suffix, is_active: item.is_active, sort_order: item.sort_order };
+    const { error } = item.id
+      ? await supabase.from('cms_stats_2026_04_21').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', item.id)
+      : await supabase.from('cms_stats_2026_04_21').insert([payload]);
+    if (error) notify('Save failed: ' + error.message, 'error');
+    else { notify('Stat saved!'); fetchAll(); }
+  };
+  const deleteStat = async (id: number) => {
+    if (!confirm('Delete this stat?')) return;
+    await supabase.from('cms_stats_2026_04_21').delete().eq('id', id);
+    notify('Stat deleted!'); fetchAll();
   };
 
+  // Services
+  const saveService = async (item: Service) => {
+    const payload = { title: item.title, subtitle: item.subtitle, description: item.description, icon: item.icon, image_url: item.image_url, sort_order: item.sort_order, is_active: item.is_active, is_featured: item.is_featured };
+    const { error } = item.id
+      ? await supabase.from('cms_services_2026_04_21').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', item.id)
+      : await supabase.from('cms_services_2026_04_21').insert([payload]);
+    if (error) notify('Save failed: ' + error.message, 'error');
+    else { notify('Service saved!'); fetchAll(); }
+  };
   const deleteService = async (id: number) => {
     if (!confirm('Delete this service?')) return;
-    await supabase.from('services_2026_04_20').delete().eq('id', id);
-    setServices(prev => prev.filter(s => s.id !== id));
-    showToast('Service deleted!');
+    await supabase.from('cms_services_2026_04_21').delete().eq('id', id);
+    notify('Service deleted!'); fetchAll();
   };
 
-  // ─── Save Portfolio ────────────────────────────────────────────────────────
-  const savePortfolio = async (item: PortfolioItem) => {
-    setSaving(true);
-    try {
-      if (item.id) {
-        const { error } = await supabase.from('portfolio_2026_04_20').update({ ...item, updated_at: new Date().toISOString() }).eq('id', item.id);
-        if (error) throw error;
-        setPortfolio(prev => prev.map(p => p.id === item.id ? item : p));
-      } else {
-        const { data, error } = await supabase.from('portfolio_2026_04_20').insert({ ...item, updated_at: new Date().toISOString() }).select().single();
-        if (error) throw error;
-        setPortfolio(prev => [...prev, data]);
-      }
-      setEditingPortfolio(null);
-      showToast('Portfolio item saved!');
-    } catch (err: any) {
-      showToast('Error: ' + err?.message, 'error');
-    } finally { setSaving(false); }
+  // Portfolio
+  const savePortfolio = async (item: Portfolio) => {
+    const payload = { title: item.title, category: item.category, client: item.client, location: item.location, project_date: item.project_date, visitors: item.visitors, description: item.description, image_url: item.image_url, award: item.award, is_featured: item.is_featured, is_active: item.is_active, sort_order: item.sort_order };
+    const { error } = item.id
+      ? await supabase.from('cms_portfolio_2026_04_21').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', item.id)
+      : await supabase.from('cms_portfolio_2026_04_21').insert([payload]);
+    if (error) notify('Save failed: ' + error.message, 'error');
+    else { notify('Project saved!'); fetchAll(); }
   };
-
   const deletePortfolio = async (id: number) => {
     if (!confirm('Delete this project?')) return;
-    await supabase.from('portfolio_2026_04_20').delete().eq('id', id);
-    setPortfolio(prev => prev.filter(p => p.id !== id));
-    showToast('Project deleted!');
+    await supabase.from('cms_portfolio_2026_04_21').delete().eq('id', id);
+    notify('Project deleted!'); fetchAll();
   };
 
-  // ─── Save Team ─────────────────────────────────────────────────────────────
-  const saveTeam = async (member: TeamMember) => {
-    setSaving(true);
-    try {
-      if (member.id) {
-        const { error } = await supabase.from('team_members_2026_04_20').update({ ...member, updated_at: new Date().toISOString() }).eq('id', member.id);
-        if (error) throw error;
-        setTeam(prev => prev.map(t => t.id === member.id ? member : t));
-      } else {
-        const { data, error } = await supabase.from('team_members_2026_04_20').insert({ ...member, updated_at: new Date().toISOString() }).select().single();
-        if (error) throw error;
-        setTeam(prev => [...prev, data]);
-      }
-      setEditingTeam(null);
-      showToast('Team member saved!');
-    } catch (err: any) {
-      showToast('Error: ' + err?.message, 'error');
-    } finally { setSaving(false); }
+  // Team
+  const saveTeam = async (item: TeamMember) => {
+    const payload = { name: item.name, role: item.role, bio: item.bio, image_url: item.image_url, email: item.email, linkedin_url: item.linkedin_url, sort_order: item.sort_order, is_active: item.is_active };
+    const { error } = item.id
+      ? await supabase.from('cms_team_2026_04_21').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', item.id)
+      : await supabase.from('cms_team_2026_04_21').insert([payload]);
+    if (error) notify('Save failed: ' + error.message, 'error');
+    else { notify('Team member saved!'); fetchAll(); }
   };
-
   const deleteTeam = async (id: number) => {
     if (!confirm('Delete this team member?')) return;
-    await supabase.from('team_members_2026_04_20').delete().eq('id', id);
-    setTeam(prev => prev.filter(t => t.id !== id));
-    showToast('Team member deleted!');
+    await supabase.from('cms_team_2026_04_21').delete().eq('id', id);
+    notify('Deleted!'); fetchAll();
   };
 
-  // ─── Save Testimonial ──────────────────────────────────────────────────────
-  const saveTestimonial = async (t: Testimonial) => {
-    setSaving(true);
-    try {
-      if (t.id) {
-        const { error } = await supabase.from('testimonials_2026_04_20').update({ ...t, updated_at: new Date().toISOString() }).eq('id', t.id);
-        if (error) throw error;
-        setTestimonials(prev => prev.map(x => x.id === t.id ? t : x));
-      } else {
-        const { data, error } = await supabase.from('testimonials_2026_04_20').insert({ ...t, updated_at: new Date().toISOString() }).select().single();
-        if (error) throw error;
-        setTestimonials(prev => [...prev, data]);
-      }
-      setEditingTestimonial(null);
-      showToast('Testimonial saved!');
-    } catch (err: any) {
-      showToast('Error: ' + err?.message, 'error');
-    } finally { setSaving(false); }
+  // Testimonials
+  const saveTestimonial = async (item: Testimonial) => {
+    const payload = { author_name: item.author_name, author_role: item.author_role, company: item.company, quote: item.quote, rating: item.rating, image_url: item.image_url, is_active: item.is_active, sort_order: item.sort_order };
+    const { error } = item.id
+      ? await supabase.from('cms_testimonials_2026_04_21').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', item.id)
+      : await supabase.from('cms_testimonials_2026_04_21').insert([payload]);
+    if (error) notify('Save failed: ' + error.message, 'error');
+    else { notify('Testimonial saved!'); fetchAll(); }
   };
-
   const deleteTestimonial = async (id: number) => {
     if (!confirm('Delete this testimonial?')) return;
-    await supabase.from('testimonials_2026_04_20').delete().eq('id', id);
-    setTestimonials(prev => prev.filter(x => x.id !== id));
-    showToast('Testimonial deleted!');
+    await supabase.from('cms_testimonials_2026_04_21').delete().eq('id', id);
+    notify('Deleted!'); fetchAll();
   };
 
-  // ─── Logo Upload ──────────────────────────────────────────────────────────
-  const uploadLogo = (logoType: 'header' | 'footer', file: File) => {
-    if (!file.type.startsWith('image/')) { showToast('Please select an image file', 'error'); return; }
-    if (file.size > 5 * 1024 * 1024) { showToast('File must be under 5MB', 'error'); return; }
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const base64 = e.target?.result as string;
-      setLogos(prev => ({ ...prev, [logoType]: { ...prev[logoType], url: base64, name: file.name } }));
-      try {
-        const { data: existing } = await supabase.from('logo_settings_2026_01_01_13_00').select('id').eq('logo_type', logoType).single();
-        if (existing) {
-          await supabase.from('logo_settings_2026_01_01_13_00').update({ logo_url: base64, logo_name: file.name, updated_at: new Date().toISOString() }).eq('logo_type', logoType);
-        } else {
-          await supabase.from('logo_settings_2026_01_01_13_00').insert({ logo_type: logoType, logo_url: base64, logo_name: file.name, alt_text: `MOPi Production ${logoType} logo` });
-        }
-        showToast(`${logoType} logo updated!`);
-      } catch (err: any) {
-        showToast('Logo saved locally. DB: ' + err?.message, 'error');
-      }
-    };
-    reader.readAsDataURL(file);
+  // About
+  const saveAbout = async (item: AboutContent) => {
+    const { error } = await supabase.from('cms_about_content_2026_04_21').update({ title: item.title, content: item.content, image_url: item.image_url, updated_at: new Date().toISOString() }).eq('id', item.id);
+    if (error) notify('Save failed: ' + error.message, 'error');
+    else notify('About section saved!');
   };
 
-  // ─── Media Upload ─────────────────────────────────────────────────────────
-  const uploadMedia = (file: File, section = 'general') => {
-    if (!file.type.startsWith('image/')) { showToast('Please select an image file', 'error'); return; }
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const url = e.target?.result as string;
-      const newItem: MediaItem = { name: file.name, url, type: 'image', alt_text: file.name, section };
-      try {
-        const { data, error } = await supabase.from('media_library_2026_04_20').insert(newItem).select().single();
-        if (error) throw error;
-        setMedia(prev => [data, ...prev]);
-        showToast('Media uploaded!');
-      } catch {
-        setMedia(prev => [{ ...newItem, id: Date.now() }, ...prev]);
-        showToast('Media saved locally');
-      }
-    };
-    reader.readAsDataURL(file);
+  // Inbox
+  const updateInboxStatus = async (id: number, status: string) => {
+    await supabase.from('cms_contact_submissions_2026_04_21').update({ status, updated_at: new Date().toISOString() }).eq('id', id);
+    notify('Status updated!'); fetchAll();
+  };
+  const deleteInbox = async (id: number) => {
+    if (!confirm('Delete this message?')) return;
+    await supabase.from('cms_contact_submissions_2026_04_21').delete().eq('id', id);
+    notify('Message deleted!'); fetchAll();
   };
 
-  const deleteMedia = async (id: number) => {
-    if (!confirm('Delete this media item?')) return;
-    await supabase.from('media_library_2026_04_20').delete().eq('id', id);
-    setMedia(prev => prev.filter(m => m.id !== id));
-    showToast('Media deleted!');
+  // Media upload
+  const handleMediaUpload = async (file: File) => {
+    try {
+      const ext = file.name.split('.').pop();
+      const filename = `media/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+      const { error } = await supabase.storage.from('cms-media').upload(filename, file, { upsert: true });
+      if (error) throw error;
+      const { data } = supabase.storage.from('cms-media').getPublicUrl(filename);
+      await supabase.from('cms_media_2026_04_21').insert([{ filename: file.name, url: data.publicUrl, alt_text: file.name.replace(`.${ext}`, ''), category: 'general', file_type: 'image', file_size: file.size }]);
+      notify('Image uploaded!'); fetchAll();
+    } catch {
+      notify('Upload failed. Saving as base64...', 'error');
+    }
+  };
+  const deleteMedia = async (item: MediaItem) => {
+    if (!confirm('Delete this image?')) return;
+    await supabase.from('cms_media_2026_04_21').delete().eq('id', item.id);
+    notify('Deleted!'); fetchAll();
   };
 
-  // ─── Contact status ───────────────────────────────────────────────────────
-  const updateContactStatus = async (id: number, status: string) => {
-    await supabase.from('contact_submissions_2026_04_20').update({ status }).eq('id', id);
-    setContacts(prev => prev.map(c => c.id === id ? { ...c, status } : c));
-    showToast('Status updated!');
-  };
-  const deleteContact = async (id: number) => {
-    if (!confirm('Delete this submission?')) return;
-    await supabase.from('contact_submissions_2026_04_20').delete().eq('id', id);
-    setContacts(prev => prev.filter(c => c.id !== id));
-    showToast('Submission deleted!');
-  };
-
-  // ─── Sidebar nav items ─────────────────────────────────────────────────────
-  const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'settings', label: 'Site Settings', icon: Settings },
-    { id: 'hero', label: 'Hero Sections', icon: Home },
-    { id: 'services', label: 'Services', icon: Wrench },
-    { id: 'portfolio', label: 'Portfolio', icon: FolderOpen },
-    { id: 'team', label: 'Team', icon: Users },
-    { id: 'testimonials', label: 'Testimonials', icon: Star },
-    { id: 'media', label: 'Media Library', icon: Image },
-    { id: 'logos', label: 'Logos', icon: ImageIcon },
-    { id: 'contacts', label: 'Contact Inbox', icon: MessageSquare },
-  ];
-
-  // ─── Login Screen ──────────────────────────────────────────────────────────
-  if (!isAuthenticated) return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-          <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-8 text-center">
-            <img src="./images/mopi_logo_20260101_112924.png" alt="MOPi" className="h-16 w-auto mx-auto mb-4 object-contain" />
-            <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
-            <p className="text-orange-100 text-sm mt-1">MOPi Production CMS</p>
+  // ════════════════ LOGIN SCREEN ════════════════
+  if (!authed) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#000', fontFamily: "'Inter', sans-serif" }}>
+        <style>{`@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }`}</style>
+        <div className="w-full max-w-sm" style={{ animation: 'fadeUp 0.5s ease' }}>
+          <div className="text-center mb-8">
+            <img src="/images/mopi_logo_20260101_112924.png" alt="MOPi" className="h-14 w-auto object-contain mx-auto mb-4" />
+            <h1 className="text-xl font-black text-white mb-1" style={{ fontFamily: "'Poppins', sans-serif" }}>Admin Dashboard</h1>
+            <p className="text-sm" style={{ color: '#6b7280' }}>Sign in to manage your website</p>
           </div>
-          <form onSubmit={handleLogin} className="p-8 space-y-5">
+          <form onSubmit={handleLogin} className="space-y-4 p-7 rounded-2xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
-              <Input type="email" placeholder="admin@mopiproduction.com" value={loginForm.email} onChange={e => setLoginForm(p => ({ ...p, email: e.target.value }))} required className="w-full" />
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Email</label>
+              <Input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} placeholder="admin@mopiproduction.com" required />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-              <Input type="password" placeholder="Enter password" value={loginForm.password} onChange={e => setLoginForm(p => ({ ...p, password: e.target.value }))} required className="w-full" />
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Password</label>
+              <div className="relative">
+                <Input type={showPwd ? 'text' : 'password'} value={loginPwd} onChange={e => setLoginPwd(e.target.value)} placeholder="••••••••" required />
+                <button type="button" onClick={() => setShowPwd(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: '#6b7280' }}>
+                  {showPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
-            <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition-all hover:scale-[1.02]">
-              Sign In to Dashboard
-            </Button>
-            <p className="text-center text-xs text-gray-400">Enter any email and password to access</p>
+            {loginError && <p className="text-xs py-2 px-3 rounded-lg flex items-center gap-2" style={{ background: 'rgba(220,38,38,0.1)', color: '#ef4444', border: '1px solid rgba(220,38,38,0.2)' }}><AlertCircle className="h-3.5 w-3.5" />{loginError}</p>}
+            <button type="submit" disabled={loginLoading}
+              className="w-full py-3 rounded-xl text-white font-bold text-sm transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
+              style={{ background: '#F4A300', boxShadow: '0 6px 20px rgba(244,163,0,0.3)' }}>
+              {loginLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
+              {loginLoading ? 'Signing in...' : 'Sign In'}
+            </button>
+            <p className="text-center text-xs mt-3" style={{ color: '#374151' }}>
+              <Link to="/" className="hover:underline" style={{ color: '#6b7280' }}>← Back to Website</Link>
+            </p>
           </form>
         </div>
       </div>
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-    </div>
-  );
+    );
+  }
 
-  // ─── Helper: Field Editor ──────────────────────────────────────────────────
-  const Field = ({ label, value, onChange, type = 'text', rows }: { label: string; value: string; onChange: (v: string) => void; type?: string; rows?: number }) => (
-    <div className="space-y-1">
-      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{label}</label>
-      {rows ? <Textarea value={value} onChange={e => onChange(e.target.value)} rows={rows} className="text-sm resize-none" /> : <Input type={type} value={value} onChange={e => onChange(e.target.value)} className="text-sm" />}
-    </div>
-  );
+  // ════════════════ SIDEBAR CONFIG ════════════════
+  const sidebarGroups = [
+    {
+      label: 'Overview', items: [
+        { id: 'dashboard' as Section, icon: LayoutDashboard, label: 'Dashboard' },
+      ]
+    },
+    {
+      label: 'Global', items: [
+        { id: 'site-settings' as Section, icon: Settings, label: 'Site Settings' },
+        { id: 'social-links' as Section, icon: Globe, label: 'Social Media' },
+        { id: 'logos' as Section, icon: Image, label: 'Logos' },
+      ]
+    },
+    {
+      label: 'Pages', items: [
+        { id: 'hero-sections' as Section, icon: Home, label: 'Hero Sections' },
+        { id: 'stats' as Section, icon: BarChart2, label: 'Stats & Numbers' },
+        { id: 'about' as Section, icon: Info, label: 'About Page' },
+        { id: 'services' as Section, icon: Briefcase, label: 'Services' },
+        { id: 'portfolio' as Section, icon: Layers, label: 'Portfolio' },
+      ]
+    },
+    {
+      label: 'Content', items: [
+        { id: 'team' as Section, icon: Users, label: 'Team Members' },
+        { id: 'testimonials' as Section, icon: Star, label: 'Testimonials' },
+        { id: 'media' as Section, icon: Image, label: 'Media Library' },
+        { id: 'inbox' as Section, icon: MessageSquare, label: `Inbox ${inbox.filter(m => m.status === 'new').length > 0 ? `(${inbox.filter(m => m.status === 'new').length})` : ''}` },
+      ]
+    },
+  ];
 
-  // ─── Tab: Dashboard ────────────────────────────────────────────────────────
-  const DashboardTab = () => (
-    <div className="space-y-6">
-      <SectionHeader icon={LayoutDashboard} title="Dashboard Overview" subtitle="Your website at a glance" />
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+  const unreadCount = inbox.filter(m => m.status === 'new').length;
+
+  // ════════════════ SECTION RENDERERS ════════════════
+
+  const renderDashboard = () => (
+    <div>
+      <h2 className="text-2xl font-black text-white mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>Dashboard</h2>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: 'Services', count: services.length, icon: Wrench, color: 'bg-blue-50 text-blue-600' },
-          { label: 'Portfolio', count: portfolio.length, icon: FolderOpen, color: 'bg-purple-50 text-purple-600' },
-          { label: 'Team Members', count: team.length, icon: Users, color: 'bg-green-50 text-green-600' },
-          { label: 'New Contacts', count: contacts.filter(c => c.status === 'new').length, icon: MessageSquare, color: 'bg-orange-50 text-orange-600' },
-        ].map(stat => (
-          <Card key={stat.label} className="cursor-pointer hover:shadow-md transition-all hover:-translate-y-0.5">
-            <CardContent className="p-5">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${stat.color}`}>
-                <stat.icon className="h-5 w-5" />
+          { label: 'Services', count: services.length, icon: Briefcase, color: '#3b82f6' },
+          { label: 'Portfolio', count: portfolio.length, icon: Layers, color: '#8b5cf6' },
+          { label: 'Team', count: team.length, icon: Users, color: '#10b981' },
+          { label: 'New Messages', count: unreadCount, icon: MessageSquare, color: '#F4A300' },
+        ].map(c => (
+          <div key={c.label} className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: `${c.color}20` }}>
+                <c.icon className="h-4.5 w-4.5" style={{ color: c.color }} />
               </div>
-              <div className="text-2xl font-bold text-gray-900">{stat.count}</div>
-              <div className="text-sm text-gray-500">{stat.label}</div>
-            </CardContent>
-          </Card>
+              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#6b7280' }}>{c.label}</span>
+            </div>
+            <div className="text-3xl font-black" style={{ color: c.color, fontFamily: "'Poppins', sans-serif" }}>{c.count}</div>
+          </div>
         ))}
       </div>
-      <Card>
-        <CardHeader><CardTitle className="text-base">Quick Actions</CardTitle></CardHeader>
-        <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {[
-            { label: 'Edit Homepage Hero', tab: 'hero', icon: Home },
-            { label: 'Add Portfolio Item', tab: 'portfolio', icon: FolderOpen },
-            { label: 'Add Service', tab: 'services', icon: Wrench },
-            { label: 'Upload Media', tab: 'media', icon: Image },
-            { label: 'Update Logo', tab: 'logos', icon: ImageIcon },
-            { label: 'View Contacts', tab: 'contacts', icon: MessageSquare },
-          ].map(action => (
-            <button key={action.label} onClick={() => setActiveTab(action.tab)} className="flex items-center gap-2 p-3 rounded-lg border border-gray-200 hover:border-orange-300 hover:bg-orange-50 transition-all text-sm font-medium text-gray-700 hover:text-orange-600">
-              <action.icon className="h-4 w-4" />
-              {action.label}
-            </button>
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+          <h3 className="font-bold text-sm mb-4 text-white flex items-center gap-2"><MessageSquare className="h-4 w-4" style={{ color: '#F4A300' }} />Recent Messages</h3>
+          {inbox.slice(0, 5).map(m => (
+            <div key={m.id} className="flex items-start gap-3 py-3" style={{ borderBottom: '1px solid #1f2937' }}>
+              <span className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{ background: m.status === 'new' ? '#F4A300' : '#374151' }} />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-white truncate">{m.name}</p>
+                <p className="text-xs truncate" style={{ color: '#6b7280' }}>{m.message}</p>
+              </div>
+              <span className="text-[10px] shrink-0" style={{ color: '#4b5563' }}>{new Date(m.created_at).toLocaleDateString()}</span>
+            </div>
           ))}
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader><CardTitle className="text-base">Recent Contact Submissions</CardTitle></CardHeader>
-        <CardContent>
-          {contacts.length === 0 ? <p className="text-gray-400 text-sm">No contact submissions yet.</p> : (
-            <div className="space-y-2">
-              {contacts.slice(0, 5).map(c => (
-                <div key={c.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-800">{c.name} <span className="font-normal text-gray-500">— {c.company}</span></p>
-                    <p className="text-xs text-gray-400">{c.email} · {c.service}</p>
-                  </div>
-                  <Badge className={c.status === 'new' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}>{c.status}</Badge>
+          {inbox.length === 0 && <p className="text-sm" style={{ color: '#4b5563' }}>No messages yet.</p>}
+        </div>
+        <div className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+          <h3 className="font-bold text-sm mb-4 text-white flex items-center gap-2"><Server className="h-4 w-4" style={{ color: '#F4A300' }} />Quick Links</h3>
+          <div className="space-y-2">
+            {[
+              { label: 'Homepage', url: '/' }, { label: 'About Page', url: '/about' },
+              { label: 'Services Page', url: '/services' }, { label: 'Portfolio Page', url: '/portfolio' },
+              { label: 'Contact Page', url: '/contact' },
+            ].map(l => (
+              <Link key={l.url} to={l.url} target="_blank"
+                className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg transition-all hover:text-[#F4A300]"
+                style={{ color: '#9ca3af', background: '#0f172a' }}>
+                <ExternalLink className="h-3.5 w-3.5" />{l.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderSiteSettings = () => {
+    const groups = [...new Set(settings.map(s => s.group_name))];
+    return (
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Site Settings</h2>
+          <button onClick={fetchAll} className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg transition-all hover:text-[#F4A300]" style={{ color: '#6b7280', background: '#111827', border: '1px solid #1f2937' }}>
+            <RefreshCw className="h-3.5 w-3.5" />Refresh
+          </button>
+        </div>
+        {groups.map(g => (
+          <div key={g} className="mb-7 p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+            <h3 className="text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2" style={{ color: '#F4A300' }}>
+              <span className="w-4 h-px block" style={{ background: '#F4A300' }} />{g}
+            </h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              {settings.filter(s => s.group_name === g).map(s => (
+                <div key={s.id}>
+                  <Field label={s.label}>
+                    <div className="flex gap-2">
+                      <Input value={s.value || ''} onChange={e => setSettings(prev => prev.map(x => x.id === s.id ? { ...x, value: e.target.value } : x))} />
+                      <button onClick={() => saveSetting(s)} className="px-3 py-2 rounded-lg text-white text-xs font-bold shrink-0 transition-all hover:scale-105" style={{ background: '#F4A300' }}>
+                        <Save className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </Field>
                 </div>
               ))}
             </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
-
-  // ─── Tab: Site Settings ────────────────────────────────────────────────────
-  const SettingsTab = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <SectionHeader icon={Settings} title="Site Settings" subtitle="Control all website text and info" />
-        <Button onClick={saveSiteSettings} disabled={saving} className="bg-orange-500 hover:bg-orange-600 text-white">
-          {saving ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />} Save All
-        </Button>
+          </div>
+        ))}
       </div>
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card><CardHeader><CardTitle className="text-sm text-orange-600 uppercase tracking-wide">Company Info</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            {(['company_name', 'company_tagline', 'company_email', 'company_phone', 'company_address'] as const).map(k => (
-              <Field key={k} label={k.replace('company_', '').replace('_', ' ')} value={siteSettings[k] || ''} onChange={v => setSiteSettings(p => ({ ...p, [k]: v }))} />
-            ))}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Description</label>
-              <Textarea value={siteSettings.company_description || ''} onChange={e => setSiteSettings(p => ({ ...p, company_description: e.target.value }))} rows={3} className="text-sm resize-none" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card><CardHeader><CardTitle className="text-sm text-orange-600 uppercase tracking-wide">Social Media</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            {[
-              { key: 'company_facebook', label: 'Facebook URL', icon: Facebook },
-              { key: 'company_instagram', label: 'Instagram URL', icon: Instagram },
-              { key: 'company_linkedin', label: 'LinkedIn URL', icon: Linkedin },
-              { key: 'company_twitter', label: 'Twitter URL', icon: Twitter },
-            ].map(s => (
-              <div key={s.key} className="space-y-1">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-1"><s.icon className="h-3 w-3" />{s.label}</label>
-                <Input value={siteSettings[s.key] || ''} onChange={e => setSiteSettings(p => ({ ...p, [s.key]: e.target.value }))} className="text-sm" />
+    );
+  };
+
+  const renderSocialLinks = () => (
+    <div>
+      <h2 className="text-2xl font-black text-white mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>Social Media Links</h2>
+      <div className="grid md:grid-cols-2 gap-4">
+        {socials.map(s => (
+          <div key={s.id} className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(244,163,0,0.1)', border: '1px solid rgba(244,163,0,0.2)' }}>
+                  {s.platform === 'Instagram' && <Instagram className="h-4 w-4" style={{ color: '#F4A300' }} />}
+                  {s.platform === 'Facebook' && <Facebook className="h-4 w-4" style={{ color: '#F4A300' }} />}
+                  {s.platform === 'LinkedIn' && <Linkedin className="h-4 w-4" style={{ color: '#F4A300' }} />}
+                  {s.platform === 'YouTube' && <Youtube className="h-4 w-4" style={{ color: '#F4A300' }} />}
+                  {!['Instagram', 'Facebook', 'LinkedIn', 'YouTube'].includes(s.platform) && <Link2 className="h-4 w-4" style={{ color: '#F4A300' }} />}
+                </div>
+                <span className="font-bold text-sm text-white">{s.platform}</span>
               </div>
-            ))}
-          </CardContent>
-        </Card>
-        <Card><CardHeader><CardTitle className="text-sm text-orange-600 uppercase tracking-wide">Stats (Homepage)</CardTitle></CardHeader>
-          <CardContent className="grid grid-cols-2 gap-4">
-            {[
-              { key: 'stat_projects', label: 'Projects Completed' },
-              { key: 'stat_experience', label: 'Years Experience' },
-              { key: 'stat_clients', label: 'Happy Clients' },
-              { key: 'stat_countries', label: 'Countries Served' },
-            ].map(s => (
-              <Field key={s.key} label={s.label} value={siteSettings[s.key] || ''} onChange={v => setSiteSettings(p => ({ ...p, [s.key]: v }))} />
-            ))}
-          </CardContent>
-        </Card>
+              <Toggle checked={s.is_active} onChange={v => setSocials(prev => prev.map(x => x.id === s.id ? { ...x, is_active: v } : x))} />
+            </div>
+            <Field label="Profile / Page URL">
+              <div className="flex gap-2">
+                <Input value={s.url} placeholder="https://instagram.com/mopiproduction" onChange={e => setSocials(prev => prev.map(x => x.id === s.id ? { ...x, url: e.target.value } : x))} />
+                <button onClick={() => saveSocial(s)} className="px-3 rounded-lg text-white shrink-0 transition-all hover:scale-105" style={{ background: '#F4A300' }}>
+                  <Save className="h-4 w-4" />
+                </button>
+              </div>
+            </Field>
+          </div>
+        ))}
+      </div>
+      {/* Add new social */}
+      <div className="mt-4 p-5 rounded-xl" style={{ background: '#111827', border: '1px dashed #374151' }}>
+        <h3 className="font-bold text-sm text-white mb-4 flex items-center gap-2"><Plus className="h-4 w-4" style={{ color: '#F4A300' }} />Add New Social Link</h3>
+        <NewSocialForm onSave={async (item) => { await saveSocial({ ...item, id: 0 }); }} />
       </div>
     </div>
   );
 
-  // ─── Tab: Hero Sections ────────────────────────────────────────────────────
-  const pages = ['home', 'about', 'services', 'portfolio', 'contact'];
-  const HeroTab = () => (
-    <div className="space-y-6">
-      <SectionHeader icon={Home} title="Hero Sections" subtitle="Edit the top banner for each page" />
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {pages.map(page => {
-          const hero = heroSections[page];
-          return (
-            <Card key={page} className="hover:shadow-md transition-all cursor-pointer group" onClick={() => setEditingHero(hero || { page, title: '', subtitle: '', description: '', button_primary_text: '', button_primary_link: '', button_secondary_text: '', button_secondary_link: '', background_image: '' })}>
-              <CardContent className="p-0 overflow-hidden rounded-xl">
-                <div className="relative h-32 bg-gray-900">
-                  {hero?.background_image && <img src={hero.background_image} alt={page} className="w-full h-full object-cover opacity-50" onError={e => (e.target as HTMLImageElement).style.display = 'none'} />}
-                  <div className="absolute inset-0 flex flex-col justify-end p-4">
-                    <Badge className="w-fit mb-1 capitalize bg-orange-500 text-white text-xs">{page}</Badge>
-                    <p className="text-white font-bold text-sm line-clamp-2">{hero?.title || 'Click to configure'}</p>
-                  </div>
-                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="bg-white rounded-lg p-1.5"><Edit className="h-4 w-4 text-orange-500" /></div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Hero Edit Modal */}
-      {editingHero && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setEditingHero(null)}>
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between rounded-t-2xl">
-              <h3 className="font-bold text-gray-900 capitalize">{editingHero.page} — Hero Section</h3>
-              <button onClick={() => setEditingHero(null)} className="p-1 hover:bg-gray-100 rounded-lg"><X className="h-5 w-5" /></button>
+  const renderLogos = () => (
+    <div>
+      <h2 className="text-2xl font-black text-white mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>Logo Management</h2>
+      <div className="grid md:grid-cols-2 gap-5">
+        {logos.map(logo => (
+          <div key={logo.id} className="p-6 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-bold text-white">{logo.name}</h3>
+                <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(244,163,0,0.1)', color: '#F4A300' }}>{logo.placement}</span>
+              </div>
+              <Toggle checked={logo.is_active} onChange={v => setLogos(prev => prev.map(x => x.id === logo.id ? { ...x, is_active: v } : x))} />
             </div>
-            <div className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <Field label="Title" value={editingHero.title} onChange={v => setEditingHero(p => p ? { ...p, title: v } : p)} />
-                <Field label="Subtitle" value={editingHero.subtitle} onChange={v => setEditingHero(p => p ? { ...p, subtitle: v } : p)} />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Description</label>
-                <Textarea value={editingHero.description} onChange={e => setEditingHero(p => p ? { ...p, description: e.target.value } : p)} rows={3} className="text-sm resize-none" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <Field label="Primary Button Text" value={editingHero.button_primary_text} onChange={v => setEditingHero(p => p ? { ...p, button_primary_text: v } : p)} />
-                <Field label="Primary Button Link" value={editingHero.button_primary_link} onChange={v => setEditingHero(p => p ? { ...p, button_primary_link: v } : p)} />
-                <Field label="Secondary Button Text" value={editingHero.button_secondary_text} onChange={v => setEditingHero(p => p ? { ...p, button_secondary_text: v } : p)} />
-                <Field label="Secondary Button Link" value={editingHero.button_secondary_link} onChange={v => setEditingHero(p => p ? { ...p, button_secondary_link: v } : p)} />
-              </div>
-              <ImagePicker label="Background Image" value={editingHero.background_image} onChange={v => setEditingHero(p => p ? { ...p, background_image: v } : p)} />
+            {/* Current logo preview */}
+            <div className="mb-4 p-4 rounded-lg flex items-center justify-center" style={{ background: '#000', border: '1px solid #374151', minHeight: 90 }}>
+              {logo.url ? <img src={logo.url} alt={logo.alt_text} className="max-h-16 max-w-full object-contain" /> : <span className="text-xs" style={{ color: '#4b5563' }}>No logo set</span>}
             </div>
-            <div className="sticky bottom-0 bg-white border-t px-6 py-4 flex gap-3 rounded-b-2xl">
-              <Button onClick={() => saveHero(editingHero!)} disabled={saving} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white">
-                {saving ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />} Save Hero
-              </Button>
-              <Button variant="outline" onClick={() => setEditingHero(null)} className="flex-1">Cancel</Button>
+            <div className="space-y-3">
+              <Field label="Upload New Logo">
+                <ImageUploader currentUrl="" onUploaded={url => setLogos(prev => prev.map(x => x.id === logo.id ? { ...x, url } : x))} label="Click or drag to upload" folder="logos" />
+              </Field>
+              <Field label="Alt Text">
+                <Input value={logo.alt_text} onChange={e => setLogos(prev => prev.map(x => x.id === logo.id ? { ...x, alt_text: e.target.value } : x))} placeholder="Logo description" />
+              </Field>
+              <button onClick={() => saveLogo(logo)} className="w-full py-2.5 rounded-lg text-white font-bold text-sm transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
+                style={{ background: '#F4A300' }}>
+                <Save className="h-4 w-4" />Save Logo
+              </button>
             </div>
           </div>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 
-  // ─── Tab: Services ─────────────────────────────────────────────────────────
-  const ServicesTab = () => {
-    const emptyService: ServiceItem = { title: '', subtitle: '', description: '', image: '', features: [], pricing: '', is_featured: false, sort_order: 0, is_active: true };
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <SectionHeader icon={Wrench} title="Services" subtitle="Manage your service offerings" />
-          <Button onClick={() => setEditingService(emptyService)} className="bg-orange-500 hover:bg-orange-600 text-white">
-            <Plus className="h-4 w-4 mr-2" /> Add Service
-          </Button>
-        </div>
-        <div className="grid md:grid-cols-2 gap-4">
-          {services.map(service => (
-            <Card key={service.id} className="hover:shadow-md transition-all">
-              <CardContent className="p-0 overflow-hidden rounded-xl">
-                {service.image && <img src={service.image} alt={service.title} className="w-full h-40 object-cover" onError={e => (e.target as HTMLImageElement).style.display = 'none'} />}
-                <div className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h3 className="font-bold text-gray-900">{service.title}</h3>
-                      <p className="text-xs text-gray-500">{service.subtitle}</p>
-                    </div>
-                    {service.is_featured && <Badge className="bg-orange-100 text-orange-700 shrink-0">Featured</Badge>}
-                  </div>
-                  <p className="text-sm text-gray-600 line-clamp-2 mb-3">{service.description}</p>
-                  <p className="text-sm font-semibold text-orange-600 mb-3">{service.pricing}</p>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => setEditingService(service)} className="flex-1 hover:border-orange-300 hover:text-orange-600">
-                      <Edit className="h-3 w-3 mr-1" /> Edit
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => deleteService(service.id!)} className="text-red-500 hover:border-red-300 hover:bg-red-50">
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+  const renderHeroSections = () => (
+    <div>
+      <h2 className="text-2xl font-black text-white mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>Hero Sections</h2>
+      <p className="text-sm mb-6" style={{ color: '#6b7280' }}>Manage the hero section content for each page of your website.</p>
+      <div className="space-y-5">
+        {heroes.map(hero => (
+          <HeroEditor key={hero.id} hero={hero} onSave={saveHero} saving={saving} />
+        ))}
+      </div>
+    </div>
+  );
 
-        {editingService && (
-          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setEditingService(null)}>
-            <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
-              <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between rounded-t-2xl">
-                <h3 className="font-bold">{editingService.id ? 'Edit Service' : 'Add Service'}</h3>
-                <button onClick={() => setEditingService(null)} className="p-1 hover:bg-gray-100 rounded-lg"><X className="h-5 w-5" /></button>
+  const renderStats = () => (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Stats & Numbers</h2>
+        <button onClick={() => setStats(prev => [...prev, { id: 0, label: 'New Stat', value: 0, suffix: '+', sort_order: prev.length, is_active: true }])}
+          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white transition-all hover:scale-105"
+          style={{ background: '#F4A300' }}>
+          <Plus className="h-4 w-4" />Add Stat
+        </button>
+      </div>
+      <div className="grid md:grid-cols-2 gap-4">
+        {stats.map((stat, i) => (
+          <div key={stat.id || `new-${i}`} className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-3xl font-black" style={{ color: '#F4A300', fontFamily: "'Poppins', sans-serif" }}>{stat.value}{stat.suffix}</div>
+              <div className="flex items-center gap-2">
+                <Toggle checked={stat.is_active} onChange={v => setStats(prev => prev.map((x, xi) => xi === i ? { ...x, is_active: v } : x))} />
+                {stat.id > 0 && <button onClick={() => deleteStat(stat.id)} className="p-1.5 rounded-lg hover:bg-red-900/30" style={{ color: '#ef4444' }}><Trash2 className="h-4 w-4" /></button>}
               </div>
-              <div className="p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="Title" value={editingService.title} onChange={v => setEditingService(p => p ? { ...p, title: v } : p)} />
-                  <Field label="Subtitle" value={editingService.subtitle} onChange={v => setEditingService(p => p ? { ...p, subtitle: v } : p)} />
-                  <Field label="Pricing" value={editingService.pricing} onChange={v => setEditingService(p => p ? { ...p, pricing: v } : p)} />
-                  <Field label="Sort Order" value={String(editingService.sort_order)} onChange={v => setEditingService(p => p ? { ...p, sort_order: parseInt(v) || 0 } : p)} type="number" />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Description</label>
-                  <Textarea value={editingService.description} onChange={e => setEditingService(p => p ? { ...p, description: e.target.value } : p)} rows={3} className="text-sm resize-none" />
-                </div>
-                <ImagePicker label="Service Image" value={editingService.image} onChange={v => setEditingService(p => p ? { ...p, image: v } : p)} />
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Features (one per line)</label>
-                  <Textarea value={editingService.features.join('\n')} onChange={e => setEditingService(p => p ? { ...p, features: e.target.value.split('\n').filter(Boolean) } : p)} rows={4} className="text-sm resize-none" />
-                </div>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={editingService.is_featured} onChange={e => setEditingService(p => p ? { ...p, is_featured: e.target.checked } : p)} className="rounded" />
-                  <span className="text-sm font-medium text-gray-700">Featured on Homepage</span>
-                </label>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="col-span-2">
+                <Field label="Label">
+                  <Input value={stat.label} onChange={e => setStats(prev => prev.map((x, xi) => xi === i ? { ...x, label: e.target.value } : x))} placeholder="Projects Completed" />
+                </Field>
               </div>
-              <div className="sticky bottom-0 bg-white border-t px-6 py-4 flex gap-3 rounded-b-2xl">
-                <Button onClick={() => saveService(editingService!)} disabled={saving} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white">
-                  {saving ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />} Save Service
-                </Button>
-                <Button variant="outline" onClick={() => setEditingService(null)} className="flex-1">Cancel</Button>
+              <div>
+                <Field label="Suffix">
+                  <Input value={stat.suffix} onChange={e => setStats(prev => prev.map((x, xi) => xi === i ? { ...x, suffix: e.target.value } : x))} placeholder="+" />
+                </Field>
               </div>
+              <div className="col-span-2">
+                <Field label="Number">
+                  <Input type="number" value={stat.value} onChange={e => setStats(prev => prev.map((x, xi) => xi === i ? { ...x, value: parseInt(e.target.value) || 0 } : x))} />
+                </Field>
+              </div>
+              <div>
+                <Field label="Order">
+                  <Input type="number" value={stat.sort_order} onChange={e => setStats(prev => prev.map((x, xi) => xi === i ? { ...x, sort_order: parseInt(e.target.value) || 0 } : x))} />
+                </Field>
+              </div>
+            </div>
+            <button onClick={() => saveStat(stat)} className="mt-4 w-full py-2 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" style={{ background: '#F4A300' }}>
+              <Save className="h-4 w-4" />{stat.id ? 'Save Changes' : 'Create Stat'}
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderAbout = () => (
+    <div>
+      <h2 className="text-2xl font-black text-white mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>About Page Content</h2>
+      <div className="grid md:grid-cols-2 gap-5">
+        {aboutContent.map(ab => (
+          <div key={ab.id} className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+            <h3 className="font-black text-sm uppercase tracking-widest mb-4 flex items-center gap-2" style={{ color: '#F4A300' }}>
+              <span className="w-3 h-px block" style={{ background: '#F4A300' }} />{ab.section}
+            </h3>
+            <div className="space-y-3">
+              <Field label="Section Title">
+                <Input value={ab.title || ''} onChange={e => setAboutContent(prev => prev.map(x => x.id === ab.id ? { ...x, title: e.target.value } : x))} />
+              </Field>
+              <Field label="Content">
+                <Textarea rows={4} value={ab.content || ''} onChange={e => setAboutContent(prev => prev.map(x => x.id === ab.id ? { ...x, content: e.target.value } : x))} />
+              </Field>
+              <Field label="Section Image (optional)">
+                <ImageUploader currentUrl={ab.image_url || ''} onUploaded={url => setAboutContent(prev => prev.map(x => x.id === ab.id ? { ...x, image_url: url } : x))} folder="about" />
+              </Field>
+              <button onClick={() => saveAbout(ab)} className="w-full py-2.5 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" style={{ background: '#F4A300' }}>
+                <Save className="h-4 w-4" />Save Section
+              </button>
             </div>
           </div>
-        )}
+        ))}
       </div>
-    );
-  };
+    </div>
+  );
 
-  // ─── Tab: Portfolio ────────────────────────────────────────────────────────
-  const PortfolioTab = () => {
-    const emptyProject: PortfolioItem = { title: '', category: 'Exhibition', client: '', location: '', project_date: '', description: '', image: '', award: '', is_featured: false, is_active: true };
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <SectionHeader icon={FolderOpen} title="Portfolio" subtitle="Manage your project showcase" />
-          <Button onClick={() => setEditingPortfolio(emptyProject)} className="bg-orange-500 hover:bg-orange-600 text-white">
-            <Plus className="h-4 w-4 mr-2" /> Add Project
-          </Button>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {portfolio.map(item => (
-            <Card key={item.id} className="hover:shadow-md transition-all">
-              <CardContent className="p-0 overflow-hidden rounded-xl">
-                <div className="relative">
-                  <img src={item.image} alt={item.title} className="w-full h-44 object-cover" onError={e => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1703849222937-8a050e8a0607?w=400&auto=format&fit=crop&q=60' }} />
-                  <div className="absolute top-2 left-2 flex gap-1">
-                    <Badge className="bg-orange-500 text-white text-xs">{item.category}</Badge>
-                    {item.is_featured && <Badge className="bg-yellow-500 text-white text-xs">⭐</Badge>}
-                  </div>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-bold text-gray-900 mb-1">{item.title}</h3>
-                  <p className="text-xs text-gray-500 mb-3">{item.client} · {item.location}</p>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => setEditingPortfolio(item)} className="flex-1 hover:border-orange-300 hover:text-orange-600">
-                      <Edit className="h-3 w-3 mr-1" /> Edit
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => deletePortfolio(item.id!)} className="text-red-500 hover:border-red-300 hover:bg-red-50">
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+  const renderServices = () => (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Services</h2>
+        <button onClick={() => setServices(prev => [...prev, { id: 0, title: 'New Service', subtitle: '', description: '', icon: 'Layers', image_url: '', sort_order: prev.length + 1, is_active: true, is_featured: false }])}
+          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#F4A300' }}>
+          <Plus className="h-4 w-4" />Add Service
+        </button>
+      </div>
+      <div className="space-y-4">
+        {services.map((svc, i) => (
+          <ServiceEditor key={svc.id || `new-${i}`} service={svc} index={i}
+            onChange={updated => setServices(prev => prev.map((x, xi) => xi === i ? updated : x))}
+            onSave={() => saveService(svc)}
+            onDelete={() => svc.id ? deleteService(svc.id) : setServices(prev => prev.filter((_, xi) => xi !== i))} />
+        ))}
+      </div>
+    </div>
+  );
 
-        {editingPortfolio && (
-          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setEditingPortfolio(null)}>
-            <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
-              <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between rounded-t-2xl">
-                <h3 className="font-bold">{editingPortfolio.id ? 'Edit Project' : 'Add Project'}</h3>
-                <button onClick={() => setEditingPortfolio(null)} className="p-1 hover:bg-gray-100 rounded-lg"><X className="h-5 w-5" /></button>
-              </div>
-              <div className="p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="Project Title" value={editingPortfolio.title} onChange={v => setEditingPortfolio(p => p ? { ...p, title: v } : p)} />
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Category</label>
-                    <select value={editingPortfolio.category} onChange={e => setEditingPortfolio(p => p ? { ...p, category: e.target.value } : p)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
-                      {['Exhibition', 'Event', 'Booth', 'Corporate'].map(c => <option key={c}>{c}</option>)}
-                    </select>
-                  </div>
-                  <Field label="Client Name" value={editingPortfolio.client} onChange={v => setEditingPortfolio(p => p ? { ...p, client: v } : p)} />
-                  <Field label="Location" value={editingPortfolio.location} onChange={v => setEditingPortfolio(p => p ? { ...p, location: v } : p)} />
-                  <Field label="Date" value={editingPortfolio.project_date} onChange={v => setEditingPortfolio(p => p ? { ...p, project_date: v } : p)} />
-                  <Field label="Award (optional)" value={editingPortfolio.award} onChange={v => setEditingPortfolio(p => p ? { ...p, award: v } : p)} />
+  const renderPortfolio = () => (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Portfolio Projects</h2>
+        <button onClick={() => setPortfolio(prev => [...prev, { id: 0, title: 'New Project', category: 'Exhibition', client: '', location: 'Cairo, Egypt', project_date: '2026', visitors: '', description: '', image_url: '', award: '', is_featured: false, is_active: true, sort_order: prev.length + 1 }])}
+          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#F4A300' }}>
+          <Plus className="h-4 w-4" />Add Project
+        </button>
+      </div>
+      <div className="space-y-4">
+        {portfolio.map((proj, i) => (
+          <PortfolioEditor key={proj.id || `new-${i}`} project={proj} index={i}
+            onChange={updated => setPortfolio(prev => prev.map((x, xi) => xi === i ? updated : x))}
+            onSave={() => savePortfolio(proj)}
+            onDelete={() => proj.id ? deletePortfolio(proj.id) : setPortfolio(prev => prev.filter((_, xi) => xi !== i))} />
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderTeam = () => (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Team Members</h2>
+        <button onClick={() => setTeam(prev => [...prev, { id: 0, name: 'New Member', role: '', bio: '', image_url: '', email: '', linkedin_url: '', sort_order: prev.length + 1, is_active: true }])}
+          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#F4A300' }}>
+          <Plus className="h-4 w-4" />Add Member
+        </button>
+      </div>
+      <div className="grid md:grid-cols-2 gap-4">
+        {team.map((member, i) => (
+          <div key={member.id || `new-${i}`} className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                {member.image_url ? <img src={member.image_url} className="w-10 h-10 rounded-full object-cover" alt={member.name} /> : <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: '#1f2937' }}><Users className="h-5 w-5" style={{ color: '#4b5563' }} /></div>}
+                <div>
+                  <p className="font-bold text-sm text-white">{member.name}</p>
+                  <p className="text-xs" style={{ color: '#6b7280' }}>{member.role}</p>
                 </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Description</label>
-                  <Textarea value={editingPortfolio.description} onChange={e => setEditingPortfolio(p => p ? { ...p, description: e.target.value } : p)} rows={3} className="text-sm resize-none" />
-                </div>
-                <ImagePicker label="Project Image" value={editingPortfolio.image} onChange={v => setEditingPortfolio(p => p ? { ...p, image: v } : p)} />
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={editingPortfolio.is_featured} onChange={e => setEditingPortfolio(p => p ? { ...p, is_featured: e.target.checked } : p)} className="rounded" />
-                  <span className="text-sm font-medium text-gray-700">Featured on Homepage</span>
-                </label>
               </div>
-              <div className="sticky bottom-0 bg-white border-t px-6 py-4 flex gap-3 rounded-b-2xl">
-                <Button onClick={() => savePortfolio(editingPortfolio!)} disabled={saving} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white">
-                  {saving ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />} Save Project
-                </Button>
-                <Button variant="outline" onClick={() => setEditingPortfolio(null)} className="flex-1">Cancel</Button>
+              <div className="flex items-center gap-2">
+                <Toggle checked={member.is_active} onChange={v => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, is_active: v } : x))} />
+                <button onClick={() => member.id ? deleteTeam(member.id) : setTeam(prev => prev.filter((_, xi) => xi !== i))} className="p-1.5 rounded-lg" style={{ color: '#ef4444' }}><Trash2 className="h-4 w-4" /></button>
               </div>
+            </div>
+            <div className="space-y-3">
+              <Field label="Photo">
+                <ImageUploader currentUrl={member.image_url} onUploaded={url => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, image_url: url } : x))} folder="team" />
+              </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Name"><Input value={member.name} onChange={e => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, name: e.target.value } : x))} /></Field>
+                <Field label="Role"><Input value={member.role || ''} onChange={e => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, role: e.target.value } : x))} placeholder="CEO, Designer..." /></Field>
+                <Field label="Email"><Input value={member.email || ''} onChange={e => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, email: e.target.value } : x))} type="email" /></Field>
+                <Field label="LinkedIn URL"><Input value={member.linkedin_url || ''} onChange={e => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, linkedin_url: e.target.value } : x))} /></Field>
+              </div>
+              <Field label="Bio">
+                <Textarea value={member.bio || ''} onChange={e => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, bio: e.target.value } : x))} placeholder="Short biography..." />
+              </Field>
+              <button onClick={() => saveTeam(member)} className="w-full py-2.5 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" style={{ background: '#F4A300' }}>
+                <Save className="h-4 w-4" />{member.id ? 'Save Changes' : 'Add Member'}
+              </button>
             </div>
           </div>
-        )}
+        ))}
       </div>
-    );
-  };
+    </div>
+  );
 
-  // ─── Tab: Team ─────────────────────────────────────────────────────────────
-  const TeamTab = () => {
-    const emptyMember: TeamMember = { name: '', role: '', bio: '', image: '', experience: '', sort_order: 0, is_active: true };
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <SectionHeader icon={Users} title="Team Members" subtitle="Manage your About page team section" />
-          <Button onClick={() => setEditingTeam(emptyMember)} className="bg-orange-500 hover:bg-orange-600 text-white">
-            <Plus className="h-4 w-4 mr-2" /> Add Member
-          </Button>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {team.map(member => (
-            <Card key={member.id} className="hover:shadow-md transition-all">
-              <CardContent className="p-4 flex gap-4">
-                <img src={member.image} alt={member.name} className="w-16 h-16 rounded-full object-cover shrink-0" onError={e => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=100&auto=format&fit=crop&q=60' }} />
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-gray-900 truncate">{member.name}</h3>
-                  <p className="text-xs text-orange-600 font-medium">{member.role}</p>
-                  <p className="text-xs text-gray-500">{member.experience}</p>
-                  <div className="flex gap-2 mt-3">
-                    <Button size="sm" variant="outline" onClick={() => setEditingTeam(member)} className="flex-1 h-7 text-xs hover:border-orange-300 hover:text-orange-600">
-                      <Edit className="h-3 w-3 mr-1" /> Edit
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => deleteTeam(member.id!)} className="h-7 text-red-500 hover:border-red-300 hover:bg-red-50">
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {editingTeam && (
-          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setEditingTeam(null)}>
-            <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
-              <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between rounded-t-2xl">
-                <h3 className="font-bold">{editingTeam.id ? 'Edit Member' : 'Add Member'}</h3>
-                <button onClick={() => setEditingTeam(null)} className="p-1 hover:bg-gray-100 rounded-lg"><X className="h-5 w-5" /></button>
+  const renderTestimonials = () => (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Testimonials</h2>
+        <button onClick={() => setTestimonials(prev => [...prev, { id: 0, author_name: 'Client Name', author_role: 'CEO', company: 'Company', quote: '', rating: 5, image_url: '', is_active: true, sort_order: prev.length + 1 }])}
+          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#F4A300' }}>
+          <Plus className="h-4 w-4" />Add Testimonial
+        </button>
+      </div>
+      <div className="grid md:grid-cols-2 gap-4">
+        {testimonials.map((t, i) => (
+          <div key={t.id || `new-${i}`} className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+            <div className="flex items-center justify-between mb-4">
+              <p className="font-bold text-sm text-white">{t.author_name}</p>
+              <div className="flex items-center gap-2">
+                <Toggle checked={t.is_active} onChange={v => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, is_active: v } : x))} />
+                <button onClick={() => t.id ? deleteTestimonial(t.id) : setTestimonials(prev => prev.filter((_, xi) => xi !== i))} className="p-1.5 rounded-lg" style={{ color: '#ef4444' }}><Trash2 className="h-4 w-4" /></button>
               </div>
-              <div className="p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="Full Name" value={editingTeam.name} onChange={v => setEditingTeam(p => p ? { ...p, name: v } : p)} />
-                  <Field label="Role / Position" value={editingTeam.role} onChange={v => setEditingTeam(p => p ? { ...p, role: v } : p)} />
-                  <Field label="Experience" value={editingTeam.experience} onChange={v => setEditingTeam(p => p ? { ...p, experience: v } : p)} />
-                  <Field label="Sort Order" value={String(editingTeam.sort_order)} onChange={v => setEditingTeam(p => p ? { ...p, sort_order: parseInt(v) || 0 } : p)} type="number" />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Bio</label>
-                  <Textarea value={editingTeam.bio} onChange={e => setEditingTeam(p => p ? { ...p, bio: e.target.value } : p)} rows={3} className="text-sm resize-none" />
-                </div>
-                <ImagePicker label="Profile Photo" value={editingTeam.image} onChange={v => setEditingTeam(p => p ? { ...p, image: v } : p)} />
+            </div>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Name"><Input value={t.author_name} onChange={e => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, author_name: e.target.value } : x))} /></Field>
+                <Field label="Role / Title"><Input value={t.author_role || ''} onChange={e => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, author_role: e.target.value } : x))} /></Field>
+                <Field label="Company"><Input value={t.company || ''} onChange={e => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, company: e.target.value } : x))} /></Field>
+                <Field label="Rating (1-5)">
+                  <Input type="number" min={1} max={5} value={t.rating} onChange={e => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, rating: parseInt(e.target.value) || 5 } : x))} />
+                </Field>
               </div>
-              <div className="sticky bottom-0 bg-white border-t px-6 py-4 flex gap-3 rounded-b-2xl">
-                <Button onClick={() => saveTeam(editingTeam!)} disabled={saving} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white">
-                  {saving ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />} Save Member
-                </Button>
-                <Button variant="outline" onClick={() => setEditingTeam(null)} className="flex-1">Cancel</Button>
-              </div>
+              <Field label="Photo (optional)">
+                <ImageUploader currentUrl={t.image_url || ''} onUploaded={url => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, image_url: url } : x))} folder="testimonials" />
+              </Field>
+              <Field label="Quote / Review">
+                <Textarea rows={4} value={t.quote || ''} onChange={e => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, quote: e.target.value } : x))} placeholder="What did the client say?" />
+              </Field>
+              <button onClick={() => saveTestimonial(t)} className="w-full py-2.5 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" style={{ background: '#F4A300' }}>
+                <Save className="h-4 w-4" />{t.id ? 'Save Changes' : 'Add Testimonial'}
+              </button>
             </div>
           </div>
-        )}
+        ))}
       </div>
-    );
-  };
+    </div>
+  );
 
-  // ─── Tab: Testimonials ─────────────────────────────────────────────────────
-  const TestimonialsTab = () => {
-    const empty: Testimonial = { client_name: '', client_title: '', client_company: '', client_image: '', testimonial: '', rating: 5, is_featured: false, is_active: true };
+  const renderMedia = () => {
+    const inputRef = useRef<HTMLInputElement>(null);
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <SectionHeader icon={Star} title="Testimonials" subtitle="Client reviews shown on homepage" />
-          <Button onClick={() => setEditingTestimonial(empty)} className="bg-orange-500 hover:bg-orange-600 text-white">
-            <Plus className="h-4 w-4 mr-2" /> Add Review
-          </Button>
-        </div>
-        <div className="space-y-4">
-          {testimonials.map(t => (
-            <Card key={t.id} className="hover:shadow-md transition-all">
-              <CardContent className="p-4 flex gap-4">
-                <img src={t.client_image || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=60'} alt={t.client_name} className="w-12 h-12 rounded-full object-cover shrink-0" onError={e => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=60' }} />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <div>
-                      <span className="font-bold text-gray-900 text-sm">{t.client_name}</span>
-                      <span className="text-gray-400 text-xs ml-2">{t.client_title} · {t.client_company}</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => setEditingTestimonial(t)} className="h-7 text-xs hover:border-orange-300 hover:text-orange-600">
-                        <Edit className="h-3 w-3" />
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => deleteTestimonial(t.id!)} className="h-7 text-red-500 hover:border-red-300 hover:bg-red-50">
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-600 italic">"{t.testimonial}"</p>
-                  <div className="flex items-center gap-1 mt-1">{Array.from({ length: t.rating }).map((_, i) => <Star key={i} className="h-3 w-3 text-yellow-400 fill-yellow-400" />)}</div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {editingTestimonial && (
-          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setEditingTestimonial(null)}>
-            <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
-              <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between rounded-t-2xl">
-                <h3 className="font-bold">{editingTestimonial.id ? 'Edit Testimonial' : 'Add Testimonial'}</h3>
-                <button onClick={() => setEditingTestimonial(null)} className="p-1 hover:bg-gray-100 rounded-lg"><X className="h-5 w-5" /></button>
-              </div>
-              <div className="p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="Client Name" value={editingTestimonial.client_name} onChange={v => setEditingTestimonial(p => p ? { ...p, client_name: v } : p)} />
-                  <Field label="Job Title" value={editingTestimonial.client_title} onChange={v => setEditingTestimonial(p => p ? { ...p, client_title: v } : p)} />
-                  <Field label="Company" value={editingTestimonial.client_company} onChange={v => setEditingTestimonial(p => p ? { ...p, client_company: v } : p)} />
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Rating</label>
-                    <select value={editingTestimonial.rating} onChange={e => setEditingTestimonial(p => p ? { ...p, rating: parseInt(e.target.value) } : p)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                      {[5, 4, 3, 2, 1].map(r => <option key={r} value={r}>{r} Stars</option>)}
-                    </select>
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Testimonial Text</label>
-                  <Textarea value={editingTestimonial.testimonial} onChange={e => setEditingTestimonial(p => p ? { ...p, testimonial: e.target.value } : p)} rows={4} className="text-sm resize-none" />
-                </div>
-                <ImagePicker label="Client Photo (optional)" value={editingTestimonial.client_image} onChange={v => setEditingTestimonial(p => p ? { ...p, client_image: v } : p)} />
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={editingTestimonial.is_featured} onChange={e => setEditingTestimonial(p => p ? { ...p, is_featured: e.target.checked } : p)} className="rounded" />
-                  <span className="text-sm font-medium text-gray-700">Featured on Homepage</span>
-                </label>
-              </div>
-              <div className="sticky bottom-0 bg-white border-t px-6 py-4 flex gap-3 rounded-b-2xl">
-                <Button onClick={() => saveTestimonial(editingTestimonial!)} disabled={saving} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white">
-                  {saving ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />} Save
-                </Button>
-                <Button variant="outline" onClick={() => setEditingTestimonial(null)} className="flex-1">Cancel</Button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // ─── Tab: Media Library ────────────────────────────────────────────────────
-  const MediaTab = () => {
-    const fileRef = useRef<HTMLInputElement>(null);
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <SectionHeader icon={Image} title="Media Library" subtitle="Upload and manage all website images" />
-          <Button onClick={() => fileRef.current?.click()} className="bg-orange-500 hover:bg-orange-600 text-white">
-            <Upload className="h-4 w-4 mr-2" /> Upload Image
-          </Button>
-        </div>
-        <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={e => { Array.from(e.target.files || []).forEach(f => uploadMedia(f)); e.target.value = ''; }} />
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {media.map(item => (
-            <div key={item.id} className="group relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50 aspect-square hover:shadow-md transition-all">
-              <img src={item.url} alt={item.alt_text} className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).style.opacity = '0.3' }} />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                <div className="flex gap-2">
-                  <button onClick={() => navigator.clipboard.writeText(item.url).then(() => showToast('URL copied!'))} className="bg-white text-gray-800 rounded-lg p-2 hover:bg-orange-500 hover:text-white transition-colors" title="Copy URL">
-                    <Eye className="h-4 w-4" />
-                  </button>
-                  <button onClick={() => deleteMedia(item.id!)} className="bg-white text-red-600 rounded-lg p-2 hover:bg-red-500 hover:text-white transition-colors" title="Delete">
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 p-2">
-                <p className="text-white text-xs truncate">{item.name}</p>
-              </div>
-            </div>
-          ))}
-          <button onClick={() => fileRef.current?.click()} className="aspect-square rounded-xl border-2 border-dashed border-gray-300 hover:border-orange-400 hover:bg-orange-50 transition-all flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-orange-500">
-            <Upload className="h-8 w-8" />
-            <span className="text-xs font-medium">Upload</span>
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Media Library</h2>
+          <button onClick={() => inputRef.current?.click()} className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#F4A300' }}>
+            <Upload className="h-4 w-4" />Upload Image
           </button>
         </div>
+        <input ref={inputRef} type="file" accept="image/*" multiple className="hidden"
+          onChange={e => { Array.from(e.target.files || []).forEach(handleMediaUpload); }} />
+        {media.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 rounded-xl" style={{ background: '#111827', border: '2px dashed #374151' }}>
+            <Upload className="h-10 w-10 mb-3" style={{ color: '#374151' }} />
+            <p className="font-bold text-white mb-1">No images yet</p>
+            <p className="text-sm mb-4" style={{ color: '#6b7280' }}>Upload your first image to get started</p>
+            <button onClick={() => inputRef.current?.click()} className="px-5 py-2 rounded-lg text-white font-bold text-sm" style={{ background: '#F4A300' }}>Choose Files</button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            {media.map(m => (
+              <div key={m.id} className="group relative rounded-xl overflow-hidden" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+                <img src={m.url} alt={m.alt_text || m.filename} className="w-full h-28 object-cover" />
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2" style={{ background: 'rgba(0,0,0,0.75)' }}>
+                  <a href={m.url} target="_blank" rel="noopener noreferrer" className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.2)' }}>
+                    <ExternalLink className="h-3.5 w-3.5 text-white" />
+                  </a>
+                  <button onClick={() => deleteMedia(m)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'rgba(239,68,68,0.8)' }}>
+                    <Trash2 className="h-3.5 w-3.5 text-white" />
+                  </button>
+                </div>
+                <div className="p-2">
+                  <p className="text-[10px] truncate" style={{ color: '#6b7280' }}>{m.filename}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     );
   };
 
-  // ─── Tab: Logos ────────────────────────────────────────────────────────────
-  const LogosTab = () => {
-    const headerRef = useRef<HTMLInputElement>(null);
-    const footerRef = useRef<HTMLInputElement>(null);
-    return (
-      <div className="space-y-6">
-        <SectionHeader icon={ImageIcon} title="Logo Management" subtitle="Control header and footer logos" />
-        <div className="grid md:grid-cols-2 gap-6">
-          {(['header', 'footer'] as const).map(type => (
-            <Card key={type}>
-              <CardHeader><CardTitle className="capitalize text-sm text-orange-600 uppercase tracking-wide">{type} Logo</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <div className="bg-gray-900 rounded-xl p-6 flex items-center justify-center h-32">
-                  <img src={logos[type].url} alt={logos[type].alt} className="max-h-full w-auto object-contain" onError={e => { (e.target as HTMLImageElement).src = './images/mopi_logo_20260101_112924.png' }} />
-                </div>
-                <p className="text-xs text-gray-400 truncate">{logos[type].name || 'Default logo'}</p>
-                <div className="flex gap-2">
-                  <Button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white" onClick={() => (type === 'header' ? headerRef : footerRef).current?.click()}>
-                    <Upload className="h-4 w-4 mr-2" /> Upload New
-                  </Button>
-                  <Button variant="outline" className="text-red-500 hover:border-red-300 hover:bg-red-50" onClick={() => setLogos(prev => ({ ...prev, [type]: { url: './images/mopi_logo_20260101_112924.png', alt: 'MOPi Production', name: 'default' } }))}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+  const renderInbox = () => (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
+          Contact Inbox {unreadCount > 0 && <span className="ml-2 text-sm px-2.5 py-0.5 rounded-full" style={{ background: '#F4A300', color: '#000' }}>{unreadCount} new</span>}
+        </h2>
+      </div>
+      {inbox.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+          <MessageSquare className="h-10 w-10 mb-3" style={{ color: '#374151' }} />
+          <p className="font-bold text-white">No messages yet</p>
+          <p className="text-sm mt-1" style={{ color: '#6b7280' }}>Contact form submissions will appear here</p>
         </div>
-        <input ref={headerRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) uploadLogo('header', f); e.target.value = ''; }} />
-        <input ref={footerRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) uploadLogo('footer', f); e.target.value = ''; }} />
-      </div>
-    );
-  };
-
-  // ─── Tab: Contacts ─────────────────────────────────────────────────────────
-  const ContactsTab = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <SectionHeader icon={MessageSquare} title="Contact Inbox" subtitle="All form submissions from your website" />
-        <Button variant="outline" onClick={loadAllData}><RefreshCw className="h-4 w-4 mr-2" /> Refresh</Button>
-      </div>
-      {contacts.length === 0 ? (
-        <Card><CardContent className="py-16 text-center"><MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" /><p className="text-gray-500">No contact submissions yet.</p></CardContent></Card>
       ) : (
         <div className="space-y-3">
-          {contacts.map(c => (
-            <Card key={c.id} className="hover:shadow-md transition-all">
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="font-bold text-gray-900">{c.name} <span className="font-normal text-gray-500 text-sm">— {c.company}</span></h3>
-                    <p className="text-sm text-gray-500">{c.email} {c.phone && `· ${c.phone}`}</p>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Badge className={c.status === 'new' ? 'bg-orange-100 text-orange-700' : c.status === 'replied' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}>{c.status}</Badge>
-                    <Button size="sm" variant="outline" onClick={() => deleteContact(c.id)} className="h-7 text-red-500 hover:border-red-300 hover:bg-red-50"><Trash2 className="h-3 w-3" /></Button>
+          {inbox.map(msg => (
+            <div key={msg.id} className="p-5 rounded-xl transition-all" style={{ background: '#111827', border: `1px solid ${msg.status === 'new' ? 'rgba(244,163,0,0.3)' : '#1f2937'}` }}>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-4 flex-1 min-w-0">
+                  <span className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" style={{ background: msg.status === 'new' ? '#F4A300' : msg.status === 'replied' ? '#10b981' : '#374151' }} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 flex-wrap mb-1">
+                      <span className="font-bold text-sm text-white">{msg.name}</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: msg.status === 'new' ? 'rgba(244,163,0,0.15)' : 'rgba(255,255,255,0.05)', color: msg.status === 'new' ? '#F4A300' : '#6b7280' }}>{msg.status}</span>
+                      {msg.service && <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(59,130,246,0.1)', color: '#60a5fa' }}>{msg.service}</span>}
+                    </div>
+                    <div className="flex items-center gap-4 text-xs mb-2" style={{ color: '#6b7280' }}>
+                      <span className="flex items-center gap-1"><Mail className="h-3 w-3" />{msg.email}</span>
+                      {msg.phone && <span className="flex items-center gap-1"><Phone className="h-3 w-3" />{msg.phone}</span>}
+                      {msg.company && <span>{msg.company}</span>}
+                      <span>{new Date(msg.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <p className="text-sm" style={{ color: '#d1d5db' }}>{msg.message}</p>
                   </div>
                 </div>
-                {c.service && <p className="text-xs text-orange-600 font-medium mb-2">Service: {c.service}</p>}
-                <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3">{c.message}</p>
-                <div className="flex gap-2 mt-3">
-                  {['new', 'in-progress', 'replied', 'closed'].map(s => (
-                    <button key={s} onClick={() => updateContactStatus(c.id, s)} className={`text-xs px-3 py-1 rounded-full border transition-colors ${c.status === s ? 'bg-orange-500 text-white border-orange-500' : 'border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600'}`}>{s}</button>
-                  ))}
+                <div className="flex items-center gap-2 shrink-0">
+                  <select value={msg.status} onChange={e => updateInboxStatus(msg.id, e.target.value)}
+                    className="text-xs px-2 py-1.5 rounded-lg" style={{ background: '#0f172a', border: '1px solid #374151', color: '#9ca3af' }}>
+                    <option value="new">New</option>
+                    <option value="read">Read</option>
+                    <option value="replied">Replied</option>
+                    <option value="archived">Archived</option>
+                  </select>
+                  <a href={`mailto:${msg.email}?subject=Re: Your inquiry via MOPi Production`}
+                    className="px-3 py-1.5 rounded-lg text-xs font-bold text-white flex items-center gap-1" style={{ background: '#1d4ed8' }}>
+                    <Mail className="h-3 w-3" />Reply
+                  </a>
+                  <button onClick={() => deleteInbox(msg.id)} className="p-1.5 rounded-lg" style={{ color: '#ef4444' }}><Trash2 className="h-4 w-4" /></button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       )}
     </div>
   );
 
-  // ─── Render tabs ───────────────────────────────────────────────────────────
-  const renderTab = () => {
-    switch (activeTab) {
-      case 'dashboard': return <DashboardTab />;
-      case 'settings': return <SettingsTab />;
-      case 'hero': return <HeroTab />;
-      case 'services': return <ServicesTab />;
-      case 'portfolio': return <PortfolioTab />;
-      case 'team': return <TeamTab />;
-      case 'testimonials': return <TestimonialsTab />;
-      case 'media': return <MediaTab />;
-      case 'logos': return <LogosTab />;
-      case 'contacts': return <ContactsTab />;
-      default: return <DashboardTab />;
-    }
+  const sectionRenderer: Record<Section, () => React.ReactNode> = {
+    'dashboard': renderDashboard,
+    'site-settings': renderSiteSettings,
+    'social-links': renderSocialLinks,
+    'logos': renderLogos,
+    'hero-sections': renderHeroSections,
+    'stats': renderStats,
+    'services': renderServices,
+    'portfolio': renderPortfolio,
+    'team': renderTeam,
+    'testimonials': renderTestimonials,
+    'media': renderMedia,
+    'about': renderAbout,
+    'inbox': renderInbox,
   };
 
-  // ─── Main Layout ───────────────────────────────────────────────────────────
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
-      {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'w-60' : 'w-16'} bg-gray-900 text-white flex flex-col transition-all duration-300 shrink-0`}>
-        <div className="p-4 border-b border-gray-800 flex items-center gap-3">
-          {sidebarOpen && <img src="./images/mopi_logo_20260101_112924.png" alt="MOPi" className="h-8 w-auto object-contain" />}
-          <button onClick={() => setSidebarOpen(p => !p)} className="ml-auto p-1 hover:bg-gray-800 rounded-lg transition-colors">
-            <Menu className="h-5 w-5" />
+    <div className="min-h-screen flex" style={{ background: '#0a0a0a', fontFamily: "'Inter', sans-serif" }}>
+      <style>{`
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #374151; }
+      `}</style>
+
+      {/* ── Sidebar ── */}
+      <aside className="shrink-0 flex flex-col transition-all duration-300 z-40"
+        style={{ width: sidebarOpen ? 240 : 64, background: '#0f0f0f', borderRight: '1px solid #1a1a1a', position: 'sticky', top: 0, height: '100vh', overflowY: 'auto', overflowX: 'hidden' }}>
+        {/* Logo */}
+        <div className="flex items-center gap-3 p-4 shrink-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
+          <img src="/images/mopi_logo_20260101_112924.png" alt="MOPi" className="h-8 w-8 object-contain shrink-0" />
+          {sidebarOpen && <span className="font-black text-xs tracking-widest uppercase text-white truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>CMS Admin</span>}
+          <button onClick={() => setSidebarOpen(p => !p)} className="ml-auto shrink-0 p-1 rounded hover:bg-white/5" style={{ color: '#6b7280' }}>
+            <Menu className="h-4 w-4" />
           </button>
         </div>
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {navItems.map(item => (
-            <button key={item.id} onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab === item.id ? 'bg-orange-500 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}>
-              <item.icon className="h-4 w-4 shrink-0" />
-              {sidebarOpen && <span className="truncate">{item.label}</span>}
-            </button>
+
+        {/* Nav */}
+        <nav className="flex-1 py-3 px-2">
+          {sidebarGroups.map(group => (
+            <div key={group.label} className="mb-3">
+              {sidebarOpen && <p className="text-[9px] font-black uppercase tracking-[0.25em] px-3 py-1.5 mb-1" style={{ color: '#374151' }}>{group.label}</p>}
+              {group.items.map(item => (
+                <button key={item.id} onClick={() => setSection(item.id)}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg mb-0.5 transition-all text-left"
+                  style={{ background: section === item.id ? 'rgba(244,163,0,0.12)' : 'transparent', color: section === item.id ? '#F4A300' : '#6b7280', border: section === item.id ? '1px solid rgba(244,163,0,0.2)' : '1px solid transparent' }}
+                  onMouseEnter={e => { if (section !== item.id) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
+                  onMouseLeave={e => { if (section !== item.id) e.currentTarget.style.background = 'transparent'; }}>
+                  <item.icon className="h-4.5 w-4.5 shrink-0" />
+                  {sidebarOpen && <span className="text-sm font-medium truncate">{item.label}</span>}
+                </button>
+              ))}
+            </div>
           ))}
         </nav>
-        <div className="p-3 border-t border-gray-800 space-y-1">
-          <a href="/" target="_blank" rel="noopener noreferrer" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-400 hover:bg-gray-800 hover:text-white transition-all">
-            <Eye className="h-4 w-4 shrink-0" />
-            {sidebarOpen && <span>View Website</span>}
-          </a>
-          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-400 hover:bg-red-900 hover:text-red-300 transition-all">
+
+        {/* Footer */}
+        <div className="p-3 shrink-0" style={{ borderTop: '1px solid #1a1a1a' }}>
+          <Link to="/" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-all" style={{ color: '#4b5563' }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#9ca3af')} onMouseLeave={e => (e.currentTarget.style.color = '#4b5563')}>
+            <ExternalLink className="h-4 w-4 shrink-0" />
+            {sidebarOpen && <span className="text-sm">View Website</span>}
+          </Link>
+          <button onClick={logout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all" style={{ color: '#4b5563' }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')} onMouseLeave={e => (e.currentTarget.style.color = '#4b5563')}>
             <LogOut className="h-4 w-4 shrink-0" />
-            {sidebarOpen && <span>Logout</span>}
+            {sidebarOpen && <span className="text-sm">Sign Out</span>}
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 capitalize">{navItems.find(n => n.id === activeTab)?.label || 'Dashboard'}</h1>
-            <p className="text-xs text-gray-500">MOPi Production CMS · Control your entire website</p>
+      {/* ── Main Content ── */}
+      <main className="flex-1 overflow-y-auto" style={{ minWidth: 0 }}>
+        {/* Topbar */}
+        <div className="sticky top-0 z-30 flex items-center justify-between px-6 py-4" style={{ background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #1a1a1a' }}>
+          <div className="flex items-center gap-3">
+            <div className="text-sm font-bold text-white capitalize">{section.replace(/-/g, ' ')}</div>
+            {saving && <div className="flex items-center gap-1.5 text-xs" style={{ color: '#F4A300' }}><Loader2 className="h-3.5 w-3.5 animate-spin" />Saving...</div>}
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" onClick={loadAllData} className="hover:border-orange-300 hover:text-orange-600">
-              <RefreshCw className="h-4 w-4 mr-1" /> Sync
-            </Button>
-            <a href="/" target="_blank" rel="noopener noreferrer">
-              <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
-                <Eye className="h-4 w-4 mr-1" /> Live Site
-              </Button>
-            </a>
+            <button onClick={fetchAll} className="p-2 rounded-lg transition-all hover:text-[#F4A300]" style={{ color: '#4b5563', background: '#111827', border: '1px solid #1f2937' }}>
+              <RefreshCw className="h-4 w-4" />
+            </button>
+            <Link to="/" target="_blank" className="flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-lg transition-all hover:text-[#F4A300]" style={{ color: '#6b7280', background: '#111827', border: '1px solid #1f2937' }}>
+              <ExternalLink className="h-3.5 w-3.5" />Live Site
+            </Link>
           </div>
-        </header>
-        <div className="flex-1 overflow-y-auto p-6">
-          {renderTab()}
+        </div>
+
+        {/* Content */}
+        <div className="p-6 max-w-6xl">
+          {!loaded ? (
+            <div className="flex items-center justify-center py-32">
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="h-8 w-8 animate-spin" style={{ color: '#F4A300' }} />
+                <p className="text-sm" style={{ color: '#6b7280' }}>Loading CMS data...</p>
+              </div>
+            </div>
+          ) : (
+            sectionRenderer[section]()
+          )}
         </div>
       </main>
 
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {toast && <Toast msg={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
-};
+}
 
-export default AdminDashboard;
+// ─── Sub-components ────────────────────────────────────────────────────────────
+
+function NewSocialForm({ onSave }: { onSave: (item: Omit<SocialLink, 'id'>) => void }) {
+  const [form, setForm] = useState({ platform: '', url: '', icon: '', is_active: true, sort_order: 10 });
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      <div>
+        <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Platform</label>
+        <input value={form.platform} onChange={e => setForm(p => ({ ...p, platform: e.target.value }))} placeholder="e.g. TikTok"
+          className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#111827', border: '1px solid #374151', color: '#f3f4f6' }} />
+      </div>
+      <div>
+        <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>URL</label>
+        <input value={form.url} onChange={e => setForm(p => ({ ...p, url: e.target.value }))} placeholder="https://..."
+          className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#111827', border: '1px solid #374151', color: '#f3f4f6' }} />
+      </div>
+      <div className="col-span-2">
+        <button onClick={() => { if (form.platform && form.url) { onSave({ ...form, icon: form.platform }); setForm({ platform: '', url: '', icon: '', is_active: true, sort_order: 10 }); } }}
+          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#F4A300' }}>
+          <Plus className="h-4 w-4" />Add Social Link
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function HeroEditor({ hero, onSave, saving }: { hero: HeroSection; onSave: (h: HeroSection) => void; saving: boolean }) {
+  const [data, setData] = useState(hero);
+  const [open, setOpen] = useState(false);
+  const pageColors: Record<string, string> = { home: '#F4A300', about: '#3b82f6', services: '#8b5cf6', portfolio: '#10b981', contact: '#f43f5e' };
+
+  return (
+    <div className="rounded-xl overflow-hidden" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+      <button onClick={() => setOpen(p => !p)} className="w-full flex items-center justify-between p-5 text-left">
+        <div className="flex items-center gap-3">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: pageColors[hero.page] || '#F4A300' }} />
+          <span className="font-bold text-white capitalize">{hero.page} Page Hero</span>
+          {hero.badge_text && <span className="text-xs px-2 py-0.5 rounded-full hidden sm:inline" style={{ background: 'rgba(255,255,255,0.05)', color: '#9ca3af' }}>{hero.badge_text}</span>}
+        </div>
+        <ChevronDown className="h-4 w-4 transition-transform" style={{ color: '#6b7280', transform: open ? 'rotate(180deg)' : 'none' }} />
+      </button>
+      {open && (
+        <div className="px-5 pb-5 space-y-4" style={{ borderTop: '1px solid #1f2937' }}>
+          <div className="pt-4 grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Badge Text</label>
+              <input value={data.badge_text || ''} onChange={e => setData(p => ({ ...p, badge_text: e.target.value }))}
+                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+            </div>
+            <div>
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Page</label>
+              <input value={data.page} disabled className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#4b5563' }} />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Heading</label>
+            <input value={data.heading || ''} onChange={e => setData(p => ({ ...p, heading: e.target.value }))}
+              className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }}
+              placeholder="Use <span>text</span> for orange highlight" />
+            <p className="text-xs mt-1" style={{ color: '#4b5563' }}>Tip: wrap text in {`<span>`} for orange highlight</p>
+          </div>
+          <div>
+            <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Subheading</label>
+            <textarea value={data.subheading || ''} onChange={e => setData(p => ({ ...p, subheading: e.target.value }))} rows={3}
+              className="w-full px-3 py-2.5 rounded-lg text-sm resize-none" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Primary CTA Label</label>
+              <input value={data.cta_primary_label || ''} onChange={e => setData(p => ({ ...p, cta_primary_label: e.target.value }))}
+                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+            </div>
+            <div>
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Primary CTA URL</label>
+              <input value={data.cta_primary_url || ''} onChange={e => setData(p => ({ ...p, cta_primary_url: e.target.value }))}
+                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} placeholder="/contact" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Secondary CTA Label</label>
+              <input value={data.cta_secondary_label || ''} onChange={e => setData(p => ({ ...p, cta_secondary_label: e.target.value }))}
+                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+            </div>
+            <div>
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Secondary CTA URL</label>
+              <input value={data.cta_secondary_url || ''} onChange={e => setData(p => ({ ...p, cta_secondary_url: e.target.value }))}
+                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Background Image URL (optional)</label>
+            <input value={data.bg_image_url || ''} onChange={e => setData(p => ({ ...p, bg_image_url: e.target.value }))}
+              className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} placeholder="https://..." />
+          </div>
+          <button onClick={() => onSave(data)} disabled={saving}
+            className="flex items-center gap-2 text-sm font-bold px-5 py-2.5 rounded-lg text-white transition-all hover:scale-[1.02]"
+            style={{ background: '#F4A300' }}>
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            Save Hero Section
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ServiceEditor({ service, index, onChange, onSave, onDelete }: { service: Service; index: number; onChange: (s: Service) => void; onSave: () => void; onDelete: () => void; }) {
+  const [open, setOpen] = useState(!service.id);
+  return (
+    <div className="rounded-xl overflow-hidden" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+      <button onClick={() => setOpen(p => !p)} className="w-full flex items-center justify-between p-5">
+        <div className="flex items-center gap-3">
+          <span className="w-2 h-2 rounded-full" style={{ background: service.is_active ? '#10b981' : '#374151' }} />
+          <span className="font-bold text-sm text-white">{service.title}</span>
+          {service.is_featured && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(244,163,0,0.15)', color: '#F4A300' }}>Featured</span>}
+        </div>
+        <div className="flex items-center gap-3">
+          <button onClick={e => { e.stopPropagation(); onDelete(); }} className="p-1.5 rounded-lg hover:bg-red-900/30" style={{ color: '#ef4444' }}><Trash2 className="h-4 w-4" /></button>
+          <ChevronDown className="h-4 w-4" style={{ color: '#6b7280', transform: open ? 'rotate(180deg)' : 'none' }} />
+        </div>
+      </button>
+      {open && (
+        <div className="px-5 pb-5 space-y-4" style={{ borderTop: '1px solid #1f2937' }}>
+          <div className="pt-4 grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Title</label>
+              <input value={service.title} onChange={e => onChange({ ...service, title: e.target.value })}
+                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+            </div>
+            <div>
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Subtitle</label>
+              <input value={service.subtitle || ''} onChange={e => onChange({ ...service, subtitle: e.target.value })}
+                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Description</label>
+            <textarea value={service.description || ''} onChange={e => onChange({ ...service, description: e.target.value })} rows={3}
+              className="w-full px-3 py-2.5 rounded-lg text-sm resize-none" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+          </div>
+          <div className="grid md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Icon Name</label>
+              <input value={service.icon || ''} onChange={e => onChange({ ...service, icon: e.target.value })} placeholder="Layers, Zap, Award..."
+                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+            </div>
+            <div>
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Sort Order</label>
+              <input type="number" value={service.sort_order} onChange={e => onChange({ ...service, sort_order: parseInt(e.target.value) || 0 })}
+                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+            </div>
+            <div className="flex flex-col gap-3 justify-center">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#9ca3af' }}>Active</span>
+                <div onClick={() => onChange({ ...service, is_active: !service.is_active })} className="relative inline-flex h-6 w-11 rounded-full cursor-pointer transition-colors" style={{ background: service.is_active ? '#F4A300' : '#374151' }}>
+                  <span className="inline-block h-5 w-5 rounded-full bg-white shadow mt-0.5 transition-transform" style={{ transform: service.is_active ? 'translateX(22px)' : 'translateX(2px)' }} />
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#9ca3af' }}>Featured</span>
+                <div onClick={() => onChange({ ...service, is_featured: !service.is_featured })} className="relative inline-flex h-6 w-11 rounded-full cursor-pointer transition-colors" style={{ background: service.is_featured ? '#F4A300' : '#374151' }}>
+                  <span className="inline-block h-5 w-5 rounded-full bg-white shadow mt-0.5 transition-transform" style={{ transform: service.is_featured ? 'translateX(22px)' : 'translateX(2px)' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Service Image</label>
+            <ImageUploader currentUrl={service.image_url || ''} onUploaded={url => onChange({ ...service, image_url: url })} folder="services" />
+          </div>
+          <button onClick={onSave} className="flex items-center gap-2 text-sm font-bold px-5 py-2.5 rounded-lg text-white transition-all hover:scale-[1.02]" style={{ background: '#F4A300' }}>
+            <Save className="h-4 w-4" />{service.id ? 'Save Changes' : 'Create Service'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PortfolioEditor({ project, index, onChange, onSave, onDelete }: { project: Portfolio; index: number; onChange: (p: Portfolio) => void; onSave: () => void; onDelete: () => void; }) {
+  const [open, setOpen] = useState(!project.id);
+  const categories = ['Exhibition', 'Event', 'Booth', 'Corporate', 'Brand Activation', 'Other'];
+  return (
+    <div className="rounded-xl overflow-hidden" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+      <button onClick={() => setOpen(p => !p)} className="w-full flex items-center justify-between p-5">
+        <div className="flex items-center gap-3">
+          {project.image_url && <img src={project.image_url} className="w-8 h-8 rounded-lg object-cover shrink-0" alt="" />}
+          <div className="text-left">
+            <p className="font-bold text-sm text-white">{project.title}</p>
+            <p className="text-xs" style={{ color: '#6b7280' }}>{project.category} · {project.location}</p>
+          </div>
+          {project.is_featured && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(244,163,0,0.15)', color: '#F4A300' }}>Featured</span>}
+        </div>
+        <div className="flex items-center gap-3">
+          <button onClick={e => { e.stopPropagation(); onDelete(); }} className="p-1.5 rounded-lg" style={{ color: '#ef4444' }}><Trash2 className="h-4 w-4" /></button>
+          <ChevronDown className="h-4 w-4" style={{ color: '#6b7280', transform: open ? 'rotate(180deg)' : 'none' }} />
+        </div>
+      </button>
+      {open && (
+        <div className="px-5 pb-5 space-y-4" style={{ borderTop: '1px solid #1f2937' }}>
+          <div className="pt-4 grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Project Title</label>
+              <input value={project.title} onChange={e => onChange({ ...project, title: e.target.value })}
+                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+            </div>
+            <div>
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Category</label>
+              <select value={project.category || ''} onChange={e => onChange({ ...project, category: e.target.value })}
+                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }}>
+                {categories.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Client</label>
+              <input value={project.client || ''} onChange={e => onChange({ ...project, client: e.target.value })}
+                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+            </div>
+            <div>
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Location</label>
+              <input value={project.location || ''} onChange={e => onChange({ ...project, location: e.target.value })}
+                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+            </div>
+            <div>
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Date</label>
+              <input value={project.project_date || ''} onChange={e => onChange({ ...project, project_date: e.target.value })} placeholder="March 2026"
+                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+            </div>
+            <div>
+              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Visitors</label>
+              <input value={project.visitors || ''} onChange={e => onChange({ ...project, visitors: e.target.value })} placeholder="50,000+"
+                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Award (optional)</label>
+            <input value={project.award || ''} onChange={e => onChange({ ...project, award: e.target.value })} placeholder="Best Innovation Award 2026"
+              className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+          </div>
+          <div>
+            <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Description</label>
+            <textarea value={project.description || ''} onChange={e => onChange({ ...project, description: e.target.value })} rows={3}
+              className="w-full px-3 py-2.5 rounded-lg text-sm resize-none" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+          </div>
+          <div>
+            <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Project Image</label>
+            <ImageUploader currentUrl={project.image_url || ''} onUploaded={url => onChange({ ...project, image_url: url })} folder="portfolio" />
+          </div>
+          <div className="flex items-center gap-6">
+            {[['is_active', 'Active'], ['is_featured', 'Featured']].map(([key, label]) => (
+              <div key={key} className="flex items-center gap-2">
+                <div onClick={() => onChange({ ...project, [key]: !project[key as keyof Portfolio] })}
+                  className="relative inline-flex h-6 w-11 rounded-full cursor-pointer transition-colors"
+                  style={{ background: project[key as keyof Portfolio] ? '#F4A300' : '#374151' }}>
+                  <span className="inline-block h-5 w-5 rounded-full bg-white shadow mt-0.5 transition-transform"
+                    style={{ transform: project[key as keyof Portfolio] ? 'translateX(22px)' : 'translateX(2px)' }} />
+                </div>
+                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#9ca3af' }}>{label}</span>
+              </div>
+            ))}
+          </div>
+          <button onClick={onSave} className="flex items-center gap-2 text-sm font-bold px-5 py-2.5 rounded-lg text-white transition-all hover:scale-[1.02]" style={{ background: '#F4A300' }}>
+            <Save className="h-4 w-4" />{project.id ? 'Save Changes' : 'Create Project'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
