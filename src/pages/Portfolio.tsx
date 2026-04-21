@@ -137,11 +137,21 @@ const [menuOpen, setMenuOpen] = useState(false);
   const spotlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const cms = useCMS();
 
-  useEffect(() => {
+useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60);
     window.addEventListener('scroll', fn);
     return () => window.removeEventListener('scroll', fn);
   }, []);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (selectedProject) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [selectedProject]);
 
   const navLinks = [
     { label: 'Home', to: '/' }, { label: 'About', to: '/about' },
@@ -333,15 +343,15 @@ const whatsappUrlPortfolio = cms.settings.whatsapp_number ? `https://wa.me/${cms
         </div>
       </section>
 
-      {/* ── Project Detail Modal ── */}
+{/* ── Project Detail Modal ── */}
       {selectedProject && (
         <div
           className="fixed inset-0 z-[9998] flex items-center justify-center p-4"
           style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(8px)', animation: 'fadeUp 0.25s ease both' }}
-          onClick={() => setSelectedProject(null)}>
+          onClick={e => { e.stopPropagation(); setSelectedProject(null); }}>
           <div
-            className="relative w-full max-w-2xl rounded-2xl overflow-hidden"
-            style={{ background: '#111827', border: '1.5px solid rgba(244,163,0,0.3)', maxHeight: '90vh', overflowY: 'auto', animation: 'fadeUp 0.3s ease both' }}
+            className="relative w-full max-w-2xl rounded-2xl"
+            style={{ background: '#111827', border: '1.5px solid rgba(244,163,0,0.3)', maxHeight: '88vh', overflowY: 'auto', overflowX: 'hidden', animation: 'fadeUp 0.3s ease both' }}
             onClick={e => e.stopPropagation()}>
 
             {/* Hero image */}
@@ -391,13 +401,13 @@ const whatsappUrlPortfolio = cms.settings.whatsapp_number ? `https://wa.me/${cms
                 <Link to="/contact"
                   onClick={() => setSelectedProject(null)}
                   className="flex-1 inline-flex items-center justify-center gap-2 text-white font-bold text-sm py-3.5 rounded-full transition-all hover:scale-[1.02]"
-                  style={{ background: '#F4A300' }}
+style={{ background: '#F4A300' }}
                   onMouseEnter={e => (e.currentTarget.style.background = '#e09200')}
                   onMouseLeave={e => (e.currentTarget.style.background = '#F4A300')}>
                   Start a Similar Project <ArrowRight className="h-4 w-4" />
                 </Link>
                 <button
-                  onClick={() => setSelectedProject(null)}
+                  onClick={e => { e.stopPropagation(); setSelectedProject(null); }}
                   className="px-6 py-3.5 rounded-full text-sm font-bold transition-all hover:scale-[1.02]"
                   style={{ background: 'rgba(255,255,255,0.06)', color: '#9ca3af', border: '1px solid rgba(255,255,255,0.1)' }}>
                   Close
@@ -495,15 +505,18 @@ const whatsappUrlPortfolio = cms.settings.whatsapp_number ? `https://wa.me/${cms
                     onMouseLeave={e => (e.currentTarget.style.background = '#F4A300')}>
                     Start a Similar Project <ArrowRight className="h-4 w-4" />
                   </Link>
-                  {/* Back to All Projects button */}
-                  <a
-                    href="#portfolio-grid"
+{/* Back to All Projects button */}
+                  <button
+                    onClick={() => {
+                      const el = document.getElementById('portfolio-grid');
+                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
                     className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-full transition-all hover:scale-105"
                     style={{ background: 'rgba(255,255,255,0.07)', color: '#d1d5db', border: '1.5px solid rgba(255,255,255,0.15)' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = '#F4A300'; (e.currentTarget as HTMLAnchorElement).style.color = '#F4A300'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(255,255,255,0.15)'; (e.currentTarget as HTMLAnchorElement).style.color = '#d1d5db'; }}>
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#F4A300'; (e.currentTarget as HTMLButtonElement).style.color = '#F4A300'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.15)'; (e.currentTarget as HTMLButtonElement).style.color = '#d1d5db'; }}>
                     <ArrowRight className="h-4 w-4 rotate-180" /> Back to All Projects
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
