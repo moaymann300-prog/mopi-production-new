@@ -6,7 +6,7 @@ import { useCMS, getLogoUrl, getSocialUrl } from '@/hooks/useCMS';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
   Menu, X, ChevronRight, CheckCircle, Clock, Send,
-  Instagram, Facebook, Youtube, Linkedin,
+  Instagram, Facebook, Linkedin,
 } from 'lucide-react';
 
 const Reveal = ({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) => {
@@ -135,7 +135,7 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
   const heroContact = cms.heroes['contact'];
   const instagramUrl = getSocialUrl(cms.socials, 'instagram');
   const facebookUrl = getSocialUrl(cms.socials, 'facebook');
-  const youtubeUrl = getSocialUrl(cms.socials, 'youtube');
+  const _youtubeUrl = getSocialUrl(cms.socials, 'youtube');
   const linkedinUrl = getSocialUrl(cms.socials, 'linkedin');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -359,7 +359,7 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
                     { icon: Instagram, href: instagramUrl || '#', label: 'Instagram' },
                     { icon: Facebook, href: facebookUrl || '#', label: 'Facebook' },
                     { icon: Linkedin, href: linkedinUrl || '#', label: 'LinkedIn' },
-                    { icon: Youtube, href: youtubeUrl || '#', label: 'YouTube' },
+                    { icon: MessageCircle, href: whatsappUrlContact, label: 'WhatsApp' },
                   ].map(s => (
                     <a key={s.label} href={s.href} aria-label={s.label}
                       className="w-10 h-10 rounded-lg flex items-center justify-center transition-all hover:scale-110"
