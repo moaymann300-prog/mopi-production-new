@@ -38,10 +38,14 @@ const [settings, setSettings] = useState<Record<string, string>>({
     company_name: 'MOPi Production',
     tagline: 'Creating Extraordinary Events',
     email: 'info@mopiproduction.com',
+    email_main: 'info@mopiproduction.com',
+    email_projects: 'projects@mopiproduction.com',
     phone_1: '+20 100 000 0000',
     phone_2: '',
     address: 'Cairo, Egypt',
     whatsapp_number: '201000000000',
+    footer_tagline: 'Cairo\'s leading exhibition booth design and event production company.',
+    footer_description: 'Cairo\'s leading exhibition booth design and event production company.',
   });
 const [socials, setSocials] = useState<CMSSocialLink[]>([]);
   const [headerLogo, setHeaderLogo] = useState<CMSLogo | null>(null);
@@ -75,10 +79,14 @@ const [socials, setSocials] = useState<CMSSocialLink[]>([]);
           supabase.from('cms_about_content_2026_04_21').select('*'),
         ]);
 
-        // Settings → key:value map
+// Settings → key:value map
         if (settingsRes.data) {
           const map: Record<string, string> = {};
           settingsRes.data.forEach((s: CMSSetting) => { map[s.key] = s.value; });
+          // Aliases: map DB keys → keys used by pages
+          if (map['email_main'] && !map['email']) map['email'] = map['email_main'];
+          if (map['email_projects'] && !map['email_2']) map['email_2'] = map['email_projects'];
+          if (map['footer_description'] && !map['footer_tagline']) map['footer_tagline'] = map['footer_description'];
           setSettings(prev => ({ ...prev, ...map }));
         }
 
