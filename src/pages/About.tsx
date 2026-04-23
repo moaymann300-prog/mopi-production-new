@@ -181,10 +181,10 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
 
       {/* ── NAV (same as homepage) ── */}
       <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
-        style={{ background: scrolled ? 'rgba(0,0,0,0.97)' : 'rgba(0,0,0,0.92)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.07)', padding: scrolled ? '10px 0' : '14px 0', boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.4)' : 'none' }}>
+        style={{ background: scrolled ? 'rgba(0,0,0,0.97)' : 'rgba(0,0,0,0.92)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.07)', padding: scrolled ? '14px 0' : '19px 0', boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.4)' : 'none' }}>
         <div className="max-w-7xl mx-auto px-5 lg:px-8 flex items-center justify-between">
           <Link to="/">
-            <img src={logoUrl} alt={companyName} className="h-11 w-auto object-contain transition-opacity hover:opacity-75" />
+            <img src={logoUrl} alt={companyName} className="h-16 w-auto object-contain transition-opacity hover:opacity-75" />
           </Link>
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map(l => (

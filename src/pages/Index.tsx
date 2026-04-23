@@ -222,13 +222,13 @@ const navLinks: { label: string; to: string }[] = [
           background: scrolled ? 'rgba(0,0,0,0.97)' : 'transparent',
           backdropFilter: scrolled ? 'blur(16px)' : 'none',
           borderBottom: scrolled ? '1px solid rgba(255,255,255,0.07)' : 'none',
-          padding: scrolled ? '10px 0' : '18px 0',
+          padding: scrolled ? '14px 0' : '24px 0',
           boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.4)' : 'none',
         }}>
         <div className="max-w-7xl mx-auto px-5 lg:px-8 flex items-center justify-between">
 <a href="#hero">
             <img src={logoUrl} alt={companyName}
-              className="h-11 w-auto object-contain transition-opacity duration-300 hover:opacity-75" />
+              className="h-16 w-auto object-contain transition-opacity duration-300 hover:opacity-75" />
           </a>
 
 <nav className="hidden md:flex items-center gap-8">
