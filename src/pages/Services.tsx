@@ -408,7 +408,7 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
           </Reveal>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            [
+            {[
               { icon: Clock, t: isAr ? 'التسليم في الموعد' : 'On-Time Delivery', d: isAr ? 'نلتزم بكل موعد — بدون أعذار.' : 'We meet every deadline — no excuses, no exceptions.' },
               { icon: Award, t: isAr ? 'تصاميم حائزة على جوائز' : 'Award-Winning Design', d: isAr ? 'جوائز صناعية متعددة للابتكار والتميز.' : 'Multiple industry awards for innovation and excellence.' },
               { icon: Shield, t: isAr ? 'جودة عالية' : 'Premium Quality', d: isAr ? 'جودة لا تهاون فيها في كل خامة وتشطيبة وتفصيلة هيكلية.' : 'Uncompromising quality at every material, finish, and structural detail.' },
