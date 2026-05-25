@@ -822,8 +822,8 @@ const Index = () => {
               <Reveal key={i} delay={i * 90}>
                 <div className="relative p-7 rounded-2xl transition-all duration-400 group cursor-default"
                   style={{ background: '#FFFFFF', border: '1.5px solid #e9eaec', boxShadow: '0 2px 16px rgba(0,0,0,0.06)' }}
-                  onMouseEnter={e => { (e.currentTarget.style.borderColor = '#F47B20'); (e.currentTarget.style.boxShadow = '0 16px 40px rgba(244,123,32,0.1)'); (e.currentTarget.style.transform = 'translateY(-4px)'; ) }}
-                  onMouseLeave={e => { (e.currentTarget.style.borderColor = '#e9eaec'); (e.currentTarget.style.boxShadow = '0 2px 16px rgba(0,0,0,0.06)'); (e.currentTarget.style.transform = 'translateY(0)'); }}>
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#F47B20'; e.currentTarget.style.boxShadow = '0 16px 40px rgba(244,123,32,0.1)'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#e9eaec'; e.currentTarget.style.boxShadow = '0 2px 16px rgba(0,0,0,0.06)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
                   <div className="text-5xl font-black mb-4 leading-none opacity-12"
                     style={{ color: '#F47B20', fontFamily: "'Montserrat', sans-serif", opacity: 0.12 }}>
                     {step.num}
