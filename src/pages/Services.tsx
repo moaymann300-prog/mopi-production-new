@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { IMAGES } from '@/assets/images';
 import { useCMS, getLogoUrl } from '@/hooks/useCMS';
+import { useLocalLanguage } from '@/hooks/useLanguage';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
   Menu, X, ChevronRight, CheckCircle, MoveRight,
@@ -96,7 +97,7 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
         </div>
       </div>
       <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-        <p className="text-sm" style={{ color: '#374151' }}>© 2026 {companyName}. All rights reserved. {address}.</p>
+        <p className="text-sm" style={{ color: '#374151' }}>© 2026 {companyName}. All rights reserved.</p>
         <p className="text-xs tracking-wide" style={{ color: '#1f2937' }}>Exhibition Booths · Brand Activations · Event Production</p>
       </div>
     </div>
@@ -110,6 +111,7 @@ const Services = () => {
   const [scrolled, setScrolled] = useState(false);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const cms = useCMS();
+  const { t, isAr, dir, fontFamily } = useLocalLanguage();
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60);
@@ -118,56 +120,62 @@ const Services = () => {
   }, []);
 
   const navLinks = [
-    { label: 'Home', to: '/' },
-    { label: 'About', to: '/about' },
-    { label: 'Services', to: '/services' },
-    { label: 'Portfolio', to: '/portfolio' },
-    { label: 'Contact', to: '/contact' },
+    { label: t('nav.home'), to: '/' },
+    { label: t('nav.about'), to: '/about' },
+    { label: t('nav.services'), to: '/services' },
+    { label: t('nav.portfolio'), to: '/portfolio' },
+    { label: t('nav.contact'), to: '/contact' },
   ];
 
   const mainServices = [
     {
-      icon: Layers, title: 'Exhibition Booth Design & Build',
-      subtitle: 'Custom-designed booths that captivate and convert',
-      desc: 'From concept to completion, we create stunning exhibition booths that tell your brand story and drive meaningful engagement with your target audience.',
+      icon: Layers,
+      title: isAr ? 'تصميم وتنفيذ أجنحة المعارض' : 'Exhibition Booth Design & Build',
+      subtitle: isAr ? 'أجنحة مصممة خصيصاً تستقطب الأنظار وتحقق النتائج' : 'Custom-designed booths that captivate and convert',
+      desc: isAr ? 'من الفكرة للتنفيذ، نصمم أجنحة معارض احترافية تعكس هوية براندك وتحقق تفاعلاً حقيقياً مع جمهورك المستهدف.' : 'From concept to completion, we create stunning exhibition booths that tell your brand story and drive meaningful engagement with your target audience.',
       image: IMAGES.BOOTH_8,
-      features: ['3D Design & Visualization', 'Custom Branding Integration', 'Interactive Elements', 'Premium Materials', 'Modular Systems', 'On-site Installation'],
-      process: ['Initial Consultation & Brief', '3D Design Development', 'Client Approval & Refinement', 'Production & Fabrication', 'Installation & Setup', 'Post-Event Support'],
+      features: isAr ? ['تصميم ثلاثي الأبعاد وتصور واقعي', 'دمج هوية البراند بالكامل', 'عناصر تفاعلية وتقنية', 'خامات ممتازة عالية الجودة', 'أنظمة معيارية قابلة للتوسيع', 'تركيب ودعم في الموقع'] : ['3D Design & Visualization', 'Custom Branding Integration', 'Interactive Elements', 'Premium Materials', 'Modular Systems', 'On-site Installation'],
+      process: isAr ? ['استشارة أولية وتحليل المتطلبات', 'تطوير التصميم ثلاثي الأبعاد', 'موافقة العميل والتعديلات', 'التصنيع والإنتاج', 'التركيب والإعداد', 'الدعم بعد الفعالية'] : ['Initial Consultation & Brief', '3D Design Development', 'Client Approval & Refinement', 'Production & Fabrication', 'Installation & Setup', 'Post-Event Support'],
     },
     {
-      icon: Zap, title: 'Event Production & Management',
-      subtitle: 'Complete event management from concept to execution',
-      desc: 'Full-service event production including stage design, lighting, audio-visual systems, and on-the-ground management for corporate events and product launches.',
+      icon: Zap,
+      title: isAr ? 'تنفيذ وإدارة الفعاليات' : 'Event Production & Management',
+      subtitle: isAr ? 'إدارة متكاملة للفعاليات من الفكرة حتى التنفيذ' : 'Complete event management from concept to execution',
+      desc: isAr ? 'خدمة متكاملة في إنتاج الفعاليات تشمل تصميم المسرح والإضاءة وأنظمة الصوت والصورة والإدارة الميدانية للفعاليات المؤسسية.' : 'Full-service event production including stage design, lighting, audio-visual systems, and on-the-ground management for corporate events and product launches.',
       image: IMAGES.EVENT_1,
-      features: ['Stage Design & Construction', 'Professional Lighting Systems', 'Audio-Visual Integration', 'Technical Support Team', 'Project Management', 'Live Event Coordination'],
-      process: ['Event Planning & Strategy', 'Technical Requirements Analysis', 'Design & Setup Planning', 'Equipment Installation', 'Live Event Management', 'Post-Event Breakdown'],
+      features: isAr ? ['تصميم وإنشاء المسرح', 'أنظمة إضاءة احترافية', 'تكامل الصوت والصورة', 'فريق دعم تقني متخصص', 'إدارة مشروع متكاملة', 'تنسيق الفعالية مباشرة'] : ['Stage Design & Construction', 'Professional Lighting Systems', 'Audio-Visual Integration', 'Technical Support Team', 'Project Management', 'Live Event Coordination'],
+      process: isAr ? ['تخطيط الفعالية والاستراتيجية', 'تحليل المتطلبات التقنية', 'التصميم وتخطيط الإعداد', 'تركيب المعدات', 'إدارة الفعالية المباشرة', 'التفكيك بعد الفعالية'] : ['Event Planning & Strategy', 'Technical Requirements Analysis', 'Design & Setup Planning', 'Equipment Installation', 'Live Event Management', 'Post-Event Breakdown'],
     },
     {
-      icon: Award, title: 'Brand Activations',
-      subtitle: 'Immersive experiences that deeply engage audiences',
-      desc: 'Creative brand activations and installations that create memorable interactions between your brand and your audience, driving real engagement and recall.',
+      icon: Award,
+      title: isAr ? 'براند أكتيفيشن' : 'Brand Activations',
+      subtitle: isAr ? 'تجارب تفاعلية تترك أثراً حقيقياً في ذاكرة جمهورك' : 'Immersive experiences that deeply engage audiences',
+      desc: isAr ? 'تفعيلات براند إبداعية ومنشآت تصنع تفاعلاً حقيقياً بين براندك وجمهورك، تُحدث أثراً وتُعزز التذكّر.' : 'Creative brand activations and installations that create memorable interactions between your brand and your audience, driving real engagement and recall.',
       image: IMAGES.EVENT_3,
-      features: ['Concept & Strategy', 'Custom Installations', 'Interactive Experiences', 'Brand Storytelling', 'Audience Engagement', 'Post-Activation Reports'],
-      process: ['Brand Analysis & Strategy', 'Creative Concept Development', 'Design & Production', 'Installation & Testing', 'Live Activation Management', 'Performance Analysis'],
+      features: isAr ? ['الفكرة والاستراتيجية', 'منشآت مخصصة', 'تجارب تفاعلية', 'سرد قصة البراند', 'تفاعل الجمهور', 'تقارير ما بعد التفعيل'] : ['Concept & Strategy', 'Custom Installations', 'Interactive Experiences', 'Brand Storytelling', 'Audience Engagement', 'Post-Activation Reports'],
+      process: isAr ? ['تحليل البراند والاستراتيجية', 'تطوير المفهوم الإبداعي', 'التصميم والإنتاج', 'التركيب والاختبار', 'إدارة التفعيل المباشر', 'تحليل الأداء'] : ['Brand Analysis & Strategy', 'Creative Concept Development', 'Design & Production', 'Installation & Testing', 'Live Activation Management', 'Performance Analysis'],
     },
     {
-      icon: Wrench, title: 'Custom Fabrication',
-      subtitle: 'Tailored structures for any space and purpose',
-      desc: 'Modular and custom structures designed to your exact specifications — from temporary installations to permanent displays, kiosks, and architectural elements.',
+      icon: Wrench,
+      title: isAr ? 'تصنيع مخصص' : 'Custom Fabrication',
+      subtitle: isAr ? 'هياكل مصنوعة وفق مواصفاتك لأي مكان وغرض' : 'Tailored structures for any space and purpose',
+      desc: isAr ? 'هياكل معيارية ومخصصة مصممة وفق مواصفاتك الدقيقة — من المنشآت المؤقتة إلى العروض الدائمة والكيوسكات والعناصر المعمارية.' : 'Modular and custom structures designed to your exact specifications — from temporary installations to permanent displays, kiosks, and architectural elements.',
       image: IMAGES.BOOTH_3,
-      features: ['Modular Design Systems', 'Custom Fabrication', 'Structural Engineering', 'Premium Materials', 'Quick Assembly Systems', 'Maintenance Support'],
-      process: ['Site Assessment & Planning', 'Structural Design', 'Material Selection', 'Fabrication & QC', 'Installation & Testing', 'Handover & Training'],
+      features: isAr ? ['أنظمة تصميم معيارية', 'تصنيع مخصص', 'هندسة هيكلية', 'خامات ممتازة', 'أنظمة تجميع سريع', 'دعم الصيانة'] : ['Modular Design Systems', 'Custom Fabrication', 'Structural Engineering', 'Premium Materials', 'Quick Assembly Systems', 'Maintenance Support'],
+      process: isAr ? ['تقييم الموقع والتخطيط', 'التصميم الهيكلي', 'اختيار المواد', 'التصنيع ومراقبة الجودة', 'التركيب والاختبار', 'التسليم والتدريب'] : ['Site Assessment & Planning', 'Structural Design', 'Material Selection', 'Fabrication & QC', 'Installation & Testing', 'Handover & Training'],
     },
   ];
 
   const additionalServices = [
-    { icon: Palette, title: 'Branding & Graphics', desc: 'Banners, signage, lightboxes, and full visual branding that elevates your presence at any show.' },
-    { icon: Settings, title: 'Technical Support', desc: '24/7 on-site technical support during events and exhibitions — no detail is too small.' },
-    { icon: Truck, title: 'Logistics Management', desc: 'Complete logistics coordination including shipping, storage, and transportation management.' },
-    { icon: Users, title: 'Project Management', desc: 'Dedicated project managers ensuring on-time, on-budget delivery with zero surprises.' },
+    { icon: Palette, title: isAr ? 'هوية بصرية وجرافيك' : 'Branding & Graphics', desc: isAr ? 'بانرات، لافتات، لايتبوكسات، وهوية بصرية متكاملة ترفع مستوى حضورك في أي معرض.' : 'Banners, signage, lightboxes, and full visual branding that elevates your presence at any show.' },
+    { icon: Settings, title: isAr ? 'دعم تقني' : 'Technical Support', desc: isAr ? 'دعم تقني ميداني على مدار الساعة أثناء الفعاليات والمعارض — لا تفاصيل صغيرة.' : '24/7 on-site technical support during events and exhibitions — no detail is too small.' },
+    { icon: Truck, title: isAr ? 'إدارة اللوجستيات' : 'Logistics Management', desc: isAr ? 'تنسيق لوجستي متكامل يشمل الشحن والتخزين والنقل.' : 'Complete logistics coordination including shipping, storage, and transportation management.' },
+    { icon: Users, title: isAr ? 'إدارة المشاريع' : 'Project Management', desc: isAr ? 'مديرو مشاريع متخصصون يضمنون التسليم في الوقت المحدد وبالميزانية المقررة.' : 'Dedicated project managers ensuring on-time, on-budget delivery with zero surprises.' },
   ];
 
-  const industries = ['Technology & IT', 'Healthcare & Pharma', 'Automotive', 'Financial Services', 'Consumer Goods', 'Energy & Utilities', 'Education', 'Government & Public'];
+  const industries = isAr
+    ? ['تكنولوجيا المعلومات', 'الصحة والدواء', 'السيارات', 'الخدمات المالية', 'السلع الاستهلاكية', 'الطاقة والمرافق', 'التعليم', 'الحكومة والقطاع العام']
+    : ['Technology & IT', 'Healthcare & Pharma', 'Automotive', 'Financial Services', 'Consumer Goods', 'Energy & Utilities', 'Education', 'Government & Public'];
 
   // CMS-driven data with fallbacks
   const companyName = cms.settings.company_name || 'MOPi Production';
@@ -181,7 +189,7 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
   const _cmsServices = cms.services;
 
   return (
-    <div className="overflow-x-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div className="overflow-x-hidden" dir={dir} style={{ fontFamily }}>
       <style>{`
         @keyframes slowZoom { from{transform:scale(1.05)} to{transform:scale(1.13)} }
         @keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
@@ -205,10 +213,10 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
           <div className="hidden md:flex items-center gap-3">
             <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 text-white text-sm font-semibold px-4 py-2 rounded-full transition-all hover:scale-105" style={{ background: '#16a34a' }}>
-              <MessageCircle className="h-4 w-4" /> WhatsApp
+              <MessageCircle className="h-4 w-4" /> {t('nav.whatsapp')}
             </a>
             <Link to="/contact" className="flex items-center gap-2 text-white text-sm font-semibold px-5 py-2 rounded-full transition-all hover:scale-105" style={{ background: '#F4A300' }}>
-              Get a Quote <ArrowRight className="h-3.5 w-3.5" />
+              {t('nav.quote')} <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
           <button onClick={() => setMenuOpen(p => !p)} className="md:hidden p-2 text-white">{menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}</button>
@@ -223,8 +231,8 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
             ))}
             <div className="flex gap-3 pt-4">
               <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
-                className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#16a34a' }}>WhatsApp</a>
-              <Link to="/contact" className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#F4A300' }}>Get a Quote</Link>
+                className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#16a34a' }}>{t('nav.whatsapp')}</a>
+              <Link to="/contact" className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#F4A300' }}>{t('nav.quote')}</Link>
             </div>
           </div>
         </div>
@@ -242,19 +250,19 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
         <div className="relative z-10 text-center px-5 max-w-4xl mx-auto py-24">
           <div className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase px-4 py-2 rounded-full mb-8"
             style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#F4A300', animation: 'fadeDown 0.8s ease 0.2s both' }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F4A300' }} />{hero?.badge_text || 'End-to-End Solutions'}
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F4A300' }} />{hero?.badge_text || (isAr ? 'حلول متكاملة' : 'End-to-End Solutions')}
           </div>
           <h1 className="font-black leading-tight text-white mb-6"
-            style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both', fontFamily: "'Poppins', sans-serif" }}>
-            {hero?.heading ? <span dangerouslySetInnerHTML={{ __html: hero.heading }} /> : <>Comprehensive<br /><span style={{ color: '#F4A300' }}>Exhibition Solutions</span></>}
+            style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both' }}>
+            {hero?.heading ? <span dangerouslySetInnerHTML={{ __html: hero.heading }} /> : isAr ? <>حلول معارض<br /><span style={{ color: '#F4A300' }}>شاملة ومتكاملة</span></> : <>Comprehensive<br /><span style={{ color: '#F4A300' }}>Exhibition Solutions</span></>}
           </h1>
-          <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both' }}>
-            {hero?.subheading || 'From concept to completion — we provide end-to-end services that transform your brand vision into powerful, engaging experiences.'}
+          <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both', lineHeight: isAr ? '2' : '1.7' }}>
+            {hero?.subheading || (isAr ? 'من الفكرة للتنفيذ — نقدم خدمات متكاملة تحوّل رؤية براندك إلى تجارب قوية ومؤثرة.' : 'From concept to completion — we provide end-to-end services that transform your brand vision into powerful, engaging experiences.')}
           </p>
           <Link to="/contact"
             className="inline-flex items-center gap-3 text-white font-bold text-base px-9 py-4 rounded-full transition-all hover:scale-105"
             style={{ background: '#F4A300', boxShadow: '0 10px 30px rgba(244,163,0,0.3)', animation: 'fadeDown 0.9s ease 0.65s both' }}>
-            Get Custom Quote <ArrowRight className="h-5 w-5" />
+            {isAr ? 'اطلب عرض سعر' : 'Get Custom Quote'} <ArrowRight className="h-5 w-5" />
           </Link>
         </div>
       </section>
@@ -273,11 +281,11 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
                   style={{ background: 'rgba(244,163,0,0.1)', border: '1px solid rgba(244,163,0,0.2)', color: '#F4A300' }}>
                   <svc.icon className="h-3.5 w-3.5" /> {svc.title}
                 </div>
-                <h2 className="font-black mb-4" style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', color: '#000', fontFamily: "'Poppins', sans-serif" }}>{svc.subtitle}</h2>
-                <p className="text-base leading-relaxed mb-7" style={{ color: '#555' }}>{svc.desc}</p>
+                <h2 className="font-black mb-4" style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', color: '#000' }}>{svc.subtitle}</h2>
+                <p className="text-base leading-relaxed mb-7" style={{ color: '#555', lineHeight: isAr ? '2' : '1.7' }}>{svc.desc}</p>
 
                 <div className="mb-7">
-                  <h3 className="font-bold text-sm mb-4 uppercase tracking-widest" style={{ color: '#000' }}>Key Features</h3>
+                  <h3 className="font-bold text-sm mb-4 uppercase tracking-widest" style={{ color: '#000' }}>{isAr ? 'المميزات الرئيسية' : 'Key Features'}</h3>
                   <div className="grid grid-cols-2 gap-2.5">
                     {svc.features.map((f, fi) => (
                       <div key={fi} className="flex items-center gap-2 text-sm" style={{ color: '#2B2B2B' }}>
@@ -288,7 +296,7 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
                 </div>
 
                 <div className="mb-8">
-                  <h3 className="font-bold text-sm mb-4 uppercase tracking-widest" style={{ color: '#000' }}>Our Process</h3>
+                  <h3 className="font-bold text-sm mb-4 uppercase tracking-widest" style={{ color: '#000' }}>{isAr ? 'خطوات العمل' : 'Our Process'}</h3>
                   <div className="space-y-2">
                     {svc.process.map((step, si) => (
                       <div key={si} className="flex items-center gap-3 text-sm" style={{ color: '#555' }}>
@@ -304,7 +312,7 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
                   style={{ background: '#F4A300', boxShadow: '0 8px 24px rgba(244,163,0,0.25)' }}
                   onMouseEnter={e => (e.currentTarget.style.background = '#e09200')}
                   onMouseLeave={e => (e.currentTarget.style.background = '#F4A300')}>
-                  Get a Quote <MoveRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  {isAr ? 'اطلب عرض سعر' : 'Get a Quote'} <MoveRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Reveal>
             </div>
@@ -334,11 +342,11 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-16">
-            <SectionLabel text="Support Services" />
-            <h2 className="font-black mb-4 text-white" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontFamily: "'Poppins', sans-serif" }}>
-              Additional <span style={{ color: '#F4A300' }}>Services</span>
+            <SectionLabel text={isAr ? 'خدمات الدعم' : 'Support Services'} />
+            <h2 className="font-black mb-4 text-white" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>
+              {isAr ? <>خدمات <span style={{ color: '#F4A300' }}>إضافية</span></> : <>Additional <span style={{ color: '#F4A300' }}>Services</span></>}
             </h2>
-            <p className="text-lg max-w-xl mx-auto" style={{ color: '#9ca3af' }}>Comprehensive support to ensure every project's complete success</p>
+            <p className="text-lg max-w-xl mx-auto" style={{ color: '#9ca3af' }}>{isAr ? 'دعم شامل لضمان نجاح كل مشروع بالكامل' : "Comprehensive support to ensure every project's complete success"}</p>
           </Reveal>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -352,8 +360,8 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
                     style={{ background: 'rgba(244,163,0,0.12)', border: '1.5px solid rgba(244,163,0,0.3)' }}>
                     <s.icon className="h-6 w-6" style={{ color: '#F4A300' }} />
                   </div>
-                  <h3 className="font-bold text-base mb-3 text-white transition-colors group-hover:text-[#F4A300]" style={{ fontFamily: "'Poppins', sans-serif" }}>{s.title}</h3>
-                  <p className="text-sm leading-relaxed" style={{ color: '#9ca3af' }}>{s.desc}</p>
+                  <h3 className="font-bold text-base mb-3 text-white transition-colors group-hover:text-[#F4A300]">{s.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: '#9ca3af', lineHeight: isAr ? '2' : '1.7' }}>{s.desc}</p>
                 </div>
               </Reveal>
             ))}
@@ -367,9 +375,9 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-14">
-            <SectionLabel text="Sectors We Serve" />
-            <h2 className="font-black mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000', fontFamily: "'Poppins', sans-serif" }}>Industries We Serve</h2>
-            <p className="text-lg max-w-xl mx-auto" style={{ color: '#555' }}>Our expertise spans multiple industries with tailored solutions</p>
+            <SectionLabel text={isAr ? 'القطاعات التي نخدمها' : 'Sectors We Serve'} />
+            <h2 className="font-black mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>{isAr ? 'القطاعات التي نخدمها' : 'Industries We Serve'}</h2>
+            <p className="text-lg max-w-xl mx-auto" style={{ color: '#555' }}>{isAr ? 'خبرتنا تمتد عبر قطاعات متعددة بحلول مخصصة' : 'Our expertise spans multiple industries with tailored solutions'}</p>
           </Reveal>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -394,18 +402,18 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-14">
-            <SectionLabel text="Why Choose Us" />
-            <h2 className="font-black mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000', fontFamily: "'Poppins', sans-serif" }}>Why Choose MOPi?</h2>
+            <SectionLabel text={isAr ? 'لماذا موبي؟' : 'Why Choose Us'} />
+            <h2 className="font-black mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>{isAr ? 'لماذا تختار موبي؟' : 'Why Choose MOPi?'}</h2>
           </Reveal>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[
-              { icon: Clock, t: 'On-Time Delivery', d: 'We meet every deadline — no excuses, no exceptions.' },
-              { icon: Award, t: 'Award-Winning Design', d: 'Multiple industry awards for innovation and excellence.' },
-              { icon: Shield, t: 'Premium Quality', d: 'Uncompromising quality at every material, finish, and structural detail.' },
-              { icon: Users, t: 'Expert Team', d: '8+ years of specialists in design, production, and live events.' },
-              { icon: Layers, t: 'A-to-Z Service', d: 'Concept, logistics, hotel, setup, management — all under one roof.' },
-              { icon: Zap, t: '8+ Years Experience', d: 'Proven track record delivering 500+ projects across the MENA region.' },
+            [
+              { icon: Clock, t: isAr ? 'التسليم في الموعد' : 'On-Time Delivery', d: isAr ? 'نلتزم بكل موعد — بدون أعذار.' : 'We meet every deadline — no excuses, no exceptions.' },
+              { icon: Award, t: isAr ? 'تصاميم حائزة على جوائز' : 'Award-Winning Design', d: isAr ? 'جوائز صناعية متعددة للابتكار والتميز.' : 'Multiple industry awards for innovation and excellence.' },
+              { icon: Shield, t: isAr ? 'جودة عالية' : 'Premium Quality', d: isAr ? 'جودة لا تهاون فيها في كل خامة وتشطيبة وتفصيلة هيكلية.' : 'Uncompromising quality at every material, finish, and structural detail.' },
+              { icon: Users, t: isAr ? 'فريق متخصص' : 'Expert Team', d: isAr ? '+8 سنوات من المتخصصين في التصميم والإنتاج والفعاليات.' : '8+ years of specialists in design, production, and live events.' },
+              { icon: Layers, t: isAr ? 'خدمة من أول لآخر' : 'A-to-Z Service', d: isAr ? 'الفكرة، اللوجستيات، التركيب، الإدارة — كل شيء تحت سقف واحد.' : 'Concept, logistics, hotel, setup, management — all under one roof.' },
+              { icon: Zap, t: isAr ? '+8 سنوات خبرة' : '8+ Years Experience', d: isAr ? 'سجل حافل بتسليم +500 مشروع في منطقة الشرق الأوسط.' : 'Proven track record delivering 500+ projects across the MENA region.' },
             ].map((w, i) => (
               <Reveal key={i} delay={i * 60}>
                 <div className="group flex items-start gap-5 p-7 rounded-2xl cursor-default transition-all duration-400 hover:-translate-y-1"
@@ -417,8 +425,8 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
                     <w.icon className="h-5 w-5" style={{ color: '#F4A300' }} />
                   </div>
                   <div>
-                    <h3 className="font-bold text-base mb-2 transition-colors group-hover:text-[#F4A300]" style={{ color: '#000', fontFamily: "'Poppins', sans-serif" }}>{w.t}</h3>
-                    <p className="text-sm leading-relaxed" style={{ color: '#555' }}>{w.d}</p>
+                    <h3 className="font-bold text-base mb-2 transition-colors group-hover:text-[#F4A300]" style={{ color: '#000' }}>{w.t}</h3>
+                    <p className="text-sm leading-relaxed" style={{ color: '#555', lineHeight: isAr ? '2' : '1.7' }}>{w.d}</p>
                   </div>
                 </div>
               </Reveal>
@@ -436,18 +444,18 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
         <div className="absolute left-0 inset-y-0 w-[4px]" style={{ background: '#F4A300' }} />
 
         <Reveal className="relative max-w-4xl mx-auto text-center">
-          <SectionLabel text="Let's Get Started" />
-          <h2 className="font-black text-white leading-tight mb-6" style={{ fontSize: 'clamp(2.2rem, 5vw, 4rem)', fontFamily: "'Poppins', sans-serif" }}>
-            Ready to Start<br /><span style={{ color: '#F4A300' }}>Your Project?</span>
-          </h2>
-          <p className="text-lg mb-11" style={{ color: '#9ca3af' }}>Let's discuss your exhibition needs and create a custom solution that exceeds expectations.</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/contact"
-              className="group inline-flex items-center justify-center gap-3 text-white font-bold text-lg px-10 py-5 rounded-full transition-all hover:scale-105"
-              style={{ background: '#F4A300', boxShadow: '0 12px 30px rgba(244,163,0,0.3)' }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#e09200')}
-              onMouseLeave={e => (e.currentTarget.style.background = '#F4A300')}>
-              Free Consultation <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            <SectionLabel text={isAr ? 'لنبدأ معاً' : "Let's Get Started"} />
+            <h2 className="font-black text-white leading-tight mb-6" style={{ fontSize: 'clamp(2.2rem, 5vw, 4rem)' }}>
+              {isAr ? <>مستعد لبدء<br /><span style={{ color: '#F4A300' }}>مشروعك؟</span></> : <>Ready to Start<br /><span style={{ color: '#F4A300' }}>Your Project?</span></>}
+            </h2>
+            <p className="text-lg mb-11" style={{ color: '#9ca3af' }}>{isAr ? 'دعنا نناقش احتياجات معرضك ونصنع لك حلاً مخصصاً يفوق التوقعات.' : "Let's discuss your exhibition needs and create a custom solution that exceeds expectations."}</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/contact"
+                className="group inline-flex items-center justify-center gap-3 text-white font-bold text-lg px-10 py-5 rounded-full transition-all hover:scale-105"
+                style={{ background: '#F4A300', boxShadow: '0 12px 30px rgba(244,163,0,0.3)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = '#e09200')}
+                onMouseLeave={e => (e.currentTarget.style.background = '#F4A300')}>
+                {isAr ? 'استشارة مجانية' : 'Free Consultation'} <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
 <a href={`tel:${phoneDisplay.replace(/\s/g, '')}`}
               className="inline-flex items-center justify-center gap-3 text-white font-bold text-lg px-10 py-5 rounded-full transition-all hover:scale-105"

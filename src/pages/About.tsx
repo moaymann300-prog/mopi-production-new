@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { IMAGES } from '@/assets/images';
 import { useCMS, getLogoUrl, getSocialUrl } from '@/hooks/useCMS';
+import { useLocalLanguage } from '@/hooks/useLanguage';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
   Menu, X, ChevronRight, MoveRight, CheckCircle,
@@ -68,9 +69,9 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
           </div>
         </div>
         <div>
-          <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">Services</h4>
+          <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">{t('footer.services')}</h4>
           <ul className="space-y-2.5">
-            {['Exhibition Booth Design', 'Event Production', 'Brand Activations', 'Custom Fabrication', 'Branding & Graphics'].map(s => (
+            {(isAr ? ['تصميم أجنحة المعارض', 'تنفيذ الفعاليات', 'براند أكتيفيشن', 'تصنيع مخصص', 'هوية بصرية وجرافيك'] : ['Exhibition Booth Design', 'Event Production', 'Brand Activations', 'Custom Fabrication', 'Branding & Graphics']).map(s => (
               <li key={s}><Link to="/services" className="text-sm flex items-center gap-1.5 group" style={{ color: '#6b7280' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#F4A300')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
@@ -80,7 +81,7 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
           </ul>
         </div>
         <div>
-          <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">Contact</h4>
+          <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">{t('footer.contact')}</h4>
           <ul className="space-y-3">
             <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}><MapPin className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {address}</li>
 <li><a href={`tel:${phone.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
@@ -101,12 +102,12 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
           </ul>
           <Link to="/admin" className="inline-flex items-center gap-1 mt-7 text-xs transition-colors" style={{ color: '#374151' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#6b7280')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#374151')}>Admin Dashboard →</Link>
+            onMouseLeave={e => (e.currentTarget.style.color = '#374151')}>{t('footer.admin')} →</Link>
         </div>
       </div>
       <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-        <p className="text-sm" style={{ color: '#374151' }}>© 2026 {companyName}. All rights reserved. {address}.</p>
-        <p className="text-xs tracking-wide" style={{ color: '#1f2937' }}>Exhibition Booths · Brand Activations · Event Production</p>
+        <p className="text-sm" style={{ color: '#374151' }}>© 2026 {companyName}. {t('footer.rights')}</p>
+        <p className="text-xs tracking-wide" style={{ color: '#1f2937' }}>{isAr ? 'أجنحة المعارض · براند أكتيفيشن · إنتاج الفعاليات' : 'Exhibition Booths · Brand Activations · Event Production'}</p>
       </div>
     </div>
   </footer>
@@ -118,6 +119,7 @@ const About = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const cms = useCMS();
+  const { t, isAr, dir, fontFamily } = useLocalLanguage();
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60);
@@ -126,34 +128,34 @@ const About = () => {
   }, []);
 
   const navLinks = [
-    { label: 'Home', to: '/' },
-    { label: 'About', to: '/about' },
-    { label: 'Services', to: '/services' },
-    { label: 'Portfolio', to: '/portfolio' },
-    { label: 'Contact', to: '/contact' },
+    { label: t('nav.home'), to: '/' },
+    { label: t('nav.about'), to: '/about' },
+    { label: t('nav.services'), to: '/services' },
+    { label: t('nav.portfolio'), to: '/portfolio' },
+    { label: t('nav.contact'), to: '/contact' },
   ];
 
   const values = [
-    { icon: Lightbulb, title: 'Innovation', desc: 'We push boundaries of design and technology to create cutting-edge exhibition experiences.' },
-    { icon: Shield, title: 'Quality', desc: 'Every project meets our rigorous standards — exceptional results that exceed expectations.' },
-    { icon: Users, title: 'Collaboration', desc: 'We work closely with clients as partners, bringing their vision to life seamlessly.' },
-    { icon: Globe, title: 'Regional Reach', desc: 'With projects across Egypt and the MENA region, we deliver world-class expertise.' },
+    { icon: Lightbulb, title: isAr ? 'الابتكار' : 'Innovation', desc: isAr ? 'نكسر حدود التصميم والتكنولوجيا لنصنع تجارب معارض استثنائية.' : 'We push boundaries of design and technology to create cutting-edge exhibition experiences.' },
+    { icon: Shield, title: isAr ? 'الجودة' : 'Quality', desc: isAr ? 'كل مشروع يخضع لمعاييرنا الصارمة — نتائج استثنائية تفوق التوقعات.' : 'Every project meets our rigorous standards — exceptional results that exceed expectations.' },
+    { icon: Users, title: isAr ? 'الشراكة' : 'Collaboration', desc: isAr ? 'نعمل مع عملائنا كشركاء حقيقيين لتحويل رؤيتهم إلى واقع.' : 'We work closely with clients as partners, bringing their vision to life seamlessly.' },
+    { icon: Globe, title: isAr ? 'الانتشار الإقليمي' : 'Regional Reach', desc: isAr ? 'مشاريع في مصر ومنطقة الشرق الأوسط بمعايير دولية عالية.' : 'With projects across Egypt and the MENA region, we deliver world-class expertise.' },
   ];
 
   const milestones = [
-    { year: '2016', event: 'MOPi Production Founded in Cairo' },
-    { year: '2018', event: 'First International Exhibition Project' },
-    { year: '2020', event: '100+ Projects Milestone Reached' },
-    { year: '2022', event: 'Expanded to Saudi Arabia & UAE Markets' },
-    { year: '2024', event: '400+ Projects Completed' },
-    { year: '2026', event: '500+ Projects & Growing' },
+    { year: '2016', event: isAr ? 'تأسيس موبي برودكشن في القاهرة' : 'MOPi Production Founded in Cairo' },
+    { year: '2018', event: isAr ? 'أول مشروع معرض دولي' : 'First International Exhibition Project' },
+    { year: '2020', event: isAr ? 'تجاوز حاجز 100 مشروع منجز' : '100+ Projects Milestone Reached' },
+    { year: '2022', event: isAr ? 'التوسع إلى السوق السعودي والإماراتي' : 'Expanded to Saudi Arabia & UAE Markets' },
+    { year: '2024', event: isAr ? 'إتمام 400+ مشروع' : '400+ Projects Completed' },
+    { year: '2026', event: isAr ? '+500 مشروع ونحو المزيد' : '500+ Projects & Growing' },
   ];
 
   const achievements = [
-    { year: '2025', title: 'Best Exhibition Design', org: 'MENA Trade Show Association', desc: 'Recognized for innovative booth design at Cairo Tech Expo 2025.' },
-    { year: '2024', title: 'Client Choice Award', org: 'Exhibition Industry Alliance', desc: 'Highest client satisfaction rating for two consecutive years.' },
-    { year: '2023', title: 'Innovation in Design', org: 'Gulf Exhibition Awards', desc: 'Revolutionary custom modular booth system design.' },
-    { year: '2022', title: 'Top Production Company', org: 'Egypt Events Council', desc: 'Leading event production company in the Egyptian market.' },
+    { year: '2025', title: isAr ? 'أفضل تصميم معرض' : 'Best Exhibition Design', org: 'MENA Trade Show Association', desc: isAr ? 'تكريم على تصميم الجناح المبتكر في Cairo Tech Expo 2025.' : 'Recognized for innovative booth design at Cairo Tech Expo 2025.' },
+    { year: '2024', title: isAr ? 'جائزة اختيار العملاء' : 'Client Choice Award', org: 'Exhibition Industry Alliance', desc: isAr ? 'أعلى تقييم رضا عملاء لعامين متتاليين.' : 'Highest client satisfaction rating for two consecutive years.' },
+    { year: '2023', title: isAr ? 'الابتكار في التصميم' : 'Innovation in Design', org: 'Gulf Exhibition Awards', desc: isAr ? 'تصميم نظام بوث معياري مخصص ثوري.' : 'Revolutionary custom modular booth system design.' },
+    { year: '2022', title: isAr ? 'أفضل شركة إنتاج' : 'Top Production Company', org: 'Egypt Events Council', desc: isAr ? 'شركة إنتاج الفعاليات الرائدة في السوق المصري.' : 'Leading event production company in the Egyptian market.' },
   ];
 
   // CMS-driven data with fallbacks
@@ -171,7 +173,7 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
   const visionContent = cms.about['vision'];
 
   return (
-    <div className="overflow-x-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div className="overflow-x-hidden" dir={dir} style={{ fontFamily }}>
       <style>{`
         @keyframes slowZoom { from{transform:scale(1.05)} to{transform:scale(1.13)} }
         @keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
@@ -198,12 +200,12 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
             <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 text-white text-sm font-semibold px-4 py-2 rounded-full transition-all duration-300 hover:scale-105"
               style={{ background: '#16a34a' }}>
-              <MessageCircle className="h-4 w-4" /> WhatsApp
+              <MessageCircle className="h-4 w-4" /> {t('nav.whatsapp')}
             </a>
             <Link to="/contact"
               className="flex items-center gap-2 text-white text-sm font-semibold px-5 py-2 rounded-full transition-all duration-300 hover:scale-105"
               style={{ background: '#F4A300' }}>
-              Get a Quote <ArrowRight className="h-3.5 w-3.5" />
+              {t('nav.quote')} <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
           <button onClick={() => setMenuOpen(p => !p)} className="md:hidden p-2 text-white">{menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}</button>
@@ -219,8 +221,8 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
             ))}
             <div className="flex gap-3 pt-4">
               <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
-                className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#16a34a' }}>WhatsApp</a>
-              <Link to="/contact" className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#F4A300' }}>Get a Quote</Link>
+                className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#16a34a' }}>{t('nav.whatsapp')}</a>
+              <Link to="/contact" className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#F4A300' }}>{t('nav.quote')}</Link>
             </div>
           </div>
         </div>
@@ -239,14 +241,14 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
           <div className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase px-4 py-2 rounded-full mb-8"
             style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#F4A300', animation: 'fadeDown 0.8s ease 0.2s both' }}>
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F4A300' }} />
-            {hero?.badge_text || 'Our Story'}
+            {hero?.badge_text || (isAr ? 'قصتنا' : 'Our Story')}
           </div>
           <h1 className="font-black leading-tight text-white mb-6"
-            style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both', fontFamily: "'Poppins', sans-serif" }}>
-            {hero?.heading ? <span dangerouslySetInnerHTML={{ __html: hero.heading }} /> : <>Crafting Excellence<br /><span style={{ color: '#F4A300' }}>Since 2016</span></>}
+            style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both' }}>
+            {hero?.heading ? <span dangerouslySetInnerHTML={{ __html: hero.heading }} /> : isAr ? <>{' '}نصنع التميز<br /><span style={{ color: '#F4A300' }}>منذ 2016</span></> : <>Crafting Excellence<br /><span style={{ color: '#F4A300' }}>Since 2016</span></>}
           </h1>
-          <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both' }}>
-            {hero?.subheading || 'Passionate creators, innovative designers, and meticulous builders dedicated to transforming your brand vision into extraordinary experiences.'}
+          <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both', lineHeight: isAr ? '2' : '1.7' }}>
+            {hero?.subheading || (isAr ? 'مبدعون شغوفون ومصممون مبتكرون وبنّاؤون دقيقون نحوّل رؤية براندك إلى تجارب استثنائية.' : 'Passionate creators, innovative designers, and meticulous builders dedicated to transforming your brand vision into extraordinary experiences.')}
           </p>
         </div>
       </section>
@@ -262,13 +264,13 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
               <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(244,163,0,0.1)', border: '1.5px solid rgba(244,163,0,0.25)' }}>
                 <Target className="h-5 w-5" style={{ color: '#F4A300' }} />
               </div>
-              <h2 className="text-3xl font-black" style={{ color: '#000', fontFamily: "'Poppins', sans-serif" }}>Our Mission</h2>
+              <h2 className="text-3xl font-black" style={{ color: '#000' }}>{isAr ? 'رسالتنا' : 'Our Mission'}</h2>
             </div>
-            <p className="text-lg leading-relaxed mb-6" style={{ color: '#555' }}>
-              {missionContent?.content || "To revolutionize Egypt's exhibition and event industry by creating immersive, innovative experiences that connect brands with their audiences in meaningful, measurable ways."}
+            <p className="text-lg leading-relaxed mb-6" style={{ color: '#555', lineHeight: isAr ? '2' : '1.8' }}>
+              {missionContent?.content || (isAr ? 'نسعى لإحداث نقلة نوعية في صناعة المعارض والفعاليات بمصر والمنطقة، من خلال تجارب مبتكرة تربط الشركات بجمهورها بطرق حقيقية وقابلة للقياس.' : "To revolutionize Egypt's exhibition and event industry by creating immersive, innovative experiences that connect brands with their audiences in meaningful, measurable ways.")}
             </p>
             <div className="space-y-3">
-              {['Deliver world-class exhibition solutions', 'Foster long-term client partnerships', 'Drive innovation in design and production', 'Maintain the highest quality standards'].map(item => (
+              {(isAr ? ['تقديم حلول معارض عالمية المستوى', 'بناء شراكات طويلة المدى مع العملاء', 'قيادة الابتكار في التصميم والتنفيذ', 'الالتزام بأعلى معايير الجودة'] : ['Deliver world-class exhibition solutions', 'Foster long-term client partnerships', 'Drive innovation in design and production', 'Maintain the highest quality standards']).map(item => (
                 <div key={item} className="flex items-center gap-3">
                   <CheckCircle className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} />
                   <span className="text-sm" style={{ color: '#2B2B2B' }}>{item}</span>
@@ -282,15 +284,15 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
               <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(244,163,0,0.1)', border: '1.5px solid rgba(244,163,0,0.25)' }}>
                 <Star className="h-5 w-5" style={{ color: '#F4A300' }} />
               </div>
-              <h2 className="text-3xl font-black" style={{ color: '#000', fontFamily: "'Poppins', sans-serif" }}>Our Vision</h2>
+              <h2 className="text-3xl font-black" style={{ color: '#000' }}>{isAr ? 'رؤيتنا' : 'Our Vision'}</h2>
             </div>
-            <p className="text-lg leading-relaxed mb-7" style={{ color: '#555' }}>
-              {visionContent?.content || "To be the MENA region's premier exhibition design and event production company, recognized for creativity, reliability, and the ability to transform spaces into powerful brand experiences."}
+            <p className="text-lg leading-relaxed mb-7" style={{ color: '#555', lineHeight: isAr ? '2' : '1.8' }}>
+              {visionContent?.content || (isAr ? 'أن نكون الشريك الأول في المنطقة لتصميم المعارض وإنتاج الفعاليات، معروفين بالإبداع والموثوقية وتحويل الفضاءات إلى تجارب براند استثنائية.' : "To be the MENA region's premier exhibition design and event production company, recognized for creativity, reliability, and the ability to transform spaces into powerful brand experiences.")}
             </p>
             <div className="p-6 rounded-2xl" style={{ background: '#000', border: '1.5px solid #1A1A1A' }}>
-              <h3 className="font-bold text-base mb-3 text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Looking Ahead to 2030</h3>
-              <p className="text-sm leading-relaxed" style={{ color: '#9ca3af' }}>
-                We aim to be the preferred partner for Fortune 500 companies and major MENA corporations seeking premium exhibition solutions — while leading the industry in innovation.
+              <h3 className="font-bold text-base mb-3 text-white">{isAr ? 'نظرتنا حتى 2030' : 'Looking Ahead to 2030'}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: '#9ca3af', lineHeight: isAr ? '2' : '1.7' }}>
+                {isAr ? 'هدفنا أن نكون الشريك المفضل لكبرى الشركات في المنطقة الباحثة عن حلول معارض متميزة — مع قيادة الابتكار في الصناعة.' : 'We aim to be the preferred partner for Fortune 500 companies and major MENA corporations seeking premium exhibition solutions — while leading the industry in innovation.'}
               </p>
               <div className="mt-4 h-px" style={{ background: 'linear-gradient(to right, #F4A300, transparent)' }} />
             </div>
@@ -304,9 +306,9 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-16">
-            <SectionLabel text="What We Stand For" />
-            <h2 className="font-black mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000', fontFamily: "'Poppins', sans-serif" }}>Our Core Values</h2>
-            <p className="text-lg max-w-xl mx-auto" style={{ color: '#555' }}>The principles that guide every decision we make and every project we undertake</p>
+            <SectionLabel text={isAr ? 'مبادئنا' : 'What We Stand For'} />
+            <h2 className="font-black mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>{isAr ? 'قيمنا الأساسية' : 'Our Core Values'}</h2>
+            <p className="text-lg max-w-xl mx-auto" style={{ color: '#555' }}>{isAr ? 'المبادئ التي توجه كل قرار نتخذه وكل مشروع ننجزه' : 'The principles that guide every decision we make and every project we undertake'}</p>
           </Reveal>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -320,8 +322,8 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
                     style={{ background: 'rgba(244,163,0,0.1)', border: '1.5px solid rgba(244,163,0,0.25)' }}>
                     <v.icon className="h-6 w-6" style={{ color: '#F4A300' }} />
                   </div>
-                  <h3 className="font-bold text-base mb-3 transition-colors group-hover:text-[#F4A300]" style={{ color: '#000', fontFamily: "'Poppins', sans-serif" }}>{v.title}</h3>
-                  <p className="text-sm leading-relaxed" style={{ color: '#555' }}>{v.desc}</p>
+                  <h3 className="font-bold text-base mb-3 transition-colors group-hover:text-[#F4A300]" style={{ color: '#000' }}>{v.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: '#555', lineHeight: isAr ? '2' : '1.7' }}>{v.desc}</p>
                 </div>
               </Reveal>
             ))}
@@ -336,11 +338,11 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
 
         <div className="max-w-4xl mx-auto">
           <Reveal className="text-center mb-16">
-            <SectionLabel text="Our Journey" />
-            <h2 className="font-black mb-4 text-white" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontFamily: "'Poppins', sans-serif" }}>
-              Milestones That <span style={{ color: '#F4A300' }}>Shaped Us</span>
+            <SectionLabel text={isAr ? 'رحلتنا' : 'Our Journey'} />
+            <h2 className="font-black mb-4 text-white" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>
+              {isAr ? <>{' '}المحطات التي <span style={{ color: '#F4A300' }}>شكّلتنا</span></> : <>Milestones That <span style={{ color: '#F4A300' }}>Shaped Us</span></>}
             </h2>
-            <p className="text-lg max-w-xl mx-auto" style={{ color: '#9ca3af' }}>From humble beginnings to regional leadership</p>
+            <p className="text-lg max-w-xl mx-auto" style={{ color: '#9ca3af' }}>{isAr ? 'من بداية متواضعة إلى ريادة إقليمية' : 'From humble beginnings to regional leadership'}</p>
           </Reveal>
 
           <div className="relative">
@@ -357,7 +359,7 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
                         onMouseEnter={e => { (e.currentTarget.style.borderColor = 'rgba(244,163,0,0.4)'); (e.currentTarget.style.background = 'rgba(244,163,0,0.05)'); }}
                         onMouseLeave={e => { (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'); (e.currentTarget.style.background = 'rgba(255,255,255,0.04)'); }}>
                         <div className="text-xl font-black mb-1" style={{ color: '#F4A300', fontFamily: "'Poppins', sans-serif" }}>{m.year}</div>
-                        <div className="text-sm font-semibold text-white">{m.event}</div>
+                        <div className="text-sm font-semibold text-white" style={{ direction: isAr ? 'rtl' : 'ltr' }}>{m.event}</div>
                       </div>
                     </div>
                     {/* Dot */}
@@ -380,11 +382,11 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-16">
-            <SectionLabel text="Recognition" />
-            <h2 className="font-black mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000', fontFamily: "'Poppins', sans-serif" }}>
-              Awards & <span style={{ color: '#F4A300' }}>Achievements</span>
+            <SectionLabel text={isAr ? 'التقدير' : 'Recognition'} />
+            <h2 className="font-black mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
+              {isAr ? <>{' '}الجوائز و<span style={{ color: '#F4A300' }}>الإنجازات</span></> : <>Awards & <span style={{ color: '#F4A300' }}>Achievements</span></>}
             </h2>
-            <p className="text-lg max-w-xl mx-auto" style={{ color: '#555' }}>Our commitment to excellence recognized by industry leaders</p>
+            <p className="text-lg max-w-xl mx-auto" style={{ color: '#555' }}>{isAr ? 'التزامنا بالتميز معترف به من قادة الصناعة' : 'Our commitment to excellence recognized by industry leaders'}</p>
           </Reveal>
 
           <div className="grid md:grid-cols-2 gap-5">
@@ -401,10 +403,10 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
                   <div>
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-xl font-black" style={{ color: '#F4A300', fontFamily: "'Poppins', sans-serif" }}>{a.year}</span>
-                      <h3 className="font-bold text-base transition-colors group-hover:text-[#F4A300]" style={{ color: '#000', fontFamily: "'Poppins', sans-serif" }}>{a.title}</h3>
+                      <h3 className="font-bold text-base transition-colors group-hover:text-[#F4A300]" style={{ color: '#000' }}>{a.title}</h3>
                     </div>
                     <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: '#9ca3af' }}>{a.org}</p>
-                    <p className="text-sm leading-relaxed" style={{ color: '#555' }}>{a.desc}</p>
+                    <p className="text-sm leading-relaxed" style={{ color: '#555', lineHeight: isAr ? '2' : '1.7' }}>{a.desc}</p>
                   </div>
                 </div>
               </Reveal>
@@ -422,25 +424,25 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
         <div className="absolute left-0 inset-y-0 w-[4px]" style={{ background: '#F4A300' }} />
 
         <Reveal className="relative max-w-4xl mx-auto text-center">
-          <SectionLabel text="Let's Work Together" />
-          <h2 className="font-black text-white leading-tight mb-6" style={{ fontSize: 'clamp(2.2rem, 5vw, 4rem)', fontFamily: "'Poppins', sans-serif" }}>
-            Ready to Build Something<br /><span style={{ color: '#F4A300' }}>Extraordinary?</span>
+          <SectionLabel text={isAr ? 'لنعمل معاً' : "Let's Work Together"} />
+          <h2 className="font-black text-white leading-tight mb-6" style={{ fontSize: 'clamp(2.2rem, 5vw, 4rem)' }}>
+            {isAr ? <>مستعد لبناء شيء<br /><span style={{ color: '#F4A300' }}>استثنائي؟</span></> : <>Ready to Build Something<br /><span style={{ color: '#F4A300' }}>Extraordinary?</span></>}
           </h2>
-          <p className="text-lg mb-11" style={{ color: '#9ca3af' }}>Join hundreds of satisfied clients who trusted MOPi Production.</p>
+          <p className="text-lg mb-11" style={{ color: '#9ca3af' }}>{isAr ? 'انضم لمئات العملاء الراضين الذين وثقوا بموبي برودكشن.' : 'Join hundreds of satisfied clients who trusted MOPi Production.'}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/contact"
               className="group inline-flex items-center justify-center gap-3 text-white font-bold text-lg px-10 py-5 rounded-full transition-all duration-300 hover:scale-105"
               style={{ background: '#F4A300', boxShadow: '0 12px 30px rgba(244,163,0,0.3)' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#e09200'); }}
               onMouseLeave={e => { (e.currentTarget.style.background = '#F4A300'); }}>
-              Request a Quote <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              {isAr ? 'اطلب عرض سعر' : 'Request a Quote'} <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
             <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-3 text-white font-bold text-lg px-10 py-5 rounded-full transition-all duration-300 hover:scale-105"
               style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.15)' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#16a34a'); (e.currentTarget.style.borderColor = '#16a34a'); }}
               onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(255,255,255,0.07)'); (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'); }}>
-              <MessageCircle className="h-5 w-5" /> WhatsApp Us
+              <MessageCircle className="h-5 w-5" /> {isAr ? 'واتساب' : 'WhatsApp Us'}
             </a>
           </div>
         </Reveal>
