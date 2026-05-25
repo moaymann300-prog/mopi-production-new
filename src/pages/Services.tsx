@@ -33,14 +33,15 @@ const SectionLabel = ({ text }: { text: string }) => (
 
 const SharedFooter = () => {
   const cms = useCMS();
+  const { isAr } = useLocalLanguage();
   const companyName = cms.settings.company_name || 'MOPi Production';
   const email = cms.settings.email || 'info@mopiproduction.com';
-const phone = cms.settings.phone_1 || '+20 100 000 0000';
+  const phone = cms.settings.phone_1 || '+20 100 000 0000';
   const phone2 = cms.settings.phone_2 || '';
   const address = cms.settings.address || 'Cairo, Egypt';
-  const tagline = cms.settings.footer_tagline || cms.settings.tagline || "Cairo's leading exhibition booth design and event production company.";
+  const tagline = cms.settings.footer_tagline || cms.settings.tagline || (isAr ? 'شركة موبي برودكشن — الرائدة في تصميم المعارض وإنتاج الفعاليات.' : "Cairo's leading exhibition booth design and event production company.");
   const logoUrl = getLogoUrl(cms.footerLogo || cms.headerLogo);
-const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings.whatsapp_number.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
+  const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings.whatsapp_number.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
   return (
   <footer style={{ background: '#000000', borderTop: '3px solid #F4A300' }} className="py-14 px-5">
     <div className="max-w-7xl mx-auto">
@@ -61,14 +62,14 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
               style={{ background: 'rgba(244,163,0,0.1)', border: '1px solid rgba(244,163,0,0.25)', color: '#F4A300' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#F4A300'); (e.currentTarget.style.color = '#fff'); }}
               onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(244,163,0,0.1)'); (e.currentTarget.style.color = '#F4A300'); }}>
-              <Mail className="h-3.5 w-3.5" /> Email Us
+              <Mail className="h-3.5 w-3.5" /> {isAr ? 'راسلنا' : 'Email Us'}
             </a>
           </div>
         </div>
         <div>
-          <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">Services</h4>
+          <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">{isAr ? 'خدماتنا' : 'Services'}</h4>
           <ul className="space-y-2.5">
-            {['Exhibition Booth Design', 'Event Production', 'Brand Activations', 'Custom Fabrication', 'Branding & Graphics'].map(s => (
+            {(isAr ? ['تصميم أجنحة المعارض', 'تنفيذ الفعاليات', 'براند أكتيفيشن', 'تصنيع مخصص', 'هوية بصرية وجرافيك'] : ['Exhibition Booth Design', 'Event Production', 'Brand Activations', 'Custom Fabrication', 'Branding & Graphics']).map(s => (
               <li key={s}><Link to="/services" className="text-sm flex items-center gap-1.5" style={{ color: '#6b7280' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#F4A300')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
@@ -78,7 +79,7 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
           </ul>
         </div>
         <div>
-          <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">Contact</h4>
+          <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">{isAr ? 'تواصل معنا' : 'Contact'}</h4>
           <ul className="space-y-3">
             <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}><MapPin className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {address}</li>
 <li><a href={`tel:${phone.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
@@ -93,12 +94,12 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
           </ul>
           <Link to="/admin" className="inline-flex items-center gap-1 mt-7 text-xs transition-colors" style={{ color: '#374151' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#6b7280')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#374151')}>Admin Dashboard →</Link>
+            onMouseLeave={e => (e.currentTarget.style.color = '#374151')}>{isAr ? 'لوحة التحكم' : 'Admin Dashboard'} →</Link>
         </div>
       </div>
       <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-        <p className="text-sm" style={{ color: '#374151' }}>© 2026 {companyName}. All rights reserved.</p>
-        <p className="text-xs tracking-wide" style={{ color: '#1f2937' }}>Exhibition Booths · Brand Activations · Event Production</p>
+        <p className="text-sm" style={{ color: '#374151' }}>© 2026 {companyName}. {isAr ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}</p>
+        <p className="text-xs tracking-wide" style={{ color: '#1f2937' }}>{isAr ? 'أجنحة المعارض · براند أكتيفيشن · إنتاج الفعاليات' : 'Exhibition Booths · Brand Activations · Event Production'}</p>
       </div>
     </div>
   </footer>
