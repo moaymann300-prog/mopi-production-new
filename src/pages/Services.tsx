@@ -256,7 +256,7 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
         <div className="relative z-10 text-center px-5 max-w-4xl mx-auto py-24">
           <div className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase px-4 py-2 rounded-full mb-8"
             style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#ED8214', animation: 'fadeDown 0.8s ease 0.2s both' }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#ED8214' }} />{ct('services','hero','badge', hero?.badge_text || (isAr ? 'حلول متكاملة' : 'End-to-End Solutions'))}
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#ED8214' }} />{hero?.badge_text || (isAr ? 'حلول متكاملة' : 'End-to-End Solutions')}
           </div>
           <h1 className="font-black leading-tight text-white mb-6"
             style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both' }}>
