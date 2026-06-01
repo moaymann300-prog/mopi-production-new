@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { IMAGES } from '@/assets/images';
 import { supabase } from '@/integrations/supabase/client';
-import { useCMS, getLogoUrl, getSocialUrl, getCMSText, getCMSImage } from '@/hooks/useCMS';
+import { useCMS, getLogoUrl, getSocialUrl, getCMSText, getCMSImage } // CMS-driven from '@/hooks/useCMS';
 import { useLocalLanguage } from '@/hooks/useLanguage';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
