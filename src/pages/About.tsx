@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { IMAGES } from '@/assets/images';
-import { useCMS, getLogoUrl, getSocialUrl } from '@/hooks/useCMS';
+import { useCMS, getLogoUrl, getSocialUrl, getCMSText, getCMSImage } from '@/hooks/useCMS';
 import { useLocalLanguage } from '@/hooks/useLanguage';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
@@ -120,7 +120,14 @@ const About = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const cms = useCMS();
-  const { t, isAr, dir, fontFamily } = useLocalLanguage();
+  const { t: _t, isAr, dir, fontFamily, lang } = useLocalLanguage();
+  // CMS text helper with language-aware fallback
+  const ct = (page: string, section: string, field: string, fallback: string) =>
+    getCMSText(cms.pageContent, page, section, field, lang as 'en' | 'ar', fallback);
+  // CMS image helper
+  const ci = (page: string, section: string, key: string, fallback: string) =>
+    getCMSImage(cms.pageImages, page, section, key, fallback);
+  const t = _t;
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60);
@@ -232,7 +239,7 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
       {/* ══ § 1 · HERO — BLACK ══ */}
       <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden pt-20" style={{ background: '#000000' }}>
         <div className="absolute inset-0">
-          <img src={hero?.bg_image_url || IMAGES.CORPORATE_4} alt="" className="w-full h-full object-cover" style={{ opacity: 0.28, animation: 'slowZoom 20s ease-in-out infinite alternate' }} />
+          <img src={ci('about','hero','background', hero?.bg_image_url || IMAGES.CORPORATE_4)} alt="" className="w-full h-full object-cover" style={{ opacity: 0.28, animation: 'slowZoom 20s ease-in-out infinite alternate' }} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,1) 100%)' }} />
         </div>
         <div className="absolute left-0 inset-y-0 w-[3px]" style={{ background: 'linear-gradient(to bottom, transparent, #ED8214, transparent)', opacity: 0.6 }} />
@@ -242,14 +249,14 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
           <div className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase px-4 py-2 rounded-full mb-8"
             style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#ED8214', animation: 'fadeDown 0.8s ease 0.2s both' }}>
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#ED8214' }} />
-            {hero?.badge_text || (isAr ? 'قصتنا' : 'Our Story')}
+            {ct('about','hero','badge', hero?.badge_text || (isAr ? 'قصتنا' : 'Our Story'))}
           </div>
           <h1 className="font-black leading-tight text-white mb-6"
             style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both' }}>
-            {hero?.heading ? <span dangerouslySetInnerHTML={{ __html: hero.heading }} /> : isAr ? <>{' '}نصنع التميز<br /><span style={{ color: '#ED8214' }}>منذ 2016</span></> : <>Crafting Excellence<br /><span style={{ color: '#ED8214' }}>Since 2016</span></>}
+            {ct('about','hero','heading','') ? <span dangerouslySetInnerHTML={{ __html: ct('about','hero','heading','') }} /> : hero?.heading ? <span dangerouslySetInnerHTML={{ __html: hero.heading }} /> : isAr ? <>{' '}نصنع التميز<br /><span style={{ color: '#ED8214' }}>منذ 2016</span></> : <>Crafting Excellence<br /><span style={{ color: '#ED8214' }}>Since 2016</span></>}
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both', lineHeight: isAr ? '2' : '1.7' }}>
-            {hero?.subheading || (isAr ? 'مبدعون شغوفون ومصممون مبتكرون وبنّاؤون دقيقون نحوّل رؤية براندك إلى تجارب استثنائية.' : 'Passionate creators, innovative designers, and meticulous builders dedicated to transforming your brand vision into extraordinary experiences.')}
+            {ct('about','hero','subtitle', hero?.subheading || (isAr ? 'مبدعون شغوفون ومصممون مبتكرون وبنّاؤون دقيقون نحوّل رؤية براندك إلى تجارب استثنائية.' : 'Passionate creators, innovative designers, and meticulous builders dedicated to transforming your brand vision into extraordinary experiences.'))}
           </p>
         </div>
       </section>
@@ -268,7 +275,7 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
               <h2 className="text-3xl font-black" style={{ color: '#000' }}>{isAr ? 'رسالتنا' : 'Our Mission'}</h2>
             </div>
             <p className="text-lg leading-relaxed mb-6" style={{ color: '#555', lineHeight: isAr ? '2' : '1.8' }}>
-              {missionContent?.content || (isAr ? 'نسعى لإحداث نقلة نوعية في صناعة المعارض والفعاليات بمصر والمنطقة، من خلال تجارب مبتكرة تربط الشركات بجمهورها بطرق حقيقية وقابلة للقياس.' : "To revolutionize Egypt's exhibition and event industry by creating immersive, innovative experiences that connect brands with their audiences in meaningful, measurable ways.")}
+              {ct('about','mission','content', missionContent?.content || (isAr ? 'نسعى لإحداث نقلة نوعية في صناعة المعارض والفعاليات بمصر والمنطقة، من خلال تجارب مبتكرة تربط الشركات بجمهورها بطرق حقيقية وقابلة للقياس.' : "To revolutionize Egypt's exhibition and event industry by creating immersive, innovative experiences that connect brands with their audiences in meaningful, measurable ways."))}
             </p>
             <div className="space-y-3">
               {(isAr ? ['تقديم حلول معارض عالمية المستوى', 'بناء شراكات طويلة المدى مع العملاء', 'قيادة الابتكار في التصميم والتنفيذ', 'الالتزام بأعلى معايير الجودة'] : ['Deliver world-class exhibition solutions', 'Foster long-term client partnerships', 'Drive innovation in design and production', 'Maintain the highest quality standards']).map(item => (
@@ -288,7 +295,7 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
               <h2 className="text-3xl font-black" style={{ color: '#000' }}>{isAr ? 'رؤيتنا' : 'Our Vision'}</h2>
             </div>
             <p className="text-lg leading-relaxed mb-7" style={{ color: '#555', lineHeight: isAr ? '2' : '1.8' }}>
-              {visionContent?.content || (isAr ? 'أن نكون الشريك الأول في المنطقة لتصميم المعارض وإنتاج الفعاليات، معروفين بالإبداع والموثوقية وتحويل الفضاءات إلى تجارب براند استثنائية.' : "To be the MENA region's premier exhibition design and event production company, recognized for creativity, reliability, and the ability to transform spaces into powerful brand experiences.")}
+              {ct('about','mission','vision', visionContent?.content || (isAr ? 'أن نكون الشريك الأول في المنطقة لتصميم المعارض وإنتاج الفعاليات، معروفين بالإبداع والموثوقية وتحويل الفضاءات إلى تجارب براند استثنائية.' : "To be the MENA region's premier exhibition design and event production company, recognized for creativity, reliability, and the ability to transform spaces into powerful brand experiences."))}
             </p>
             <div className="p-6 rounded-2xl" style={{ background: '#000', border: '1.5px solid #1A1A1A' }}>
               <h3 className="font-bold text-base mb-3 text-white">{isAr ? 'نظرتنا حتى 2030' : 'Looking Ahead to 2030'}</h3>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { IMAGES } from '@/assets/images';
-import { useCMS, getLogoUrl } from '@/hooks/useCMS';
+import { useCMS, getLogoUrl, getCMSText, getCMSImage } from '@/hooks/useCMS';
 import { useLocalLanguage } from '@/hooks/useLanguage';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
@@ -149,7 +149,12 @@ const Portfolio = () => {
   const [spotlightTransition, setSpotlightTransition] = useState(false);
   const spotlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const cms = useCMS();
-  const { t, isAr, dir, fontFamily } = useLocalLanguage();
+  const { t: _t, isAr, dir, fontFamily, lang } = useLocalLanguage();
+  const ct = (page: string, section: string, field: string, fallback: string) =>
+    getCMSText(cms.pageContent, page, section, field, lang as 'en' | 'ar', fallback);
+  const ci = (page: string, section: string, key: string, fallback: string) =>
+    getCMSImage(cms.pageImages, page, section, key, fallback);
+  const t = _t;
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60);
@@ -363,7 +368,7 @@ const Portfolio = () => {
       {/* ══ § 1 · HERO — BLACK ══ */}
       <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden pt-20" style={{ background: '#000000' }}>
         <div className="absolute inset-0">
-          <img src={heroPortfolio?.bg_image_url || IMAGES.BOOTH_8} alt="" className="w-full h-full object-cover" style={{ opacity: 0.3, animation: 'slowZoom 22s ease-in-out infinite alternate' }} />
+          <img src={ci('portfolio','hero','background', heroPortfolio?.bg_image_url || IMAGES.BOOTH_8)} alt="" className="w-full h-full object-cover" style={{ opacity: 0.3, animation: 'slowZoom 22s ease-in-out infinite alternate' }} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,1) 100%)' }} />
         </div>
         <div className="absolute left-0 inset-y-0 w-[3px]" style={{ background: 'linear-gradient(to bottom, transparent, #ED8214, transparent)', opacity: 0.6 }} />
@@ -374,20 +379,14 @@ const Portfolio = () => {
           <div className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase px-4 py-2 rounded-full mb-8"
             style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#ED8214', animation: 'fadeDown 0.8s ease 0.2s both' }}>
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#ED8214' }} />
-            {heroPortfolio?.badge_text || (isAr ? '+500 مشروع تم تسليمه' : '500+ Projects Delivered')}
+            {ct('portfolio','hero','badge', heroPortfolio?.badge_text || (isAr ? '+500 مشروع تم تسليمه' : '500+ Projects Delivered'))}
           </div>
           <h1 className="font-black leading-tight text-white mb-6"
             style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both', lineHeight: isAr ? '1.4' : '1.15' }}>
-            {heroPortfolio?.heading
-              ? <span dangerouslySetInnerHTML={{ __html: heroPortfolio.heading }} />
-              : isAr
-                ? <>أعمالنا تتحدث<br /><span style={{ color: '#ED8214' }}>عنا</span></>
-                : <>Showcasing <span style={{ color: '#ED8214' }}>Excellence</span><br />Across Industries</>}
+            {ct('portfolio','hero','heading', '') ? <span dangerouslySetInnerHTML={{ __html: ct('portfolio','hero','heading','') }} /> : heroPortfolio?.heading ? <span dangerouslySetInnerHTML={{ __html: heroPortfolio.heading }} /> : isAr ? <>أعمالنا تتحدث<br /><span style={{ color: '#ED8214' }}>عنا</span></> : <>Showcasing <span style={{ color: '#ED8214' }}>Excellence</span><br />Across Industries</>}
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both', lineHeight: isAr ? '2' : '1.7' }}>
-            {isAr
-              ? 'مشاريع حائزة على جوائز حوّلت البراندات وصنعت تجارب لا تُنسى في مصر ومنطقة الشرق الأوسط.'
-              : 'Award-winning projects that have transformed brands and created memorable experiences across Egypt and the MENA region.'}
+            {ct('portfolio','hero','subtitle', isAr ? 'مشاريع حائزة على جوائز حوّلت البراندات وصنعت تجارب لا تُنسى في مصر ومنطقة الشرق الأوسط.' : 'Award-winning projects that have transformed brands and created memorable experiences across Egypt and the MENA region.')}
           </p>
         </div>
       </section>

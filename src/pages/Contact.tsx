@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { IMAGES } from '@/assets/images';
 import { supabase } from '@/integrations/supabase/client';
-import { useCMS, getLogoUrl, getSocialUrl } from '@/hooks/useCMS';
+import { useCMS, getLogoUrl, getSocialUrl, getCMSText, getCMSImage } from '@/hooks/useCMS';
 import { useLocalLanguage } from '@/hooks/useLanguage';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
@@ -113,7 +113,12 @@ const Contact = () => {
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone: '', company: '', service: '', message: '' });
   const cms = useCMS();
-  const { t, isAr, dir, fontFamily } = useLocalLanguage();
+  const { t: _t, isAr, dir, fontFamily, lang } = useLocalLanguage();
+  const ct = (page: string, section: string, field: string, fallback: string) =>
+    getCMSText(cms.pageContent, page, section, field, lang as 'en' | 'ar', fallback);
+  const ci = (page: string, section: string, key: string, fallback: string) =>
+    getCMSImage(cms.pageImages, page, section, key, fallback);
+  const t = _t;
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60);
@@ -206,7 +211,7 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
       {/* ══ § 1 · HERO — BLACK ══ */}
       <section className="relative min-h-[65vh] flex items-center justify-center overflow-hidden pt-20" style={{ background: '#000000' }}>
         <div className="absolute inset-0">
-          <img src={heroContact?.bg_image_url || IMAGES.BOOTH_5} alt="" className="w-full h-full object-cover" style={{ opacity: 0.22, animation: 'slowZoom 22s ease-in-out infinite alternate' }} />
+          <img src={ci('contact','hero','background', heroContact?.bg_image_url || IMAGES.BOOTH_5)} alt="" className="w-full h-full object-cover" style={{ opacity: 0.22, animation: 'slowZoom 22s ease-in-out infinite alternate' }} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,1) 100%)' }} />
         </div>
         <div className="absolute left-0 inset-y-0 w-[3px]" style={{ background: 'linear-gradient(to bottom, transparent, #ED8214, transparent)', opacity: 0.6 }} />
@@ -215,14 +220,14 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
         <div className="relative z-10 text-center px-5 max-w-4xl mx-auto py-20">
           <div className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase px-4 py-2 rounded-full mb-8"
             style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#ED8214', animation: 'fadeDown 0.8s ease 0.2s both' }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#ED8214' }} />{heroContact?.badge_text || (isAr ? 'دائماً في خدمتك' : 'Always Ready to Help')}
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#ED8214' }} />{ct('contact','hero','badge', heroContact?.badge_text || (isAr ? 'دائماً في خدمتك' : 'Always Ready to Help'))}
           </div>
           <h1 className="font-black leading-tight text-white mb-6"
             style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both' }}>
-            {heroContact?.heading ? <span dangerouslySetInnerHTML={{ __html: heroContact.heading }} /> : isAr ? <>دعنا نبني<br /><span style={{ color: '#ED8214' }}>شيئاً استثنائياً</span></> : <>Let's Build<br /><span style={{ color: '#ED8214' }}>Something Amazing</span></>}
+            {ct('contact','hero','heading', '') ? <span dangerouslySetInnerHTML={{ __html: ct('contact','hero','heading', '') }} /> : heroContact?.heading ? <span dangerouslySetInnerHTML={{ __html: heroContact.heading }} /> : isAr ? <>دعنا نبني<br /><span style={{ color: '#ED8214' }}>شيئاً استثنائياً</span></> : <>Let's Build<br /><span style={{ color: '#ED8214' }}>Something Amazing</span></>}
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both', lineHeight: isAr ? '2' : '1.7' }}>
-            {heroContact?.subheading || (isAr ? 'تواصل مع فريقنا للحصول على استشارة مجانية. سنناقش مشروعك ونقدم لك عرضاً مخصصاً خلال 24 ساعة.' : "Get in touch with our team for a free consultation. We'll discuss your project and create a custom proposal within 24 hours.")}
+            {ct('contact','hero','subtitle', heroContact?.subheading || (isAr ? 'تواصل مع فريقنا للحصول على استشارة مجانية. سنناقش مشروعك ونقدم لك عرضاً مخصصاً خلال 24 ساعة.' : "Get in touch with our team for a free consultation. We'll discuss your project and create a custom proposal within 24 hours."))}
           </p>
         </div>
       </section>
