@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { IMAGES } from '@/assets/images';
-import { useCMS, getLogoUrl } from '@/hooks/useCMS';
+import { useCMS, getLogoUrl, getCMSText, getCMSImage } from '@/hooks/useCMS';
 import { useLocalLanguage } from '@/hooks/useLanguage';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
@@ -339,7 +339,12 @@ const Index = () => {
         style={{ background: '#111111' }}>
 
         <div className="absolute inset-0">
-          <img src={IMAGES.HERO_MAIN_20260421_114546_27} alt=""
+          <img
+            src={
+              cms.heroes['home']?.bg_image_url ||
+              getCMSImage(cms.pageImages, 'home', 'hero', 'background', IMAGES.HERO_MAIN_20260421_114546_27)
+            }
+            alt=""
             className="w-full h-full object-cover"
             style={{ opacity: 0.28, animation: 'slowZoom 24s ease-in-out infinite alternate' }} />
           <div className="absolute inset-0"
