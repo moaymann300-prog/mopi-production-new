@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { IMAGES } from '@/assets/images';
-import { useCMS, getLogoUrl, getCMSText, getCMSImage } from '@/hooks/useCMS';
+import { useCMS, getLogoUrl, getCMSText, getCMSImage } from '@/hooks/useCMS'; // v2
 import { useLocalLanguage } from '@/hooks/useLanguage';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
