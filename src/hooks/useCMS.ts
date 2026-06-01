@@ -12,6 +12,8 @@ export interface CMSPortfolio { id: number; title: string; category: string; cli
 export interface CMSTeam { id: number; name: string; role: string; bio: string; image_url: string; email: string; linkedin_url: string; sort_order: number; is_active: boolean; }
 export interface CMSTestimonial { id: number; author_name: string; author_role: string; company: string; quote: string; rating: number; image_url: string; is_active: boolean; }
 export interface CMSAbout { section: string; title: string; content: string; image_url: string; }
+export interface CMSPageContent { id: number; page: string; section: string; field: string; value_en: string; value_ar: string; }
+export interface CMSPageImage { id: number; page: string; section: string; image_key: string; image_url: string; alt_text_en: string; alt_text_ar: string; }
 
 export interface CMSData {
   settings: Record<string, string>;
@@ -26,6 +28,8 @@ export interface CMSData {
   team: CMSTeam[];
   testimonials: CMSTestimonial[];
   about: Record<string, CMSAbout>;
+  pageContent: CMSPageContent[];
+  pageImages: CMSPageImage[];
   loading: boolean;
 }
 
@@ -58,6 +62,8 @@ const [socials, setSocials] = useState<CMSSocialLink[]>([]);
   const [team, setTeam] = useState<CMSTeam[]>([]);
   const [testimonials, setTestimonials] = useState<CMSTestimonial[]>([]);
   const [about, setAbout] = useState<Record<string, CMSAbout>>({});
+  const [pageContent, setPageContent] = useState<CMSPageContent[]>([]);
+  const [pageImages, setPageImages] = useState<CMSPageImage[]>([]);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -65,7 +71,7 @@ const [socials, setSocials] = useState<CMSSocialLink[]>([]);
         const [
           settingsRes, socialsRes, logosRes, heroesRes,
           statsRes, servicesRes, portfolioRes, teamRes,
-          testimonialsRes, aboutRes,
+          testimonialsRes, aboutRes, pageContentRes, pageImagesRes,
         ] = await Promise.all([
           supabase.from('cms_site_settings_2026_04_21').select('key, value'),
           supabase.from('cms_social_links_2026_04_21').select('*').eq('is_active', true).order('sort_order'),
@@ -77,6 +83,8 @@ const [socials, setSocials] = useState<CMSSocialLink[]>([]);
           supabase.from('cms_team_2026_04_21').select('*').eq('is_active', true).order('sort_order'),
           supabase.from('cms_testimonials_2026_04_21').select('*').eq('is_active', true).order('sort_order'),
           supabase.from('cms_about_content_2026_04_21').select('*'),
+          supabase.from('cms_page_content_2026_06_01').select('*'),
+          supabase.from('cms_page_images_2026_06_01').select('*'),
         ]);
 
 // Settings → key:value map
@@ -131,6 +139,10 @@ const [socials, setSocials] = useState<CMSSocialLink[]>([]);
           aboutRes.data.forEach((a: CMSAbout) => { map[a.section] = a; });
           setAbout(map);
         }
+        // Page Content
+        if (pageContentRes.data) setPageContent(pageContentRes.data);
+        // Page Images
+        if (pageImagesRes.data) setPageImages(pageImagesRes.data);
       } catch (err) {
         console.error('CMS fetch error:', err);
       } finally {
@@ -141,7 +153,7 @@ const [socials, setSocials] = useState<CMSSocialLink[]>([]);
     fetchAll();
   }, []);
 
-return {
+  return {
     settings,
     socials,
     headerLogo,
@@ -154,6 +166,8 @@ return {
     team,
     testimonials,
     about,
+    pageContent,
+    pageImages,
     loading,
   };
 }
@@ -167,4 +181,30 @@ export function getLogoUrl(logo: CMSLogo | null): string {
 export function getSocialUrl(socials: CMSSocialLink[], platform: string): string {
   const s = socials.find(s => s.platform.toLowerCase() === platform.toLowerCase());
   return s?.url || '';
+}
+
+// ─── Page Content Helpers ────────────────────────────────────────────────────
+export function getCMSText(
+  items: CMSPageContent[],
+  page: string,
+  section: string,
+  field: string,
+  lang: 'en' | 'ar',
+  fallback: string
+): string {
+  const item = items.find(i => i.page === page && i.section === section && i.field === field);
+  if (!item) return fallback;
+  return (lang === 'ar' ? item.value_ar : item.value_en) || fallback;
+}
+
+export function getCMSImage(
+  items: CMSPageImage[],
+  page: string,
+  section: string,
+  key: string,
+  fallback: string
+): string {
+  const item = items.find(i => i.page === page && i.section === section && i.image_key === key);
+  if (!item || !item.image_url) return fallback;
+  return item.image_url;
 }
