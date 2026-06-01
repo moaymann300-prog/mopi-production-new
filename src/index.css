@@ -6,7 +6,7 @@
 
 /* MOPi Production Design System
 Brand Colors:
-- Primary Orange: #F4A300
+- Primary Orange: #ED8214
 - Primary Black: #000000
 - Secondary Gray: #2B2B2B
 - Background White: #FFFFFF
@@ -25,10 +25,10 @@ Brand Colors:
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
 
-    /* Primary Orange #F4A300 */
-    --primary: 39 100% 48%;
+    /* Primary Orange #ED8214 */
+    --primary: 30 86% 50%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 39 100% 60%;
+    --primary-glow: 30 86% 62%;
 
     /* Secondary Gray #2B2B2B */
     --secondary: 0 0% 17%;
@@ -38,7 +38,7 @@ Brand Colors:
     --muted: 0 0% 95%;
     --muted-foreground: 0 0% 17%;
 
-    --accent: 39 100% 48%;
+    --accent: 30 86% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -46,15 +46,15 @@ Brand Colors:
 
     --border: 0 0% 90%;
     --input: 0 0% 95%;
-    --ring: 39 100% 48%;
+    --ring: 30 86% 50%;
 
     --radius: 0.75rem;
 
     /* Custom MOPi Variables */
-    --gradient-primary: linear-gradient(135deg, hsl(39 100% 48%), hsl(39 100% 60%));
+    --gradient-primary: linear-gradient(135deg, hsl(30 86% 50%), hsl(30 86% 62%));
     --gradient-dark: linear-gradient(135deg, hsl(0 0% 0%), hsl(0 0% 17%));
-    --shadow-elegant: 0 10px 30px -10px hsl(39 100% 48% / 0.3);
-    --shadow-glow: 0 0 40px hsl(39 100% 60% / 0.4);
+    --shadow-elegant: 0 10px 30px -10px hsl(30 86% 50% / 0.3);
+    --shadow-glow: 0 0 40px hsl(30 86% 62% / 0.4);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;

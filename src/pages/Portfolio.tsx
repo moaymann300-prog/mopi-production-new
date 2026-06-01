@@ -24,13 +24,13 @@ const Reveal = ({ children, delay = 0, className = '' }: { children: React.React
 };
 
 const SectionLabel = ({ text }: { text: string }) => (
-  <div className="inline-flex items-center gap-3 text-xs font-bold tracking-[0.22em] uppercase mb-5" style={{ color: '#F4A300' }}>
-    <span className="w-8 h-px block" style={{ background: '#F4A300' }} />{text}<span className="w-8 h-px block" style={{ background: '#F4A300' }} />
+  <div className="inline-flex items-center gap-3 text-xs font-bold tracking-[0.22em] uppercase mb-5" style={{ color: '#ED8214' }}>
+    <span className="w-8 h-px block" style={{ background: '#ED8214' }} />{text}<span className="w-8 h-px block" style={{ background: '#ED8214' }} />
   </div>
 );
 
 const Badge = ({ text }: { text: string }) => (
-  <span className="inline-block text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded tracking-wide uppercase" style={{ background: '#F4A300' }}>{text}</span>
+  <span className="inline-block text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded tracking-wide uppercase" style={{ background: '#ED8214' }}>{text}</span>
 );
 
 const Counter = ({ target, suffix = '' }: { target: number; suffix?: string }) => {
@@ -48,7 +48,7 @@ const Counter = ({ target, suffix = '' }: { target: number; suffix?: string }) =
     if (ref.current) o.observe(ref.current);
     return () => o.disconnect();
   }, [target]);
-  return <span ref={ref} style={{ color: '#F4A300' }}>{count}{suffix}</span>;
+  return <span ref={ref} style={{ color: '#ED8214' }}>{count}{suffix}</span>;
 };
 
 /* ── Shared Bilingual Footer ── */
@@ -69,7 +69,7 @@ const SharedFooter = () => {
     : ['Exhibition Booth Design', 'Event Production', 'Brand Activations', 'Custom Fabrication', 'Branding & Graphics'];
 
   return (
-    <footer style={{ background: '#000000', borderTop: '3px solid #F4A300' }} className="py-14 px-5">
+    <footer style={{ background: '#000000', borderTop: '3px solid #ED8214' }} className="py-14 px-5">
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-4 gap-10 mb-10">
           <div className="md:col-span-2">
@@ -85,9 +85,9 @@ const SharedFooter = () => {
               </a>
               <a href={`mailto:${email}`}
                 className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full transition-all hover:scale-105"
-                style={{ background: 'rgba(244,163,0,0.1)', border: '1px solid rgba(244,163,0,0.25)', color: '#F4A300' }}
-                onMouseEnter={e => { (e.currentTarget.style.background = '#F4A300'); (e.currentTarget.style.color = '#fff'); }}
-                onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(244,163,0,0.1)'); (e.currentTarget.style.color = '#F4A300'); }}>
+                style={{ background: 'rgba(244,163,0,0.1)', border: '1px solid rgba(244,163,0,0.25)', color: '#ED8214' }}
+                onMouseEnter={e => { (e.currentTarget.style.background = '#ED8214'); (e.currentTarget.style.color = '#fff'); }}
+                onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(244,163,0,0.1)'); (e.currentTarget.style.color = '#ED8214'); }}>
                 <Mail className="h-3.5 w-3.5" /> {isAr ? 'راسلنا' : 'Email Us'}
               </a>
             </div>
@@ -97,7 +97,7 @@ const SharedFooter = () => {
             <ul className="space-y-2.5">
               {footerServices.map(s => (
                 <li key={s}><Link to="/services" className="text-sm flex items-center gap-1.5" style={{ color: '#6b7280' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#F4A300')}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#ED8214')}
                   onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
                   <span className="w-1 h-1 rounded-full" style={{ background: 'rgba(244,163,0,0.4)' }} />{s}
                 </Link></li>
@@ -107,16 +107,16 @@ const SharedFooter = () => {
           <div>
             <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">{isAr ? 'تواصل معنا' : 'Contact'}</h4>
             <ul className="space-y-3">
-              <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}><MapPin className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {address}</li>
+              <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}><MapPin className="h-4 w-4 shrink-0" style={{ color: '#ED8214' }} /> {address}</li>
               <li><a href={`tel:${phone.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#fff')} onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
-                <Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {phone}</a></li>
+                <Phone className="h-4 w-4 shrink-0" style={{ color: '#ED8214' }} /> {phone}</a></li>
               {phone2 && <li><a href={`tel:${phone2.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#fff')} onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
-                <Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {phone2}</a></li>}
+                <Phone className="h-4 w-4 shrink-0" style={{ color: '#ED8214' }} /> {phone2}</a></li>}
               <li><a href={`mailto:${email}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#fff')} onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
-                <Mail className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {email}</a></li>
+                <Mail className="h-4 w-4 shrink-0" style={{ color: '#ED8214' }} /> {email}</a></li>
             </ul>
             <Link to="/admin" className="inline-flex items-center gap-1 mt-7 text-xs" style={{ color: '#374151' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#6b7280')} onMouseLeave={e => (e.currentTarget.style.color = '#374151')}>
@@ -308,7 +308,7 @@ const Portfolio = () => {
         @keyframes fadeUp    { from{opacity:0;transform:translateY(20px)}  to{opacity:1;transform:translateY(0)} }
         @keyframes slideInRight { from{opacity:0;transform:translateX(32px)} to{opacity:1;transform:translateX(0)} }
         @keyframes slideInLeft  { from{opacity:0;transform:translateX(-32px)} to{opacity:1;transform:translateX(0)} }
-        .nav-link::after { content:''; display:block; height:2px; width:0; background:#F4A300; transition:width 0.3s ease; margin-top:2px; }
+        .nav-link::after { content:''; display:block; height:2px; width:0; background:#ED8214; transition:width 0.3s ease; margin-top:2px; }
         .nav-link:hover::after { width:100%; }
         .port-img { transition: transform 0.7s ease; }
         .port-card:hover .port-img { transform: scale(1.1); }
@@ -327,14 +327,14 @@ const Portfolio = () => {
             <button
               onClick={() => { const stored = localStorage.getItem('mopi_lang'); const next = stored === 'ar' ? 'en' : 'ar'; localStorage.setItem('mopi_lang', next); window.dispatchEvent(new Event('mopi-lang-change')); window.location.reload(); }}
               className="text-xs font-bold px-3 py-1.5 rounded-full transition-all hover:scale-105"
-              style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#F4A300' }}>
+              style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#ED8214' }}>
               {isAr ? 'EN' : 'عربي'}
             </button>
             <a href={whatsappUrlPortfolio} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 text-white text-sm font-semibold px-4 py-2 rounded-full transition-all hover:scale-105" style={{ background: '#16a34a' }}>
               <MessageCircle className="h-4 w-4" /> {t('nav.whatsapp')}
             </a>
-            <Link to="/contact" className="flex items-center gap-2 text-white text-sm font-semibold px-5 py-2 rounded-full transition-all hover:scale-105" style={{ background: '#F4A300' }}>
+            <Link to="/contact" className="flex items-center gap-2 text-white text-sm font-semibold px-5 py-2 rounded-full transition-all hover:scale-105" style={{ background: '#ED8214' }}>
               {t('nav.quote')} <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
@@ -349,12 +349,12 @@ const Portfolio = () => {
               <button
                 onClick={() => { const stored = localStorage.getItem('mopi_lang'); const next = stored === 'ar' ? 'en' : 'ar'; localStorage.setItem('mopi_lang', next); window.dispatchEvent(new Event('mopi-lang-change')); window.location.reload(); }}
                 className="flex-1 text-center text-sm font-semibold px-4 py-3 rounded-full"
-                style={{ background: 'rgba(244,163,0,0.15)', color: '#F4A300', border: '1px solid rgba(244,163,0,0.3)' }}>
+                style={{ background: 'rgba(244,163,0,0.15)', color: '#ED8214', border: '1px solid rgba(244,163,0,0.3)' }}>
                 {isAr ? 'EN' : 'عربي'}
               </button>
               <a href={whatsappUrlPortfolio} target="_blank" rel="noopener noreferrer"
                 className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#16a34a' }}>{t('nav.whatsapp')}</a>
-              <Link to="/contact" className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#F4A300' }}>{t('nav.quote')}</Link>
+              <Link to="/contact" className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#ED8214' }}>{t('nav.quote')}</Link>
             </div>
           </div>
         </div>
@@ -366,14 +366,14 @@ const Portfolio = () => {
           <img src={heroPortfolio?.bg_image_url || IMAGES.BOOTH_8} alt="" className="w-full h-full object-cover" style={{ opacity: 0.3, animation: 'slowZoom 22s ease-in-out infinite alternate' }} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,1) 100%)' }} />
         </div>
-        <div className="absolute left-0 inset-y-0 w-[3px]" style={{ background: 'linear-gradient(to bottom, transparent, #F4A300, transparent)', opacity: 0.6 }} />
-        <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(to right, transparent, #F4A300, transparent)', opacity: 0.4 }} />
-        <div className="absolute top-20 right-16 pointer-events-none" style={{ width: 100, height: 100, border: '1px solid #F4A300', opacity: 0.1, transform: 'rotate(45deg)' }} />
+        <div className="absolute left-0 inset-y-0 w-[3px]" style={{ background: 'linear-gradient(to bottom, transparent, #ED8214, transparent)', opacity: 0.6 }} />
+        <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)', opacity: 0.4 }} />
+        <div className="absolute top-20 right-16 pointer-events-none" style={{ width: 100, height: 100, border: '1px solid #ED8214', opacity: 0.1, transform: 'rotate(45deg)' }} />
 
         <div className="relative z-10 text-center px-5 max-w-4xl mx-auto py-24">
           <div className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase px-4 py-2 rounded-full mb-8"
-            style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#F4A300', animation: 'fadeDown 0.8s ease 0.2s both' }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F4A300' }} />
+            style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#ED8214', animation: 'fadeDown 0.8s ease 0.2s both' }}>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#ED8214' }} />
             {heroPortfolio?.badge_text || (isAr ? '+500 مشروع تم تسليمه' : '500+ Projects Delivered')}
           </div>
           <h1 className="font-black leading-tight text-white mb-6"
@@ -381,8 +381,8 @@ const Portfolio = () => {
             {heroPortfolio?.heading
               ? <span dangerouslySetInnerHTML={{ __html: heroPortfolio.heading }} />
               : isAr
-                ? <>أعمالنا تتحدث<br /><span style={{ color: '#F4A300' }}>عنا</span></>
-                : <>Showcasing <span style={{ color: '#F4A300' }}>Excellence</span><br />Across Industries</>}
+                ? <>أعمالنا تتحدث<br /><span style={{ color: '#ED8214' }}>عنا</span></>
+                : <>Showcasing <span style={{ color: '#ED8214' }}>Excellence</span><br />Across Industries</>}
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both', lineHeight: isAr ? '2' : '1.7' }}>
             {isAr
@@ -393,7 +393,7 @@ const Portfolio = () => {
       </section>
 
       {/* ══ § 2 · STATS — LIGHT GRAY ══ */}
-      <section style={{ background: '#F2F2F2', borderTop: '3px solid #F4A300' }}>
+      <section style={{ background: '#F2F2F2', borderTop: '3px solid #ED8214' }}>
         <div className="max-w-5xl mx-auto px-5 py-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {stats.map((s, i) => (
             <Reveal key={s.label} delay={i * 80}>
@@ -410,7 +410,7 @@ const Portfolio = () => {
 
       {/* ══ § 3 · PORTFOLIO GRID — WHITE ══ */}
       <section id="portfolio-grid" className="py-28 px-5 relative overflow-hidden" style={{ background: '#FFFFFF' }}>
-        <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent, #F4A300, transparent)' }} />
+        <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-10">
@@ -430,9 +430,9 @@ const Portfolio = () => {
                 <button key={c.key} onClick={() => setActiveFilter(c.key)}
                   className="px-5 py-2 rounded-full text-sm font-bold tracking-wide transition-all duration-300 hover:scale-105"
                   style={activeFilter === c.key
-                    ? { background: '#F4A300', color: '#fff', boxShadow: '0 6px 20px rgba(244,163,0,0.35)' }
+                    ? { background: '#ED8214', color: '#fff', boxShadow: '0 6px 20px rgba(244,163,0,0.35)' }
                     : { background: '#FFFFFF', color: '#555', border: '1.5px solid #e5e7eb' }}
-                  onMouseEnter={e => { if (activeFilter !== c.key) { (e.currentTarget.style.borderColor = '#F4A300'); (e.currentTarget.style.color = '#F4A300'); } }}
+                  onMouseEnter={e => { if (activeFilter !== c.key) { (e.currentTarget.style.borderColor = '#ED8214'); (e.currentTarget.style.color = '#ED8214'); } }}
                   onMouseLeave={e => { if (activeFilter !== c.key) { (e.currentTarget.style.borderColor = '#e5e7eb'); (e.currentTarget.style.color = '#555'); } }}>
                   {isAr ? c.ar : c.en}
                 </button>
@@ -447,7 +447,7 @@ const Portfolio = () => {
                 className="port-card group overflow-hidden rounded-2xl cursor-pointer transition-all duration-400 hover:-translate-y-2"
                 style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.1)', animation: `fadeUp 0.5s ease ${i * 55}ms both`, border: '1.5px solid #e5e7eb' }}
                 onClick={() => setSelectedProject(p)}
-                onMouseEnter={e => { (e.currentTarget.style.borderColor = '#F4A300'); (e.currentTarget.style.boxShadow = '0 16px 40px rgba(244,163,0,0.12)'); }}
+                onMouseEnter={e => { (e.currentTarget.style.borderColor = '#ED8214'); (e.currentTarget.style.boxShadow = '0 16px 40px rgba(244,163,0,0.12)'); }}
                 onMouseLeave={e => { (e.currentTarget.style.borderColor = '#e5e7eb'); (e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)'); }}>
 
                 <div className="relative overflow-hidden h-52">
@@ -469,14 +469,14 @@ const Portfolio = () => {
                 </div>
 
                 <div className="p-5 bg-white">
-                  <h3 className="font-bold text-base mb-1.5 transition-colors group-hover:text-[#F4A300]" style={{ color: '#000' }}>
+                  <h3 className="font-bold text-base mb-1.5 transition-colors group-hover:text-[#ED8214]" style={{ color: '#000' }}>
                     {isAr ? p.titleAr : p.title}
                   </h3>
                   <p className="text-xs leading-relaxed mb-3" style={{ color: '#777', lineHeight: isAr ? '1.9' : '1.6' }}>
                     {isAr ? p.descAr : p.desc}
                   </p>
                   <div className="flex items-center justify-between text-xs" style={{ color: '#9ca3af' }}>
-                    <span className="flex items-center gap-1"><MapPin className="h-3 w-3" style={{ color: '#F4A300' }} />{isAr ? p.locationAr : p.location}</span>
+                    <span className="flex items-center gap-1"><MapPin className="h-3 w-3" style={{ color: '#ED8214' }} />{isAr ? p.locationAr : p.location}</span>
                     <span>{isAr ? p.dateAr : p.date}</span>
                   </div>
                 </div>
@@ -535,7 +535,7 @@ const Portfolio = () => {
                 ].map(({ icon: Icon, label, value }) => (
                   <div key={label}>
                     <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#6b7280' }}>
-                      <Icon className="h-3 w-3" style={{ color: '#F4A300' }} />{label}
+                      <Icon className="h-3 w-3" style={{ color: '#ED8214' }} />{label}
                     </div>
                     <div className="text-sm font-semibold text-white">{value}</div>
                   </div>
@@ -546,9 +546,9 @@ const Portfolio = () => {
                 <Link to="/contact"
                   onClick={() => setSelectedProject(null)}
                   className="flex-1 inline-flex items-center justify-center gap-2 text-white font-bold text-sm py-3.5 rounded-full transition-all hover:scale-[1.02]"
-                  style={{ background: '#F4A300' }}
+                  style={{ background: '#ED8214' }}
                   onMouseEnter={e => (e.currentTarget.style.background = '#e09200')}
-                  onMouseLeave={e => (e.currentTarget.style.background = '#F4A300')}>
+                  onMouseLeave={e => (e.currentTarget.style.background = '#ED8214')}>
                   {isAr ? 'ابدأ مشروعاً مشابهاً' : 'Start a Similar Project'} <ArrowRight className="h-4 w-4" />
                 </Link>
                 <button
@@ -565,14 +565,14 @@ const Portfolio = () => {
 
       {/* ══ § 4 · FEATURED SPOTLIGHT — BLACK ══ */}
       <section className="py-28 px-5 relative overflow-hidden" style={{ background: '#000000' }}>
-        <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent, #F4A300, transparent)' }} />
-        <div className="absolute top-16 right-16 pointer-events-none" style={{ width: 130, height: 130, border: '1px solid #F4A300', opacity: 0.06, transform: 'rotate(45deg)' }} />
+        <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
+        <div className="absolute top-16 right-16 pointer-events-none" style={{ width: 130, height: 130, border: '1px solid #ED8214', opacity: 0.06, transform: 'rotate(45deg)' }} />
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-12">
             <SectionLabel text={isAr ? 'أبرز المشاريع' : 'Spotlight'} />
             <h2 className="font-black mb-4 text-white" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>
-              {isAr ? <>مشروع <span style={{ color: '#F4A300' }}>مميز</span></> : <>Featured Project <span style={{ color: '#F4A300' }}>Spotlight</span></>}
+              {isAr ? <>مشروع <span style={{ color: '#ED8214' }}>مميز</span></> : <>Featured Project <span style={{ color: '#ED8214' }}>Spotlight</span></>}
             </h2>
             <p className="text-sm" style={{ color: '#6b7280' }}>
               {isAr ? 'مرّر المؤشر فوق أي مشروع أعلاه للمعاينة هنا' : 'Hover over any project card above to preview it here'}
@@ -593,7 +593,7 @@ const Portfolio = () => {
                   style={{ animation: 'slideInLeft 0.45s ease both' }}
                 />
                 <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, transparent, rgba(0,0,0,0.35))' }} />
-                <div className="absolute bottom-0 left-0 right-0 h-[3px]" style={{ background: '#F4A300' }} />
+                <div className="absolute bottom-0 left-0 right-0 h-[3px]" style={{ background: '#ED8214' }} />
                 {/* Index dots */}
                 <div className="absolute bottom-5 left-5 flex gap-1.5">
                   {projects.map((_, i) => (
@@ -607,7 +607,7 @@ const Portfolio = () => {
                       style={{
                         width: i === spotlightIndex ? 20 : 7,
                         height: 7, borderRadius: 4,
-                        background: i === spotlightIndex ? '#F4A300' : 'rgba(255,255,255,0.35)',
+                        background: i === spotlightIndex ? '#ED8214' : 'rgba(255,255,255,0.35)',
                         transition: 'all 0.3s ease', border: 'none', cursor: 'pointer', padding: 0,
                       }}
                     />
@@ -623,8 +623,8 @@ const Portfolio = () => {
                 <Badge text={isAr ? projects[spotlightIndex].catAr : projects[spotlightIndex].cat} />
                 {(isAr ? projects[spotlightIndex].awardAr : projects[spotlightIndex].award) && (
                   <div className="flex items-center gap-1.5 mt-2 mb-1">
-                    <Award className="h-3.5 w-3.5" style={{ color: '#F4A300' }} />
-                    <span className="text-xs font-bold" style={{ color: '#F4A300' }}>
+                    <Award className="h-3.5 w-3.5" style={{ color: '#ED8214' }} />
+                    <span className="text-xs font-bold" style={{ color: '#ED8214' }}>
                       {isAr ? projects[spotlightIndex].awardAr : projects[spotlightIndex].award}
                     </span>
                   </div>
@@ -652,9 +652,9 @@ const Portfolio = () => {
                 <div className="flex flex-wrap gap-3">
                   <Link to="/contact"
                     className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-full transition-all hover:scale-105"
-                    style={{ background: '#F4A300', color: '#fff' }}
+                    style={{ background: '#ED8214', color: '#fff' }}
                     onMouseEnter={e => (e.currentTarget.style.background = '#e09200')}
-                    onMouseLeave={e => (e.currentTarget.style.background = '#F4A300')}>
+                    onMouseLeave={e => (e.currentTarget.style.background = '#ED8214')}>
                     {isAr ? 'ابدأ مشروعاً مشابهاً' : 'Start a Similar Project'} <ArrowRight className="h-4 w-4" />
                   </Link>
                   {/* Back to All Projects button */}
@@ -665,7 +665,7 @@ const Portfolio = () => {
                     }}
                     className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-full transition-all hover:scale-105"
                     style={{ background: 'rgba(255,255,255,0.07)', color: '#d1d5db', border: '1.5px solid rgba(255,255,255,0.15)' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#F4A300'; (e.currentTarget as HTMLButtonElement).style.color = '#F4A300'; }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#ED8214'; (e.currentTarget as HTMLButtonElement).style.color = '#ED8214'; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.15)'; (e.currentTarget as HTMLButtonElement).style.color = '#d1d5db'; }}>
                     <ArrowRight className="h-4 w-4 rotate-180" /> {isAr ? 'جميع المشاريع' : 'Back to All Projects'}
                   </button>
@@ -692,7 +692,7 @@ const Portfolio = () => {
                   className="relative shrink-0 overflow-hidden rounded-xl transition-all duration-300"
                   style={{
                     width: 110, height: 70,
-                    border: i === spotlightIndex ? '2px solid #F4A300' : '2px solid rgba(255,255,255,0.08)',
+                    border: i === spotlightIndex ? '2px solid #ED8214' : '2px solid rgba(255,255,255,0.08)',
                     boxShadow: i === spotlightIndex ? '0 0 14px rgba(244,163,0,0.4)' : 'none',
                     transform: i === spotlightIndex ? 'scale(1.06)' : 'scale(1)',
                     padding: 0, background: 'none', cursor: 'pointer',
@@ -705,7 +705,7 @@ const Portfolio = () => {
                     </span>
                   </div>
                   {i === spotlightIndex && (
-                    <div className="absolute bottom-0 left-0 right-0 h-[2.5px]" style={{ background: '#F4A300' }} />
+                    <div className="absolute bottom-0 left-0 right-0 h-[2.5px]" style={{ background: '#ED8214' }} />
                   )}
                 </button>
               ))}
@@ -716,13 +716,13 @@ const Portfolio = () => {
 
       {/* ══ § 5 · CTA — DARK ══ */}
       <section className="relative py-24 px-5 overflow-hidden" style={{ background: '#1A1A1A' }}>
-        <div className="absolute left-0 inset-y-0 w-[4px]" style={{ background: '#F4A300' }} />
+        <div className="absolute left-0 inset-y-0 w-[4px]" style={{ background: '#ED8214' }} />
         <Reveal className="relative max-w-4xl mx-auto text-center">
           <SectionLabel text={isAr ? 'مشروعك القادم' : 'Your Project Next'} />
           <h2 className="font-black text-white leading-tight mb-6" style={{ fontSize: 'clamp(2.2rem, 5vw, 4rem)' }}>
             {isAr
-              ? <>مستعد لكتابة<br /><span style={{ color: '#F4A300' }}>قصة نجاحك؟</span></>
-              : <>Ready to Create Your<br /><span style={{ color: '#F4A300' }}>Success Story?</span></>}
+              ? <>مستعد لكتابة<br /><span style={{ color: '#ED8214' }}>قصة نجاحك؟</span></>
+              : <>Ready to Create Your<br /><span style={{ color: '#ED8214' }}>Success Story?</span></>}
           </h2>
           <p className="text-lg mb-11" style={{ color: '#9ca3af', lineHeight: isAr ? '2' : '1.7' }}>
             {isAr
@@ -732,9 +732,9 @@ const Portfolio = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/contact"
               className="group inline-flex items-center justify-center gap-3 text-white font-bold text-lg px-10 py-5 rounded-full transition-all hover:scale-105"
-              style={{ background: '#F4A300', boxShadow: '0 12px 30px rgba(244,163,0,0.3)' }}
+              style={{ background: '#ED8214', boxShadow: '0 12px 30px rgba(244,163,0,0.3)' }}
               onMouseEnter={e => (e.currentTarget.style.background = '#e09200')}
-              onMouseLeave={e => (e.currentTarget.style.background = '#F4A300')}>
+              onMouseLeave={e => (e.currentTarget.style.background = '#ED8214')}>
               {isAr ? 'ابدأ مشروعك' : 'Start Your Project'} <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <a href={whatsappUrlPortfolio} target="_blank" rel="noopener noreferrer"

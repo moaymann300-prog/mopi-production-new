@@ -74,7 +74,7 @@ const ImageUploader = ({ currentUrl, onUploaded, label = 'Upload Image', folder 
     <div>
       <div
         onClick={() => inputRef.current?.click()}
-        className="relative cursor-pointer rounded-xl overflow-hidden border-2 border-dashed transition-all hover:border-[#F4A300] group"
+        className="relative cursor-pointer rounded-xl overflow-hidden border-2 border-dashed transition-all hover:border-[#ED8214] group"
         style={{ borderColor: '#374151', background: '#111827', minHeight: 100 }}
         onDragOver={e => e.preventDefault()}
         onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}>
@@ -93,7 +93,7 @@ const ImageUploader = ({ currentUrl, onUploaded, label = 'Upload Image', folder 
         )}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
           style={{ background: 'rgba(244,163,0,0.15)' }}>
-          <Upload className="h-5 w-5" style={{ color: '#F4A300' }} />
+          <Upload className="h-5 w-5" style={{ color: '#ED8214' }} />
         </div>
       </div>
       <input ref={inputRef} type="file" accept="image/*" className="hidden"
@@ -121,20 +121,20 @@ const Field = ({ label, children, hint }: { label: string; children: React.React
 
 const Input = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
   <input {...props} className="w-full px-3 py-2.5 rounded-lg text-sm transition-all" style={{ background: '#111827', border: '1px solid #374151', color: '#f3f4f6', ...props.style }}
-    onFocus={e => (e.currentTarget.style.borderColor = '#F4A300')}
+    onFocus={e => (e.currentTarget.style.borderColor = '#ED8214')}
     onBlur={e => (e.currentTarget.style.borderColor = '#374151')} />
 );
 
 const Textarea = (props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
   <textarea {...props} className="w-full px-3 py-2.5 rounded-lg text-sm transition-all resize-none" rows={3}
     style={{ background: '#111827', border: '1px solid #374151', color: '#f3f4f6', ...props.style }}
-    onFocus={e => (e.currentTarget.style.borderColor = '#F4A300')}
+    onFocus={e => (e.currentTarget.style.borderColor = '#ED8214')}
     onBlur={e => (e.currentTarget.style.borderColor = '#374151')} />
 );
 
 const Toggle = ({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) => (
   <button onClick={() => onChange(!checked)} className="relative inline-flex h-6 w-11 rounded-full transition-colors"
-    style={{ background: checked ? '#F4A300' : '#374151' }}>
+    style={{ background: checked ? '#ED8214' : '#374151' }}>
     <span className="inline-block h-5 w-5 rounded-full bg-white shadow transition-transform mt-0.5"
       style={{ transform: checked ? 'translateX(22px)' : 'translateX(2px)' }} />
   </button>
@@ -408,7 +408,7 @@ export default function AdminDashboard() {
             {loginError && <p className="text-xs py-2 px-3 rounded-lg flex items-center gap-2" style={{ background: 'rgba(220,38,38,0.1)', color: '#ef4444', border: '1px solid rgba(220,38,38,0.2)' }}><AlertCircle className="h-3.5 w-3.5" />{loginError}</p>}
             <button type="submit" disabled={loginLoading}
               className="w-full py-3 rounded-xl text-white font-bold text-sm transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
-              style={{ background: '#F4A300', boxShadow: '0 6px 20px rgba(244,163,0,0.3)' }}>
+              style={{ background: '#ED8214', boxShadow: '0 6px 20px rgba(244,163,0,0.3)' }}>
               {loginLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
               {loginLoading ? 'Signing in...' : 'Sign In'}
             </button>
@@ -466,7 +466,7 @@ export default function AdminDashboard() {
           { label: 'Services', count: services.length, icon: Briefcase, color: '#3b82f6' },
           { label: 'Portfolio', count: portfolio.length, icon: Layers, color: '#8b5cf6' },
           { label: 'Team', count: team.length, icon: Users, color: '#10b981' },
-          { label: 'New Messages', count: unreadCount, icon: MessageSquare, color: '#F4A300' },
+          { label: 'New Messages', count: unreadCount, icon: MessageSquare, color: '#ED8214' },
         ].map(c => (
           <div key={c.label} className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
             <div className="flex items-center gap-3 mb-3">
@@ -481,10 +481,10 @@ export default function AdminDashboard() {
       </div>
       <div className="grid md:grid-cols-2 gap-4">
         <div className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-          <h3 className="font-bold text-sm mb-4 text-white flex items-center gap-2"><MessageSquare className="h-4 w-4" style={{ color: '#F4A300' }} />Recent Messages</h3>
+          <h3 className="font-bold text-sm mb-4 text-white flex items-center gap-2"><MessageSquare className="h-4 w-4" style={{ color: '#ED8214' }} />Recent Messages</h3>
           {inbox.slice(0, 5).map(m => (
             <div key={m.id} className="flex items-start gap-3 py-3" style={{ borderBottom: '1px solid #1f2937' }}>
-              <span className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{ background: m.status === 'new' ? '#F4A300' : '#374151' }} />
+              <span className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{ background: m.status === 'new' ? '#ED8214' : '#374151' }} />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-white truncate">{m.name}</p>
                 <p className="text-xs truncate" style={{ color: '#6b7280' }}>{m.message}</p>
@@ -495,7 +495,7 @@ export default function AdminDashboard() {
           {inbox.length === 0 && <p className="text-sm" style={{ color: '#4b5563' }}>No messages yet.</p>}
         </div>
         <div className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-          <h3 className="font-bold text-sm mb-4 text-white flex items-center gap-2"><Server className="h-4 w-4" style={{ color: '#F4A300' }} />Quick Links</h3>
+          <h3 className="font-bold text-sm mb-4 text-white flex items-center gap-2"><Server className="h-4 w-4" style={{ color: '#ED8214' }} />Quick Links</h3>
           <div className="space-y-2">
             {[
               { label: 'Homepage', url: '/' }, { label: 'About Page', url: '/about' },
@@ -503,7 +503,7 @@ export default function AdminDashboard() {
               { label: 'Contact Page', url: '/contact' },
             ].map(l => (
               <Link key={l.url} to={l.url} target="_blank"
-                className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg transition-all hover:text-[#F4A300]"
+                className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg transition-all hover:text-[#ED8214]"
                 style={{ color: '#9ca3af', background: '#0f172a' }}>
                 <ExternalLink className="h-3.5 w-3.5" />{l.label}
               </Link>
@@ -520,14 +520,14 @@ export default function AdminDashboard() {
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Site Settings</h2>
-          <button onClick={fetchAll} className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg transition-all hover:text-[#F4A300]" style={{ color: '#6b7280', background: '#111827', border: '1px solid #1f2937' }}>
+          <button onClick={fetchAll} className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg transition-all hover:text-[#ED8214]" style={{ color: '#6b7280', background: '#111827', border: '1px solid #1f2937' }}>
             <RefreshCw className="h-3.5 w-3.5" />Refresh
           </button>
         </div>
         {groups.map(g => (
           <div key={g} className="mb-7 p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-            <h3 className="text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2" style={{ color: '#F4A300' }}>
-              <span className="w-4 h-px block" style={{ background: '#F4A300' }} />{g}
+            <h3 className="text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2" style={{ color: '#ED8214' }}>
+              <span className="w-4 h-px block" style={{ background: '#ED8214' }} />{g}
             </h3>
             <div className="grid md:grid-cols-2 gap-4">
               {settings.filter(s => s.group_name === g).map(s => (
@@ -535,7 +535,7 @@ export default function AdminDashboard() {
                   <Field label={s.label}>
                     <div className="flex gap-2">
                       <Input value={s.value || ''} onChange={e => setSettings(prev => prev.map(x => x.id === s.id ? { ...x, value: e.target.value } : x))} />
-                      <button onClick={() => saveSetting(s)} className="px-3 py-2 rounded-lg text-white text-xs font-bold shrink-0 transition-all hover:scale-105" style={{ background: '#F4A300' }}>
+                      <button onClick={() => saveSetting(s)} className="px-3 py-2 rounded-lg text-white text-xs font-bold shrink-0 transition-all hover:scale-105" style={{ background: '#ED8214' }}>
                         <Save className="h-4 w-4" />
                       </button>
                     </div>
@@ -558,11 +558,11 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(244,163,0,0.1)', border: '1px solid rgba(244,163,0,0.2)' }}>
-                  {s.platform === 'Instagram' && <Instagram className="h-4 w-4" style={{ color: '#F4A300' }} />}
-                  {s.platform === 'Facebook' && <Facebook className="h-4 w-4" style={{ color: '#F4A300' }} />}
-                  {s.platform === 'LinkedIn' && <Linkedin className="h-4 w-4" style={{ color: '#F4A300' }} />}
-                  {s.platform === 'YouTube' && <Youtube className="h-4 w-4" style={{ color: '#F4A300' }} />}
-                  {!['Instagram', 'Facebook', 'LinkedIn', 'YouTube'].includes(s.platform) && <Link2 className="h-4 w-4" style={{ color: '#F4A300' }} />}
+                  {s.platform === 'Instagram' && <Instagram className="h-4 w-4" style={{ color: '#ED8214' }} />}
+                  {s.platform === 'Facebook' && <Facebook className="h-4 w-4" style={{ color: '#ED8214' }} />}
+                  {s.platform === 'LinkedIn' && <Linkedin className="h-4 w-4" style={{ color: '#ED8214' }} />}
+                  {s.platform === 'YouTube' && <Youtube className="h-4 w-4" style={{ color: '#ED8214' }} />}
+                  {!['Instagram', 'Facebook', 'LinkedIn', 'YouTube'].includes(s.platform) && <Link2 className="h-4 w-4" style={{ color: '#ED8214' }} />}
                 </div>
                 <span className="font-bold text-sm text-white">{s.platform}</span>
               </div>
@@ -571,7 +571,7 @@ export default function AdminDashboard() {
             <Field label="Profile / Page URL">
               <div className="flex gap-2">
                 <Input value={s.url} placeholder="https://instagram.com/mopiproduction" onChange={e => setSocials(prev => prev.map(x => x.id === s.id ? { ...x, url: e.target.value } : x))} />
-                <button onClick={() => saveSocial(s)} className="px-3 rounded-lg text-white shrink-0 transition-all hover:scale-105" style={{ background: '#F4A300' }}>
+                <button onClick={() => saveSocial(s)} className="px-3 rounded-lg text-white shrink-0 transition-all hover:scale-105" style={{ background: '#ED8214' }}>
                   <Save className="h-4 w-4" />
                 </button>
               </div>
@@ -581,7 +581,7 @@ export default function AdminDashboard() {
       </div>
       {/* Add new social */}
       <div className="mt-4 p-5 rounded-xl" style={{ background: '#111827', border: '1px dashed #374151' }}>
-        <h3 className="font-bold text-sm text-white mb-4 flex items-center gap-2"><Plus className="h-4 w-4" style={{ color: '#F4A300' }} />Add New Social Link</h3>
+        <h3 className="font-bold text-sm text-white mb-4 flex items-center gap-2"><Plus className="h-4 w-4" style={{ color: '#ED8214' }} />Add New Social Link</h3>
         <NewSocialForm onSave={async (item) => { await saveSocial({ ...item, id: 0 }); }} />
       </div>
     </div>
@@ -599,10 +599,10 @@ const renderLogos = () => (
                 <div className="flex items-center gap-2">
                   <h3 className="font-bold text-white">{logo.name}</h3>
                   {logo.placement === 'favicon' && (
-                    <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: 'rgba(244,163,0,0.15)', color: '#F4A300', border: '1px solid rgba(244,163,0,0.3)' }}>Browser Tab Icon</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: 'rgba(244,163,0,0.15)', color: '#ED8214', border: '1px solid rgba(244,163,0,0.3)' }}>Browser Tab Icon</span>
                   )}
                 </div>
-                <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(244,163,0,0.1)', color: '#F4A300' }}>{logo.placement}</span>
+                <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(244,163,0,0.1)', color: '#ED8214' }}>{logo.placement}</span>
               </div>
               <Toggle checked={logo.is_active} onChange={v => setLogos(prev => prev.map(x => x.id === logo.id ? { ...x, is_active: v } : x))} />
             </div>
@@ -636,7 +636,7 @@ const renderLogos = () => (
                 <Input value={logo.alt_text} onChange={e => setLogos(prev => prev.map(x => x.id === logo.id ? { ...x, alt_text: e.target.value } : x))} placeholder={logo.placement === 'favicon' ? 'Site favicon' : 'Logo description'} />
               </Field>
               <button onClick={() => saveLogo(logo)} className="w-full py-2.5 rounded-lg text-white font-bold text-sm transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
-                style={{ background: '#F4A300' }}>
+                style={{ background: '#ED8214' }}>
                 <Save className="h-4 w-4" />{logo.placement === 'favicon' ? 'Save Favicon' : 'Save Logo'}
               </button>
             </div>
@@ -664,7 +664,7 @@ const renderLogos = () => (
         <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Stats & Numbers</h2>
         <button onClick={() => setStats(prev => [...prev, { id: 0, label: 'New Stat', value: 0, suffix: '+', sort_order: prev.length, is_active: true }])}
           className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white transition-all hover:scale-105"
-          style={{ background: '#F4A300' }}>
+          style={{ background: '#ED8214' }}>
           <Plus className="h-4 w-4" />Add Stat
         </button>
       </div>
@@ -672,7 +672,7 @@ const renderLogos = () => (
         {stats.map((stat, i) => (
           <div key={stat.id || `new-${i}`} className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
             <div className="flex items-center justify-between mb-4">
-              <div className="text-3xl font-black" style={{ color: '#F4A300', fontFamily: "'Poppins', sans-serif" }}>{stat.value}{stat.suffix}</div>
+              <div className="text-3xl font-black" style={{ color: '#ED8214', fontFamily: "'Poppins', sans-serif" }}>{stat.value}{stat.suffix}</div>
               <div className="flex items-center gap-2">
                 <Toggle checked={stat.is_active} onChange={v => setStats(prev => prev.map((x, xi) => xi === i ? { ...x, is_active: v } : x))} />
                 {stat.id > 0 && <button onClick={() => deleteStat(stat.id)} className="p-1.5 rounded-lg hover:bg-red-900/30" style={{ color: '#ef4444' }}><Trash2 className="h-4 w-4" /></button>}
@@ -700,7 +700,7 @@ const renderLogos = () => (
                 </Field>
               </div>
             </div>
-            <button onClick={() => saveStat(stat)} className="mt-4 w-full py-2 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" style={{ background: '#F4A300' }}>
+            <button onClick={() => saveStat(stat)} className="mt-4 w-full py-2 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" style={{ background: '#ED8214' }}>
               <Save className="h-4 w-4" />{stat.id ? 'Save Changes' : 'Create Stat'}
             </button>
           </div>
@@ -715,8 +715,8 @@ const renderLogos = () => (
       <div className="grid md:grid-cols-2 gap-5">
         {aboutContent.map(ab => (
           <div key={ab.id} className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-            <h3 className="font-black text-sm uppercase tracking-widest mb-4 flex items-center gap-2" style={{ color: '#F4A300' }}>
-              <span className="w-3 h-px block" style={{ background: '#F4A300' }} />{ab.section}
+            <h3 className="font-black text-sm uppercase tracking-widest mb-4 flex items-center gap-2" style={{ color: '#ED8214' }}>
+              <span className="w-3 h-px block" style={{ background: '#ED8214' }} />{ab.section}
             </h3>
             <div className="space-y-3">
               <Field label="Section Title">
@@ -728,7 +728,7 @@ const renderLogos = () => (
               <Field label="Section Image (optional)">
                 <ImageUploader currentUrl={ab.image_url || ''} onUploaded={url => setAboutContent(prev => prev.map(x => x.id === ab.id ? { ...x, image_url: url } : x))} folder="about" />
               </Field>
-              <button onClick={() => saveAbout(ab)} className="w-full py-2.5 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" style={{ background: '#F4A300' }}>
+              <button onClick={() => saveAbout(ab)} className="w-full py-2.5 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" style={{ background: '#ED8214' }}>
                 <Save className="h-4 w-4" />Save Section
               </button>
             </div>
@@ -743,7 +743,7 @@ const renderLogos = () => (
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Services</h2>
         <button onClick={() => setServices(prev => [...prev, { id: 0, title: 'New Service', subtitle: '', description: '', icon: 'Layers', image_url: '', sort_order: prev.length + 1, is_active: true, is_featured: false }])}
-          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#F4A300' }}>
+          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#ED8214' }}>
           <Plus className="h-4 w-4" />Add Service
         </button>
       </div>
@@ -763,7 +763,7 @@ const renderLogos = () => (
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Portfolio Projects</h2>
         <button onClick={() => setPortfolio(prev => [...prev, { id: 0, title: 'New Project', category: 'Exhibition', client: '', location: 'Cairo, Egypt', project_date: '2026', visitors: '', description: '', image_url: '', award: '', is_featured: false, is_active: true, sort_order: prev.length + 1 }])}
-          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#F4A300' }}>
+          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#ED8214' }}>
           <Plus className="h-4 w-4" />Add Project
         </button>
       </div>
@@ -783,7 +783,7 @@ const renderLogos = () => (
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Team Members</h2>
         <button onClick={() => setTeam(prev => [...prev, { id: 0, name: 'New Member', role: '', bio: '', image_url: '', email: '', linkedin_url: '', sort_order: prev.length + 1, is_active: true }])}
-          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#F4A300' }}>
+          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#ED8214' }}>
           <Plus className="h-4 w-4" />Add Member
         </button>
       </div>
@@ -816,7 +816,7 @@ const renderLogos = () => (
               <Field label="Bio">
                 <Textarea value={member.bio || ''} onChange={e => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, bio: e.target.value } : x))} placeholder="Short biography..." />
               </Field>
-              <button onClick={() => saveTeam(member)} className="w-full py-2.5 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" style={{ background: '#F4A300' }}>
+              <button onClick={() => saveTeam(member)} className="w-full py-2.5 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" style={{ background: '#ED8214' }}>
                 <Save className="h-4 w-4" />{member.id ? 'Save Changes' : 'Add Member'}
               </button>
             </div>
@@ -831,7 +831,7 @@ const renderLogos = () => (
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Testimonials</h2>
         <button onClick={() => setTestimonials(prev => [...prev, { id: 0, author_name: 'Client Name', author_role: 'CEO', company: 'Company', quote: '', rating: 5, image_url: '', is_active: true, sort_order: prev.length + 1 }])}
-          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#F4A300' }}>
+          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#ED8214' }}>
           <Plus className="h-4 w-4" />Add Testimonial
         </button>
       </div>
@@ -860,7 +860,7 @@ const renderLogos = () => (
               <Field label="Quote / Review">
                 <Textarea rows={4} value={t.quote || ''} onChange={e => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, quote: e.target.value } : x))} placeholder="What did the client say?" />
               </Field>
-              <button onClick={() => saveTestimonial(t)} className="w-full py-2.5 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" style={{ background: '#F4A300' }}>
+              <button onClick={() => saveTestimonial(t)} className="w-full py-2.5 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" style={{ background: '#ED8214' }}>
                 <Save className="h-4 w-4" />{t.id ? 'Save Changes' : 'Add Testimonial'}
               </button>
             </div>
@@ -876,7 +876,7 @@ const renderLogos = () => (
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Media Library</h2>
-          <button onClick={() => inputRef.current?.click()} className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#F4A300' }}>
+          <button onClick={() => inputRef.current?.click()} className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#ED8214' }}>
             <Upload className="h-4 w-4" />Upload Image
           </button>
         </div>
@@ -887,7 +887,7 @@ const renderLogos = () => (
             <Upload className="h-10 w-10 mb-3" style={{ color: '#374151' }} />
             <p className="font-bold text-white mb-1">No images yet</p>
             <p className="text-sm mb-4" style={{ color: '#6b7280' }}>Upload your first image to get started</p>
-            <button onClick={() => inputRef.current?.click()} className="px-5 py-2 rounded-lg text-white font-bold text-sm" style={{ background: '#F4A300' }}>Choose Files</button>
+            <button onClick={() => inputRef.current?.click()} className="px-5 py-2 rounded-lg text-white font-bold text-sm" style={{ background: '#ED8214' }}>Choose Files</button>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
@@ -917,7 +917,7 @@ const renderLogos = () => (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
-          Contact Inbox {unreadCount > 0 && <span className="ml-2 text-sm px-2.5 py-0.5 rounded-full" style={{ background: '#F4A300', color: '#000' }}>{unreadCount} new</span>}
+          Contact Inbox {unreadCount > 0 && <span className="ml-2 text-sm px-2.5 py-0.5 rounded-full" style={{ background: '#ED8214', color: '#000' }}>{unreadCount} new</span>}
         </h2>
       </div>
       {inbox.length === 0 ? (
@@ -932,11 +932,11 @@ const renderLogos = () => (
             <div key={msg.id} className="p-5 rounded-xl transition-all" style={{ background: '#111827', border: `1px solid ${msg.status === 'new' ? 'rgba(244,163,0,0.3)' : '#1f2937'}` }}>
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-4 flex-1 min-w-0">
-                  <span className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" style={{ background: msg.status === 'new' ? '#F4A300' : msg.status === 'replied' ? '#10b981' : '#374151' }} />
+                  <span className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" style={{ background: msg.status === 'new' ? '#ED8214' : msg.status === 'replied' ? '#10b981' : '#374151' }} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 flex-wrap mb-1">
                       <span className="font-bold text-sm text-white">{msg.name}</span>
-                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: msg.status === 'new' ? 'rgba(244,163,0,0.15)' : 'rgba(255,255,255,0.05)', color: msg.status === 'new' ? '#F4A300' : '#6b7280' }}>{msg.status}</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: msg.status === 'new' ? 'rgba(244,163,0,0.15)' : 'rgba(255,255,255,0.05)', color: msg.status === 'new' ? '#ED8214' : '#6b7280' }}>{msg.status}</span>
                       {msg.service && <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(59,130,246,0.1)', color: '#60a5fa' }}>{msg.service}</span>}
                     </div>
                     <div className="flex items-center gap-4 text-xs mb-2" style={{ color: '#6b7280' }}>
@@ -1016,7 +1016,7 @@ const renderLogos = () => (
               {group.items.map(item => (
                 <button key={item.id} onClick={() => setSection(item.id)}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg mb-0.5 transition-all text-left"
-                  style={{ background: section === item.id ? 'rgba(244,163,0,0.12)' : 'transparent', color: section === item.id ? '#F4A300' : '#6b7280', border: section === item.id ? '1px solid rgba(244,163,0,0.2)' : '1px solid transparent' }}
+                  style={{ background: section === item.id ? 'rgba(244,163,0,0.12)' : 'transparent', color: section === item.id ? '#ED8214' : '#6b7280', border: section === item.id ? '1px solid rgba(244,163,0,0.2)' : '1px solid transparent' }}
                   onMouseEnter={e => { if (section !== item.id) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
                   onMouseLeave={e => { if (section !== item.id) e.currentTarget.style.background = 'transparent'; }}>
                   <item.icon className="h-4.5 w-4.5 shrink-0" />
@@ -1048,13 +1048,13 @@ const renderLogos = () => (
         <div className="sticky top-0 z-30 flex items-center justify-between px-6 py-4" style={{ background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #1a1a1a' }}>
           <div className="flex items-center gap-3">
             <div className="text-sm font-bold text-white capitalize">{section.replace(/-/g, ' ')}</div>
-            {saving && <div className="flex items-center gap-1.5 text-xs" style={{ color: '#F4A300' }}><Loader2 className="h-3.5 w-3.5 animate-spin" />Saving...</div>}
+            {saving && <div className="flex items-center gap-1.5 text-xs" style={{ color: '#ED8214' }}><Loader2 className="h-3.5 w-3.5 animate-spin" />Saving...</div>}
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={fetchAll} className="p-2 rounded-lg transition-all hover:text-[#F4A300]" style={{ color: '#4b5563', background: '#111827', border: '1px solid #1f2937' }}>
+            <button onClick={fetchAll} className="p-2 rounded-lg transition-all hover:text-[#ED8214]" style={{ color: '#4b5563', background: '#111827', border: '1px solid #1f2937' }}>
               <RefreshCw className="h-4 w-4" />
             </button>
-            <Link to="/" target="_blank" className="flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-lg transition-all hover:text-[#F4A300]" style={{ color: '#6b7280', background: '#111827', border: '1px solid #1f2937' }}>
+            <Link to="/" target="_blank" className="flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-lg transition-all hover:text-[#ED8214]" style={{ color: '#6b7280', background: '#111827', border: '1px solid #1f2937' }}>
               <ExternalLink className="h-3.5 w-3.5" />Live Site
             </Link>
           </div>
@@ -1065,7 +1065,7 @@ const renderLogos = () => (
           {!loaded ? (
             <div className="flex items-center justify-center py-32">
               <div className="flex flex-col items-center gap-3">
-                <Loader2 className="h-8 w-8 animate-spin" style={{ color: '#F4A300' }} />
+                <Loader2 className="h-8 w-8 animate-spin" style={{ color: '#ED8214' }} />
                 <p className="text-sm" style={{ color: '#6b7280' }}>Loading CMS data...</p>
               </div>
             </div>
@@ -1098,7 +1098,7 @@ function NewSocialForm({ onSave }: { onSave: (item: Omit<SocialLink, 'id'>) => v
       </div>
       <div className="col-span-2">
         <button onClick={() => { if (form.platform && form.url) { onSave({ ...form, icon: form.platform }); setForm({ platform: '', url: '', icon: '', is_active: true, sort_order: 10 }); } }}
-          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#F4A300' }}>
+          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#ED8214' }}>
           <Plus className="h-4 w-4" />Add Social Link
         </button>
       </div>
@@ -1109,13 +1109,13 @@ function NewSocialForm({ onSave }: { onSave: (item: Omit<SocialLink, 'id'>) => v
 function HeroEditor({ hero, onSave, saving }: { hero: HeroSection; onSave: (h: HeroSection) => void; saving: boolean }) {
   const [data, setData] = useState(hero);
   const [open, setOpen] = useState(false);
-  const pageColors: Record<string, string> = { home: '#F4A300', about: '#3b82f6', services: '#8b5cf6', portfolio: '#10b981', contact: '#f43f5e' };
+  const pageColors: Record<string, string> = { home: '#ED8214', about: '#3b82f6', services: '#8b5cf6', portfolio: '#10b981', contact: '#f43f5e' };
 
   return (
     <div className="rounded-xl overflow-hidden" style={{ background: '#111827', border: '1px solid #1f2937' }}>
       <button onClick={() => setOpen(p => !p)} className="w-full flex items-center justify-between p-5 text-left">
         <div className="flex items-center gap-3">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ background: pageColors[hero.page] || '#F4A300' }} />
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: pageColors[hero.page] || '#ED8214' }} />
           <span className="font-bold text-white capitalize">{hero.page} Page Hero</span>
           {hero.badge_text && <span className="text-xs px-2 py-0.5 rounded-full hidden sm:inline" style={{ background: 'rgba(255,255,255,0.05)', color: '#9ca3af' }}>{hero.badge_text}</span>}
         </div>
@@ -1175,7 +1175,7 @@ function HeroEditor({ hero, onSave, saving }: { hero: HeroSection; onSave: (h: H
           </div>
           <button onClick={() => onSave(data)} disabled={saving}
             className="flex items-center gap-2 text-sm font-bold px-5 py-2.5 rounded-lg text-white transition-all hover:scale-[1.02]"
-            style={{ background: '#F4A300' }}>
+            style={{ background: '#ED8214' }}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Save Hero Section
           </button>
@@ -1193,7 +1193,7 @@ function ServiceEditor({ service, index, onChange, onSave, onDelete }: { service
         <div className="flex items-center gap-3">
           <span className="w-2 h-2 rounded-full" style={{ background: service.is_active ? '#10b981' : '#374151' }} />
           <span className="font-bold text-sm text-white">{service.title}</span>
-          {service.is_featured && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(244,163,0,0.15)', color: '#F4A300' }}>Featured</span>}
+          {service.is_featured && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(244,163,0,0.15)', color: '#ED8214' }}>Featured</span>}
         </div>
         <div className="flex items-center gap-3">
           <button onClick={e => { e.stopPropagation(); onDelete(); }} className="p-1.5 rounded-lg hover:bg-red-900/30" style={{ color: '#ef4444' }}><Trash2 className="h-4 w-4" /></button>
@@ -1233,13 +1233,13 @@ function ServiceEditor({ service, index, onChange, onSave, onDelete }: { service
             <div className="flex flex-col gap-3 justify-center">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#9ca3af' }}>Active</span>
-                <div onClick={() => onChange({ ...service, is_active: !service.is_active })} className="relative inline-flex h-6 w-11 rounded-full cursor-pointer transition-colors" style={{ background: service.is_active ? '#F4A300' : '#374151' }}>
+                <div onClick={() => onChange({ ...service, is_active: !service.is_active })} className="relative inline-flex h-6 w-11 rounded-full cursor-pointer transition-colors" style={{ background: service.is_active ? '#ED8214' : '#374151' }}>
                   <span className="inline-block h-5 w-5 rounded-full bg-white shadow mt-0.5 transition-transform" style={{ transform: service.is_active ? 'translateX(22px)' : 'translateX(2px)' }} />
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#9ca3af' }}>Featured</span>
-                <div onClick={() => onChange({ ...service, is_featured: !service.is_featured })} className="relative inline-flex h-6 w-11 rounded-full cursor-pointer transition-colors" style={{ background: service.is_featured ? '#F4A300' : '#374151' }}>
+                <div onClick={() => onChange({ ...service, is_featured: !service.is_featured })} className="relative inline-flex h-6 w-11 rounded-full cursor-pointer transition-colors" style={{ background: service.is_featured ? '#ED8214' : '#374151' }}>
                   <span className="inline-block h-5 w-5 rounded-full bg-white shadow mt-0.5 transition-transform" style={{ transform: service.is_featured ? 'translateX(22px)' : 'translateX(2px)' }} />
                 </div>
               </div>
@@ -1249,7 +1249,7 @@ function ServiceEditor({ service, index, onChange, onSave, onDelete }: { service
             <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Service Image</label>
             <ImageUploader currentUrl={service.image_url || ''} onUploaded={url => onChange({ ...service, image_url: url })} folder="services" />
           </div>
-          <button onClick={onSave} className="flex items-center gap-2 text-sm font-bold px-5 py-2.5 rounded-lg text-white transition-all hover:scale-[1.02]" style={{ background: '#F4A300' }}>
+          <button onClick={onSave} className="flex items-center gap-2 text-sm font-bold px-5 py-2.5 rounded-lg text-white transition-all hover:scale-[1.02]" style={{ background: '#ED8214' }}>
             <Save className="h-4 w-4" />{service.id ? 'Save Changes' : 'Create Service'}
           </button>
         </div>
@@ -1270,7 +1270,7 @@ function PortfolioEditor({ project, index, onChange, onSave, onDelete }: { proje
             <p className="font-bold text-sm text-white">{project.title}</p>
             <p className="text-xs" style={{ color: '#6b7280' }}>{project.category} · {project.location}</p>
           </div>
-          {project.is_featured && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(244,163,0,0.15)', color: '#F4A300' }}>Featured</span>}
+          {project.is_featured && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(244,163,0,0.15)', color: '#ED8214' }}>Featured</span>}
         </div>
         <div className="flex items-center gap-3">
           <button onClick={e => { e.stopPropagation(); onDelete(); }} className="p-1.5 rounded-lg" style={{ color: '#ef4444' }}><Trash2 className="h-4 w-4" /></button>
@@ -1332,7 +1332,7 @@ function PortfolioEditor({ project, index, onChange, onSave, onDelete }: { proje
               <div key={key} className="flex items-center gap-2">
                 <div onClick={() => onChange({ ...project, [key]: !project[key as keyof Portfolio] })}
                   className="relative inline-flex h-6 w-11 rounded-full cursor-pointer transition-colors"
-                  style={{ background: project[key as keyof Portfolio] ? '#F4A300' : '#374151' }}>
+                  style={{ background: project[key as keyof Portfolio] ? '#ED8214' : '#374151' }}>
                   <span className="inline-block h-5 w-5 rounded-full bg-white shadow mt-0.5 transition-transform"
                     style={{ transform: project[key as keyof Portfolio] ? 'translateX(22px)' : 'translateX(2px)' }} />
                 </div>
@@ -1340,7 +1340,7 @@ function PortfolioEditor({ project, index, onChange, onSave, onDelete }: { proje
               </div>
             ))}
           </div>
-          <button onClick={onSave} className="flex items-center gap-2 text-sm font-bold px-5 py-2.5 rounded-lg text-white transition-all hover:scale-[1.02]" style={{ background: '#F4A300' }}>
+          <button onClick={onSave} className="flex items-center gap-2 text-sm font-bold px-5 py-2.5 rounded-lg text-white transition-all hover:scale-[1.02]" style={{ background: '#ED8214' }}>
             <Save className="h-4 w-4" />{project.id ? 'Save Changes' : 'Create Project'}
           </button>
         </div>

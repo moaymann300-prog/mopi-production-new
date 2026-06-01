@@ -57,7 +57,7 @@ const Admin = () => {
   // Design System State
   const [designSystem, setDesignSystem] = useState({
     colors: {
-      primary: '#F4A300',
+      primary: '#ED8214',
       secondary: '#2B2B2B',
       background: '#FFFFFF',
       text: '#000000'
@@ -388,7 +388,7 @@ const Admin = () => {
                           <Input
                             value={designSystem.colors.primary}
                             onChange={(e) => handleColorChange('primary', e.target.value)}
-                            placeholder="#F4A300"
+                            placeholder="#ED8214"
                           />
                         </div>
                       </div>

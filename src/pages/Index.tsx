@@ -32,7 +32,7 @@ const Counter = ({ target, suffix = '' }: { target: number; suffix?: string }) =
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, [target]);
-  return <span ref={ref} style={{ color: '#F47B20' }}>{count}{suffix}</span>;
+  return <span ref={ref} style={{ color: '#ED8214' }}>{count}{suffix}</span>;
 };
 
 /* ─── Reveal ──────────────────────────────────────── */
@@ -74,7 +74,7 @@ const Particles = () => {
       {items.current.map(p => (
         <div key={p.id} className="absolute rounded-full animate-pulse"
           style={{ width: p.w, height: p.w, left: `${p.left}%`, top: `${p.top}%`,
-            background: '#F47B20', opacity: 0.14,
+            background: '#ED8214', opacity: 0.14,
             animationDelay: `${p.delay}s`, animationDuration: `${p.dur}s` }} />
       ))}
     </div>
@@ -84,10 +84,10 @@ const Particles = () => {
 /* ─── SectionLabel ────────────────────────────────── */
 const SectionLabel = ({ text, dark = false }: { text: string; dark?: boolean }) => (
   <div className="inline-flex items-center gap-3 text-[10px] font-bold tracking-[0.3em] uppercase mb-5"
-    style={{ color: '#F47B20' }}>
-    <span className="w-10 h-px block" style={{ background: '#F47B20' }} />
+    style={{ color: '#ED8214' }}>
+    <span className="w-10 h-px block" style={{ background: '#ED8214' }} />
     {text}
-    <span className="w-10 h-px block" style={{ background: '#F47B20' }} />
+    <span className="w-10 h-px block" style={{ background: '#ED8214' }} />
   </div>
 );
 
@@ -100,7 +100,7 @@ const LangToggle = ({ lang, setLang }: { lang: string; setLang: (l: 'en' | 'ar')
         className="px-3 py-1.5 text-[11px] font-bold tracking-widest uppercase transition-all duration-300"
         style={{
           color: lang === l ? '#111' : 'rgba(255,255,255,0.55)',
-          background: lang === l ? '#F47B20' : 'transparent',
+          background: lang === l ? '#ED8214' : 'transparent',
         }}>
         {l.toUpperCase()}
       </button>
@@ -210,7 +210,7 @@ const Index = () => {
     : portfolioItems.filter(p => p.cat === activeFilter);
 
   const inputCls = `w-full border rounded-xl px-4 py-3.5 text-sm transition-all duration-300 focus:outline-none focus:ring-2
-    bg-white text-gray-800 placeholder-gray-400 border-gray-200 focus:border-[#F47B20] focus:ring-[#F47B20]/20`;
+    bg-white text-gray-800 placeholder-gray-400 border-gray-200 focus:border-[#ED8214] focus:ring-[#ED8214]/20`;
 
   const clients = [
     'Samsung', 'Huawei', 'L\'Oréal', 'Nestlé', 'BMW', 'Pfizer',
@@ -228,7 +228,7 @@ const Index = () => {
         @keyframes lineGrow   { from{width:0} to{width:100%} }
         @keyframes shimmer    { 0%{background-position:200% center} 100%{background-position:-200% center} }
         .nav-link::after {
-          content:''; display:block; height:1.5px; width:0; background:#F47B20;
+          content:''; display:block; height:1.5px; width:0; background:#ED8214;
           transition:width 0.35s cubic-bezier(0.4,0,0.2,1); margin-top:3px;
         }
         .nav-link:hover::after { width:100%; }
@@ -237,7 +237,7 @@ const Index = () => {
         .port-img { transition:transform 0.7s ease; }
         .port-card:hover .port-img { transform:scale(1.09); }
         .orange-shimmer {
-          background: linear-gradient(90deg, #F47B20 0%, #ffaa4d 50%, #F47B20 100%);
+          background: linear-gradient(90deg, #ED8214 0%, #ffaa4d 50%, #ED8214 100%);
           background-size: 200% auto;
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
@@ -289,15 +289,15 @@ const Index = () => {
             </a>
             <button onClick={() => scrollTo('contact')}
               className="flex items-center gap-2 text-white text-[13px] font-bold px-5 py-2 rounded-full transition-all duration-300 hover:scale-105"
-              style={{ background: '#F47B20' }}
+              style={{ background: '#ED8214' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#d96b18'); (e.currentTarget.style.boxShadow = '0 6px 20px rgba(244,123,32,0.4)'); }}
-              onMouseLeave={e => { (e.currentTarget.style.background = '#F47B20'); (e.currentTarget.style.boxShadow = 'none'); }}>
+              onMouseLeave={e => { (e.currentTarget.style.background = '#ED8214'); (e.currentTarget.style.boxShadow = 'none'); }}>
               {t('nav.quote')} <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
 
           <button onClick={() => setMenuOpen(p => !p)} className="md:hidden p-2 text-white"
-            onMouseEnter={e => (e.currentTarget.style.color = '#F47B20')}
+            onMouseEnter={e => (e.currentTarget.style.color = '#ED8214')}
             onMouseLeave={e => (e.currentTarget.style.color = '#fff')}>
             {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -312,7 +312,7 @@ const Index = () => {
               <Link key={l.label} to={l.to} onClick={() => setMenuOpen(false)}
                 className="flex items-center justify-between py-3.5 text-sm font-semibold transition-colors"
                 style={{ color: '#9ca3af', borderBottom: '1px solid rgba(255,255,255,0.04)', fontFamily }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#F47B20')}
+                onMouseEnter={e => (e.currentTarget.style.color = '#ED8214')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#9ca3af')}>
                 {l.label}
                 <ChevronRight className={`h-4 w-4 opacity-40 ${isAr ? 'rotate-180' : ''}`} />
@@ -328,7 +328,7 @@ const Index = () => {
                 style={{ background: '#16a34a' }}>{t('nav.whatsapp')}</a>
               <button onClick={() => scrollTo('contact')}
                 className="flex-1 text-center text-white text-sm font-bold px-4 py-3 rounded-full"
-                style={{ background: '#F47B20' }}>{t('nav.quote')}</button>
+                style={{ background: '#ED8214' }}>{t('nav.quote')}</button>
             </div>
           </div>
         </div>
@@ -356,22 +356,22 @@ const Index = () => {
 
         {/* Side accent lines */}
         <div className="absolute left-0 inset-y-0 w-[2px]"
-          style={{ background: 'linear-gradient(to bottom, transparent 20%, #F47B20 50%, transparent 80%)', opacity: 0.5 }} />
+          style={{ background: 'linear-gradient(to bottom, transparent 20%, #ED8214 50%, transparent 80%)', opacity: 0.5 }} />
         <div className="absolute right-0 inset-y-0 w-[1px]"
           style={{ background: 'linear-gradient(to bottom, transparent 20%, rgba(244,123,32,0.3) 50%, transparent 80%)' }} />
 
         {/* Geo diamonds */}
         <div className="absolute top-28 right-20 pointer-events-none"
-          style={{ width: 80, height: 80, border: '1px solid #F47B20', opacity: 0.1, transform: 'rotate(45deg)' }} />
+          style={{ width: 80, height: 80, border: '1px solid #ED8214', opacity: 0.1, transform: 'rotate(45deg)' }} />
         <div className="absolute bottom-36 left-16 pointer-events-none"
-          style={{ width: 50, height: 50, border: '1px solid #F47B20', opacity: 0.08, transform: 'rotate(45deg)' }} />
+          style={{ width: 50, height: 50, border: '1px solid #ED8214', opacity: 0.08, transform: 'rotate(45deg)' }} />
 
         <div className="relative z-10 text-center px-5 max-w-5xl mx-auto pt-28 pb-20">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 text-[10px] font-bold tracking-[0.28em] uppercase px-5 py-2 rounded-full mb-10"
-            style={{ background: 'rgba(244,123,32,0.1)', border: '1px solid rgba(244,123,32,0.25)', color: '#F47B20',
+            style={{ background: 'rgba(244,123,32,0.1)', border: '1px solid rgba(244,123,32,0.25)', color: '#ED8214',
               animation: 'fadeDown 0.8s ease 0.2s both' }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F47B20' }} />
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#ED8214' }} />
             {t('hero.badge')}
           </div>
 
@@ -398,7 +398,7 @@ const Index = () => {
           </h1>
 
           {/* Divider line */}
-          <div className="w-24 h-[2px] mx-auto mb-7" style={{ background: '#F47B20', animation: 'fadeDown 0.8s ease 0.5s both' }} />
+          <div className="w-24 h-[2px] mx-auto mb-7" style={{ background: '#ED8214', animation: 'fadeDown 0.8s ease 0.5s both' }} />
 
           {/* Subtext */}
           <p className="text-base md:text-lg mb-14 max-w-2xl mx-auto"
@@ -417,9 +417,9 @@ const Index = () => {
             style={{ animation: 'fadeDown 0.9s ease 0.7s both' }}>
             <button onClick={() => scrollTo('contact')}
               className="group flex items-center gap-3 text-white font-bold text-base px-10 py-4.5 rounded-full transition-all duration-300 hover:scale-105"
-              style={{ background: '#F47B20', boxShadow: '0 10px 30px rgba(244,123,32,0.3)', paddingTop: '1.1rem', paddingBottom: '1.1rem', fontFamily }}
+              style={{ background: '#ED8214', boxShadow: '0 10px 30px rgba(244,123,32,0.3)', paddingTop: '1.1rem', paddingBottom: '1.1rem', fontFamily }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#d96b18'); (e.currentTarget.style.boxShadow = '0 14px 40px rgba(244,123,32,0.5)'); }}
-              onMouseLeave={e => { (e.currentTarget.style.background = '#F47B20'); (e.currentTarget.style.boxShadow = '0 10px 30px rgba(244,123,32,0.3)'); }}>
+              onMouseLeave={e => { (e.currentTarget.style.background = '#ED8214'); (e.currentTarget.style.boxShadow = '0 10px 30px rgba(244,123,32,0.3)'); }}>
               {t('hero.cta1')}
               {isAr ? <ArrowRight className="h-5 w-5 rotate-180 transition-transform group-hover:-translate-x-1.5" /> : <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1.5" />}
             </button>
@@ -436,7 +436,7 @@ const Index = () => {
           <button onClick={() => scrollTo('stats')}
             className="inline-flex flex-col items-center gap-2 transition-colors duration-300"
             style={{ color: '#6b7280', animation: 'fadeDown 1s ease 0.85s both' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#F47B20')}
+            onMouseEnter={e => (e.currentTarget.style.color = '#ED8214')}
             onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
             <span className="text-[9px] tracking-[0.3em] uppercase font-bold">{t('hero.scroll')}</span>
             <ChevronDown className="h-4 w-4 animate-bounce" />
@@ -445,7 +445,7 @@ const Index = () => {
       </section>
 
       {/* ══ § 2 · STATS ══ */}
-      <section id="stats" style={{ background: '#F2F2F2', borderTop: '3px solid #F47B20' }}>
+      <section id="stats" style={{ background: '#F2F2F2', borderTop: '3px solid #ED8214' }}>
         <div className="max-w-5xl mx-auto px-5 py-18 grid grid-cols-2 md:grid-cols-4 gap-10 text-center"
           style={{ paddingTop: '4.5rem', paddingBottom: '4.5rem' }}>
           {[
@@ -471,9 +471,9 @@ const Index = () => {
       {/* ══ § 3 · ABOUT ══ */}
       <section id="about" className="py-28 px-5 relative overflow-hidden" style={{ background: '#FFFFFF' }}>
         <div className="absolute top-12 right-12 pointer-events-none"
-          style={{ width: 200, height: 200, border: '1px solid #F47B20', opacity: 0.055, transform: 'rotate(45deg)' }} />
+          style={{ width: 200, height: 200, border: '1px solid #ED8214', opacity: 0.055, transform: 'rotate(45deg)' }} />
         <div className="absolute bottom-16 left-8 pointer-events-none"
-          style={{ width: 100, height: 100, border: '1px solid #F47B20', opacity: 0.055, transform: 'rotate(45deg)' }} />
+          style={{ width: 100, height: 100, border: '1px solid #ED8214', opacity: 0.055, transform: 'rotate(45deg)' }} />
 
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 items-center">
           <Reveal>
@@ -481,7 +481,7 @@ const Index = () => {
             <h2 className="font-black leading-tight mb-7"
               style={{ fontSize: 'clamp(2rem,4vw,3.2rem)', color: '#111111', fontFamily }}>
               {t('about.h1')}<br />
-              <span style={{ color: '#F47B20' }}>{t('about.h2')}</span><br />
+              <span style={{ color: '#ED8214' }}>{t('about.h2')}</span><br />
               {t('about.h3')}
             </h2>
             <p className="text-lg leading-relaxed mb-5" style={{ color: '#2B2B2B', fontFamily, lineHeight: isAr ? 2.1 : 1.75 }}>
@@ -494,7 +494,7 @@ const Index = () => {
             <div className="grid grid-cols-2 gap-3.5 mb-10">
               {[t('about.p1a'), t('about.p1b'), t('about.p1c'), t('about.p1d')].map(p => (
                 <div key={p} className="flex items-center gap-2.5 text-sm group cursor-default" style={{ color: '#111111', fontFamily }}>
-                  <CheckCircle className="h-4 w-4 shrink-0 group-hover:scale-110 transition-transform" style={{ color: '#F47B20' }} />
+                  <CheckCircle className="h-4 w-4 shrink-0 group-hover:scale-110 transition-transform" style={{ color: '#ED8214' }} />
                   {p}
                 </div>
               ))}
@@ -502,9 +502,9 @@ const Index = () => {
 
             <button onClick={() => scrollTo('contact')}
               className="group inline-flex items-center gap-2.5 text-white font-bold px-8 py-3.5 rounded-full transition-all duration-300 hover:scale-105"
-              style={{ background: '#F47B20', boxShadow: '0 8px 24px rgba(244,123,32,0.25)', fontFamily }}
+              style={{ background: '#ED8214', boxShadow: '0 8px 24px rgba(244,123,32,0.25)', fontFamily }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#d96b18'); (e.currentTarget.style.boxShadow = '0 12px 32px rgba(244,123,32,0.4)'); }}
-              onMouseLeave={e => { (e.currentTarget.style.background = '#F47B20'); (e.currentTarget.style.boxShadow = '0 8px 24px rgba(244,123,32,0.25)'); }}>
+              onMouseLeave={e => { (e.currentTarget.style.background = '#ED8214'); (e.currentTarget.style.boxShadow = '0 8px 24px rgba(244,123,32,0.25)'); }}>
               {t('about.cta')}
               {isAr ? <MoveRight className="h-4 w-4 rotate-180 transition-transform group-hover:-translate-x-1" /> : <MoveRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />}
             </button>
@@ -529,9 +529,9 @@ const Index = () => {
                 ))}
               </div>
               <div className="absolute -bottom-3 -right-3 w-14 h-14 rounded-br-2xl pointer-events-none"
-                style={{ borderRight: '2.5px solid #F47B20', borderBottom: '2.5px solid #F47B20', opacity: 0.7 }} />
+                style={{ borderRight: '2.5px solid #ED8214', borderBottom: '2.5px solid #ED8214', opacity: 0.7 }} />
               <div className="absolute -top-3 -left-3 w-14 h-14 rounded-tl-2xl pointer-events-none"
-                style={{ borderLeft: '2.5px solid #F47B20', borderTop: '2.5px solid #F47B20', opacity: 0.7 }} />
+                style={{ borderLeft: '2.5px solid #ED8214', borderTop: '2.5px solid #ED8214', opacity: 0.7 }} />
             </div>
           </Reveal>
         </div>
@@ -540,7 +540,7 @@ const Index = () => {
       {/* ══ § 4 · SERVICES ══ */}
       <section id="services" className="py-28 px-5 relative overflow-hidden" style={{ background: '#F2F2F2' }}>
         <div className="absolute top-0 left-0 right-0 h-[2px]"
-          style={{ background: 'linear-gradient(to right, transparent, #F47B20, transparent)' }} />
+          style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-16">
@@ -560,7 +560,7 @@ const Index = () => {
                 <div className="svc-card group relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-500 hover:-translate-y-2"
                   style={{
                     background: '#FFFFFF',
-                    border: hoveredService === i ? '1.5px solid #F47B20' : '1.5px solid #e9eaec',
+                    border: hoveredService === i ? '1.5px solid #ED8214' : '1.5px solid #e9eaec',
                     boxShadow: hoveredService === i
                       ? '0 20px 48px rgba(244,123,32,0.12), 0 4px 12px rgba(0,0,0,0.06)'
                       : '0 2px 16px rgba(0,0,0,0.06)',
@@ -576,16 +576,16 @@ const Index = () => {
                       style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 60%, transparent 100%)' }} />
                     <div className="absolute bottom-4 left-4 w-10 h-10 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-300"
                       style={{
-                        background: hoveredService === i ? '#F47B20' : 'rgba(244,123,32,0.18)',
+                        background: hoveredService === i ? '#ED8214' : 'rgba(244,123,32,0.18)',
                         border: '1px solid rgba(244,123,32,0.45)',
                       }}>
-                      <s.icon className="h-5 w-5" style={{ color: hoveredService === i ? '#fff' : '#F47B20' }} />
+                      <s.icon className="h-5 w-5" style={{ color: hoveredService === i ? '#fff' : '#ED8214' }} />
                     </div>
                   </div>
 
                   <div className="p-6 pb-7">
                     <h3 className="font-bold text-[1.05rem] mb-2.5 transition-colors duration-300 leading-snug"
-                      style={{ color: hoveredService === i ? '#F47B20' : '#111111', fontFamily, lineHeight: isAr ? 1.7 : 1.3 }}>
+                      style={{ color: hoveredService === i ? '#ED8214' : '#111111', fontFamily, lineHeight: isAr ? 1.7 : 1.3 }}>
                       {s.title}
                     </h3>
                     <p className="text-sm leading-relaxed" style={{ color: '#555555', fontFamily, lineHeight: isAr ? 2 : 1.65 }}>
@@ -594,7 +594,7 @@ const Index = () => {
                   </div>
 
                   <div className="absolute bottom-0 left-0 right-0 h-[2px] transition-opacity duration-400"
-                    style={{ background: 'linear-gradient(to right, transparent, #F47B20, transparent)', opacity: hoveredService === i ? 1 : 0 }} />
+                    style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)', opacity: hoveredService === i ? 1 : 0 }} />
                 </div>
               </Reveal>
             ))}
@@ -605,11 +605,11 @@ const Index = () => {
                 onClick={() => scrollTo('contact')}
                 className="group w-full min-h-[320px] rounded-2xl flex flex-col items-center justify-center text-center p-8 cursor-pointer transition-all duration-500 hover:-translate-y-2"
                 style={{ background: '#111111', border: '1.5px solid #1E1E1E', boxShadow: '0 2px 16px rgba(0,0,0,0.15)' }}
-                onMouseEnter={e => { (e.currentTarget.style.border = '1.5px solid #F47B20'); (e.currentTarget.style.boxShadow = '0 20px 48px rgba(244,123,32,0.15)'); }}
+                onMouseEnter={e => { (e.currentTarget.style.border = '1.5px solid #ED8214'); (e.currentTarget.style.boxShadow = '0 20px 48px rgba(244,123,32,0.15)'); }}
                 onMouseLeave={e => { (e.currentTarget.style.border = '1.5px solid #1E1E1E'); (e.currentTarget.style.boxShadow = '0 2px 16px rgba(0,0,0,0.15)'); }}>
                 <div className="w-16 h-16 rounded-full flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110"
                   style={{ background: 'rgba(244,123,32,0.14)', border: '1.5px solid rgba(244,123,32,0.3)' }}>
-                  <MoveRight className={`h-7 w-7 ${isAr ? 'rotate-180' : ''}`} style={{ color: '#F47B20' }} />
+                  <MoveRight className={`h-7 w-7 ${isAr ? 'rotate-180' : ''}`} style={{ color: '#ED8214' }} />
                 </div>
                 <h3 className="font-bold text-lg mb-2 text-white" style={{ fontFamily }}>
                   {isAr ? 'متطلبات خاصة؟' : 'Custom Requirements?'}
@@ -626,9 +626,9 @@ const Index = () => {
       {/* ══ § 5 · PORTFOLIO ══ */}
       <section id="portfolio" className="py-28 px-5 relative overflow-hidden" style={{ background: '#111111' }}>
         <div className="absolute top-0 left-0 right-0 h-[2px]"
-          style={{ background: 'linear-gradient(to right, transparent, #F47B20, transparent)' }} />
+          style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
         <div className="absolute top-20 right-16 pointer-events-none"
-          style={{ width: 130, height: 130, border: '1px solid #F47B20', opacity: 0.055, transform: 'rotate(45deg)' }} />
+          style={{ width: 130, height: 130, border: '1px solid #ED8214', opacity: 0.055, transform: 'rotate(45deg)' }} />
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-12">
@@ -650,11 +650,11 @@ const Index = () => {
                   className="px-5 py-2 rounded-full text-sm font-bold tracking-wide transition-all duration-300 hover:scale-105"
                   style={{
                     ...(activeFilter === c
-                      ? { background: '#F47B20', color: '#fff', boxShadow: '0 6px 20px rgba(244,123,32,0.35)' }
+                      ? { background: '#ED8214', color: '#fff', boxShadow: '0 6px 20px rgba(244,123,32,0.35)' }
                       : { background: 'rgba(255,255,255,0.04)', color: '#9ca3af', border: '1.5px solid rgba(255,255,255,0.1)' }),
                     fontFamily,
                   }}
-                  onMouseEnter={e => { if (activeFilter !== c) { (e.currentTarget.style.borderColor = '#F47B20'); (e.currentTarget.style.color = '#F47B20'); } }}
+                  onMouseEnter={e => { if (activeFilter !== c) { (e.currentTarget.style.borderColor = '#ED8214'); (e.currentTarget.style.color = '#ED8214'); } }}
                   onMouseLeave={e => { if (activeFilter !== c) { (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'); (e.currentTarget.style.color = '#9ca3af'); } }}>
                   {c}
                 </button>
@@ -676,14 +676,14 @@ const Index = () => {
 
                 <div className="absolute bottom-0 left-0 right-0 p-5 transition-transform duration-300">
                   <span className="inline-block text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded tracking-wide uppercase"
-                    style={{ background: '#F47B20' }}>{p.cat}</span>
-                  <h3 className="text-white font-bold mt-1.5 text-sm transition-colors group-hover:text-[#F47B20]"
+                    style={{ background: '#ED8214' }}>{p.cat}</span>
+                  <h3 className="text-white font-bold mt-1.5 text-sm transition-colors group-hover:text-[#ED8214]"
                     style={{ fontFamily }}>
                     {p.title}
                   </h3>
                   <p className="text-xs mt-1 flex items-center gap-1 transition-opacity duration-400 opacity-0 group-hover:opacity-100"
                     style={{ color: '#9ca3af' }}>
-                    <MapPin className="h-3 w-3" style={{ color: '#F47B20' }} />{p.location}
+                    <MapPin className="h-3 w-3" style={{ color: '#ED8214' }} />{p.location}
                   </p>
                 </div>
 
@@ -694,7 +694,7 @@ const Index = () => {
                 </div>
 
                 <div className="absolute bottom-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-400"
-                  style={{ background: 'linear-gradient(to right, transparent, #F47B20, transparent)' }} />
+                  style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
               </Link>
             ))}
           </div>
@@ -703,9 +703,9 @@ const Index = () => {
             <div className="text-center mt-14">
               <Link to="/portfolio"
                 className="group inline-flex items-center gap-2.5 font-bold text-sm tracking-wide transition-all duration-300 px-8 py-3.5 rounded-full"
-                style={{ border: '1.5px solid rgba(244,123,32,0.4)', color: '#F47B20', fontFamily }}
-                onMouseEnter={e => { (e.currentTarget.style.background = '#F47B20'); (e.currentTarget.style.color = '#fff'); (e.currentTarget.style.borderColor = '#F47B20'); }}
-                onMouseLeave={e => { (e.currentTarget.style.background = 'transparent'); (e.currentTarget.style.color = '#F47B20'); (e.currentTarget.style.borderColor = 'rgba(244,123,32,0.4)'); }}>
+                style={{ border: '1.5px solid rgba(244,123,32,0.4)', color: '#ED8214', fontFamily }}
+                onMouseEnter={e => { (e.currentTarget.style.background = '#ED8214'); (e.currentTarget.style.color = '#fff'); (e.currentTarget.style.borderColor = '#ED8214'); }}
+                onMouseLeave={e => { (e.currentTarget.style.background = 'transparent'); (e.currentTarget.style.color = '#ED8214'); (e.currentTarget.style.borderColor = 'rgba(244,123,32,0.4)'); }}>
                 {t('portfolio.viewAll')}
                 {isAr ? <ChevronRight className="h-4 w-4 rotate-180 group-hover:-translate-x-1 transition-transform duration-300" /> : <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />}
               </Link>
@@ -717,7 +717,7 @@ const Index = () => {
       {/* ══ § 6 · WHY CHOOSE US ══ */}
       <section id="why" className="py-28 px-5 relative overflow-hidden" style={{ background: '#FFFFFF' }}>
         <div className="absolute top-0 left-0 right-0 h-[2px]"
-          style={{ background: 'linear-gradient(to right, transparent, #F47B20, transparent)' }} />
+          style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-16">
@@ -725,7 +725,7 @@ const Index = () => {
             <h2 className="font-black mb-4"
               style={{ fontSize: 'clamp(2rem,4vw,3.2rem)', color: '#111111', fontFamily }}>
               {t('why.h1')}{' '}
-              <span style={{ color: '#F47B20' }}>{t('why.h2')}</span>
+              <span style={{ color: '#ED8214' }}>{t('why.h2')}</span>
             </h2>
             <p className="text-lg max-w-xl mx-auto" style={{ color: '#555555', fontFamily, lineHeight: isAr ? 2 : 1.7 }}>
               {t('why.sub')}
@@ -738,7 +738,7 @@ const Index = () => {
                 <div
                   className="p-7 rounded-2xl transition-all duration-400 cursor-default group"
                   style={{
-                    border: hoveredWhy === i ? '1.5px solid #F47B20' : '1.5px solid #e9eaec',
+                    border: hoveredWhy === i ? '1.5px solid #ED8214' : '1.5px solid #e9eaec',
                     background: hoveredWhy === i ? '#FAFAFA' : '#FFFFFF',
                     boxShadow: hoveredWhy === i ? '0 16px 40px rgba(244,123,32,0.1)' : '0 2px 12px rgba(0,0,0,0.05)',
                     transform: hoveredWhy === i ? 'translateY(-4px)' : 'translateY(0)',
@@ -747,14 +747,14 @@ const Index = () => {
                   onMouseLeave={() => setHoveredWhy(null)}>
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110"
                     style={{
-                      background: hoveredWhy === i ? '#F47B20' : 'rgba(244,123,32,0.1)',
-                      border: `1.5px solid ${hoveredWhy === i ? '#F47B20' : 'rgba(244,123,32,0.25)'}`,
+                      background: hoveredWhy === i ? '#ED8214' : 'rgba(244,123,32,0.1)',
+                      border: `1.5px solid ${hoveredWhy === i ? '#ED8214' : 'rgba(244,123,32,0.25)'}`,
                     }}>
                     <w.icon className="h-5 w-5 transition-colors duration-300"
-                      style={{ color: hoveredWhy === i ? '#fff' : '#F47B20' }} />
+                      style={{ color: hoveredWhy === i ? '#fff' : '#ED8214' }} />
                   </div>
                   <h3 className="font-bold text-[1rem] mb-2.5 transition-colors duration-300"
-                    style={{ color: hoveredWhy === i ? '#F47B20' : '#111111', fontFamily, lineHeight: isAr ? 1.7 : 1.3 }}>
+                    style={{ color: hoveredWhy === i ? '#ED8214' : '#111111', fontFamily, lineHeight: isAr ? 1.7 : 1.3 }}>
                     {w.title}
                   </h3>
                   <p className="text-sm" style={{ color: '#555555', fontFamily, lineHeight: isAr ? 1.9 : 1.65 }}>
@@ -770,7 +770,7 @@ const Index = () => {
       {/* ══ § 7 · CLIENTS ══ */}
       <section id="clients" className="py-20 px-5 relative overflow-hidden" style={{ background: '#111111' }}>
         <div className="absolute top-0 left-0 right-0 h-[2px]"
-          style={{ background: 'linear-gradient(to right, transparent, #F47B20, transparent)' }} />
+          style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-12">
@@ -803,7 +803,7 @@ const Index = () => {
       {/* ══ § 8 · PROCESS ══ */}
       <section id="process" className="py-28 px-5 relative overflow-hidden" style={{ background: '#F2F2F2' }}>
         <div className="absolute top-0 left-0 right-0 h-[2px]"
-          style={{ background: 'linear-gradient(to right, transparent, #F47B20, transparent)' }} />
+          style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-16">
@@ -822,17 +822,17 @@ const Index = () => {
               <Reveal key={i} delay={i * 90}>
                 <div className="relative p-7 rounded-2xl transition-all duration-400 group cursor-default"
                   style={{ background: '#FFFFFF', border: '1.5px solid #e9eaec', boxShadow: '0 2px 16px rgba(0,0,0,0.06)' }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#F47B20'; e.currentTarget.style.boxShadow = '0 16px 40px rgba(244,123,32,0.1)'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#ED8214'; e.currentTarget.style.boxShadow = '0 16px 40px rgba(244,123,32,0.1)'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = '#e9eaec'; e.currentTarget.style.boxShadow = '0 2px 16px rgba(0,0,0,0.06)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
                   <div className="text-5xl font-black mb-4 leading-none opacity-12"
-                    style={{ color: '#F47B20', fontFamily: "'Montserrat', sans-serif", opacity: 0.12 }}>
+                    style={{ color: '#ED8214', fontFamily: "'Montserrat', sans-serif", opacity: 0.12 }}>
                     {step.num}
                   </div>
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
                     style={{ background: 'rgba(244,123,32,0.1)', border: '1.5px solid rgba(244,123,32,0.25)' }}>
-                    <span className="font-black text-sm" style={{ color: '#F47B20', fontFamily: "'Montserrat', sans-serif" }}>{step.num}</span>
+                    <span className="font-black text-sm" style={{ color: '#ED8214', fontFamily: "'Montserrat', sans-serif" }}>{step.num}</span>
                   </div>
-                  <h3 className="font-bold text-[1rem] mb-2.5 transition-colors duration-300 group-hover:text-[#F47B20]"
+                  <h3 className="font-bold text-[1rem] mb-2.5 transition-colors duration-300 group-hover:text-[#ED8214]"
                     style={{ color: '#111111', fontFamily, lineHeight: isAr ? 1.7 : 1.3 }}>
                     {step.title}
                   </h3>
@@ -854,17 +854,17 @@ const Index = () => {
           <div className="absolute inset-0"
             style={{ background: 'linear-gradient(to right, rgba(30,30,30,0.97), rgba(30,30,30,0.88), rgba(30,30,30,0.97))' }} />
         </div>
-        <div className="absolute left-0 inset-y-0 w-[3px]" style={{ background: '#F47B20' }} />
+        <div className="absolute left-0 inset-y-0 w-[3px]" style={{ background: '#ED8214' }} />
         <div className="absolute right-0 inset-y-0 w-[1px]" style={{ background: 'rgba(244,123,32,0.2)' }} />
         <div className="absolute top-1/2 right-24 -translate-y-1/2 pointer-events-none"
-          style={{ width: 160, height: 160, border: '1px solid #F47B20', opacity: 0.07, transform: 'translateY(-50%) rotate(45deg)' }} />
+          style={{ width: 160, height: 160, border: '1px solid #ED8214', opacity: 0.07, transform: 'translateY(-50%) rotate(45deg)' }} />
 
         <Reveal className="relative max-w-4xl mx-auto text-center">
           <SectionLabel text={isAr ? 'لنبدأ معاً' : "Let's Work Together"} />
           <h2 className="font-black text-white leading-tight mb-6"
             style={{ fontSize: 'clamp(2.2rem,5vw,4rem)', fontFamily }}>
             {t('cta.h1')}{' '}
-            <span style={{ color: '#F47B20' }}>{t('cta.h2')}</span>
+            <span style={{ color: '#ED8214' }}>{t('cta.h2')}</span>
           </h2>
           <p className="text-lg mb-12" style={{ color: '#9ca3af', fontFamily, lineHeight: isAr ? 2 : 1.7 }}>
             {t('cta.sub')}
@@ -873,16 +873,16 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button onClick={() => scrollTo('contact')}
               className="group flex items-center justify-center gap-3 text-white font-bold text-lg px-11 rounded-full transition-all duration-300 hover:scale-105"
-              style={{ background: '#F47B20', boxShadow: '0 12px 32px rgba(244,123,32,0.3)', paddingTop: '1.15rem', paddingBottom: '1.15rem', fontFamily }}
+              style={{ background: '#ED8214', boxShadow: '0 12px 32px rgba(244,123,32,0.3)', paddingTop: '1.15rem', paddingBottom: '1.15rem', fontFamily }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#d96b18'); (e.currentTarget.style.boxShadow = '0 16px 44px rgba(244,123,32,0.5)'); }}
-              onMouseLeave={e => { (e.currentTarget.style.background = '#F47B20'); (e.currentTarget.style.boxShadow = '0 12px 32px rgba(244,123,32,0.3)'); }}>
+              onMouseLeave={e => { (e.currentTarget.style.background = '#ED8214'); (e.currentTarget.style.boxShadow = '0 12px 32px rgba(244,123,32,0.3)'); }}>
               {t('cta.btn1')}
               {isAr ? <ArrowRight className="h-5 w-5 rotate-180 transition-transform group-hover:-translate-x-1.5" /> : <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1.5" />}
             </button>
             <Link to="/portfolio"
               className="group flex items-center justify-center gap-3 text-white font-bold text-lg px-11 rounded-full transition-all duration-300 hover:scale-105"
               style={{ background: 'rgba(255,255,255,0.06)', border: '1.5px solid rgba(255,255,255,0.15)', paddingTop: '1.15rem', paddingBottom: '1.15rem', fontFamily, textDecoration: 'none' }}
-              onMouseEnter={e => { (e.currentTarget.style.borderColor = '#F47B20'); (e.currentTarget.style.color = '#F47B20'); }}
+              onMouseEnter={e => { (e.currentTarget.style.borderColor = '#ED8214'); (e.currentTarget.style.color = '#ED8214'); }}
               onMouseLeave={e => { (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'); (e.currentTarget.style.color = '#fff'); }}>
               {t('cta.btn2')}
             </Link>
@@ -893,9 +893,9 @@ const Index = () => {
       {/* ══ § 10 · CONTACT ══ */}
       <section id="contact" className="py-28 px-5 relative overflow-hidden" style={{ background: '#F2F2F2' }}>
         <div className="absolute top-0 left-0 right-0 h-[2px]"
-          style={{ background: 'linear-gradient(to right, transparent, #F47B20, transparent)' }} />
+          style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
         <div className="absolute top-12 right-12 pointer-events-none"
-          style={{ width: 150, height: 150, border: '1px solid #F47B20', opacity: 0.055, transform: 'rotate(45deg)' }} />
+          style={{ width: 150, height: 150, border: '1px solid #ED8214', opacity: 0.055, transform: 'rotate(45deg)' }} />
 
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16">
 
@@ -905,7 +905,7 @@ const Index = () => {
             <h2 className="font-black leading-tight mb-6"
               style={{ fontSize: 'clamp(2rem,4vw,3.2rem)', color: '#111111', fontFamily }}>
               {t('contact.h1')}<br />
-              <span style={{ color: '#F47B20' }}>{t('contact.h2')}</span>
+              <span style={{ color: '#ED8214' }}>{t('contact.h2')}</span>
             </h2>
             <p className="text-lg mb-10 leading-relaxed" style={{ color: '#555555', fontFamily, lineHeight: isAr ? 2 : 1.7 }}>
               {t('contact.sub')}
@@ -923,17 +923,17 @@ const Index = () => {
                   rel="noopener noreferrer"
                   className="group flex items-center gap-4 p-4 rounded-xl transition-all duration-300"
                   style={{ background: '#FFFFFF', border: '1.5px solid #e9eaec', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', textDecoration: 'none' }}
-                  onMouseEnter={e => { (e.currentTarget.style.borderColor = '#F47B20'); (e.currentTarget.style.boxShadow = '0 8px 24px rgba(244,123,32,0.1)'); (e.currentTarget.style.transform = isAr ? 'translateX(-4px)' : 'translateX(4px)'); }}
+                  onMouseEnter={e => { (e.currentTarget.style.borderColor = '#ED8214'); (e.currentTarget.style.boxShadow = '0 8px 24px rgba(244,123,32,0.1)'); (e.currentTarget.style.transform = isAr ? 'translateX(-4px)' : 'translateX(4px)'); }}
                   onMouseLeave={e => { (e.currentTarget.style.borderColor = '#e9eaec'); (e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)'); (e.currentTarget.style.transform = 'translateX(0)'); }}>
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
                     style={{ background: 'rgba(244,123,32,0.1)', border: '1.5px solid rgba(244,123,32,0.2)' }}>
-                    <c.icon className="h-5 w-5" style={{ color: '#F47B20' }} />
+                    <c.icon className="h-5 w-5" style={{ color: '#ED8214' }} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#9ca3af', fontFamily }}>{c.label}</p>
                     <p className="text-sm font-semibold truncate" style={{ color: '#111111', fontFamily }}>{c.value}</p>
                   </div>
-                  <ChevronRight className={`h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1 ${isAr ? 'rotate-180' : ''}`} style={{ color: '#F47B20' }} />
+                  <ChevronRight className={`h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1 ${isAr ? 'rotate-180' : ''}`} style={{ color: '#ED8214' }} />
                 </a>
               ))}
             </div>
@@ -955,9 +955,9 @@ const Index = () => {
                   <p className="text-sm" style={{ color: '#555555', fontFamily }}>{t('contact.sent')}</p>
                   <button onClick={() => setFormSent(false)}
                     className="mt-6 text-sm font-semibold transition-colors"
-                    style={{ color: '#F47B20', fontFamily }}
+                    style={{ color: '#ED8214', fontFamily }}
                     onMouseEnter={e => (e.currentTarget.style.color = '#d96b18')}
-                    onMouseLeave={e => (e.currentTarget.style.color = '#F47B20')}>
+                    onMouseLeave={e => (e.currentTarget.style.color = '#ED8214')}>
                     {t('contact.another')} →
                   </button>
                 </div>
@@ -1008,9 +1008,9 @@ const Index = () => {
 
                   <button type="submit"
                     className="group w-full flex items-center justify-center gap-3 text-white font-bold py-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
-                    style={{ background: '#F47B20', boxShadow: '0 8px 24px rgba(244,123,32,0.25)', fontFamily }}
+                    style={{ background: '#ED8214', boxShadow: '0 8px 24px rgba(244,123,32,0.25)', fontFamily }}
                     onMouseEnter={e => { (e.currentTarget.style.background = '#d96b18'); (e.currentTarget.style.boxShadow = '0 12px 32px rgba(244,123,32,0.4)'); }}
-                    onMouseLeave={e => { (e.currentTarget.style.background = '#F47B20'); (e.currentTarget.style.boxShadow = '0 8px 24px rgba(244,123,32,0.25)'); }}>
+                    onMouseLeave={e => { (e.currentTarget.style.background = '#ED8214'); (e.currentTarget.style.boxShadow = '0 8px 24px rgba(244,123,32,0.25)'); }}>
                     {t('contact.send')}
                     {isAr ? <ArrowRight className="h-4 w-4 rotate-180 transition-transform group-hover:-translate-x-1.5" /> : <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1.5" />}
                   </button>
@@ -1033,7 +1033,7 @@ const Index = () => {
       </section>
 
       {/* ══ § 11 · FOOTER ══ */}
-      <footer style={{ background: '#111111', borderTop: '2px solid #F47B20' }} className="py-14 px-5">
+      <footer style={{ background: '#111111', borderTop: '2px solid #ED8214' }} className="py-14 px-5">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-10 mb-10">
 
@@ -1054,9 +1054,9 @@ const Index = () => {
                 </a>
                 <a href={emailHref}
                   className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 hover:scale-105"
-                  style={{ background: 'rgba(244,123,32,0.1)', border: '1px solid rgba(244,123,32,0.25)', color: '#F47B20' }}
-                  onMouseEnter={e => { (e.currentTarget.style.background = '#F47B20'); (e.currentTarget.style.color = '#fff'); }}
-                  onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(244,123,32,0.1)'); (e.currentTarget.style.color = '#F47B20'); }}>
+                  style={{ background: 'rgba(244,123,32,0.1)', border: '1px solid rgba(244,123,32,0.25)', color: '#ED8214' }}
+                  onMouseEnter={e => { (e.currentTarget.style.background = '#ED8214'); (e.currentTarget.style.color = '#fff'); }}
+                  onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(244,123,32,0.1)'); (e.currentTarget.style.color = '#ED8214'); }}>
                   <Mail className="h-3.5 w-3.5" /> {t('footer.email')}
                 </a>
               </div>
@@ -1072,7 +1072,7 @@ const Index = () => {
                     <Link to="/services"
                       className="text-sm flex items-center gap-1.5 transition-colors duration-200"
                       style={{ color: '#6b7280', textDecoration: 'none', fontFamily }}
-                      onMouseEnter={e => (e.currentTarget.style.color = '#F47B20')}
+                      onMouseEnter={e => (e.currentTarget.style.color = '#ED8214')}
                       onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
                       <span className="w-1 h-1 rounded-full shrink-0" style={{ background: 'rgba(244,123,32,0.4)' }} />{s}
                     </Link>
@@ -1087,14 +1087,14 @@ const Index = () => {
               </h4>
               <ul className="space-y-3">
                 <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280', fontFamily }}>
-                  <MapPin className="h-4 w-4 shrink-0" style={{ color: '#F47B20' }} /> {cmsAddress}
+                  <MapPin className="h-4 w-4 shrink-0" style={{ color: '#ED8214' }} /> {cmsAddress}
                 </li>
                 <li>
                   <a href={phoneHref} className="flex items-center gap-2.5 text-sm transition-colors duration-200"
                     style={{ color: '#6b7280', fontFamily }}
                     onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
                     onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
-                    <Phone className="h-4 w-4 shrink-0" style={{ color: '#F47B20' }} /> {cmsPhone}
+                    <Phone className="h-4 w-4 shrink-0" style={{ color: '#ED8214' }} /> {cmsPhone}
                   </a>
                 </li>
                 {cmsPhone2 && (
@@ -1104,7 +1104,7 @@ const Index = () => {
                       style={{ color: '#6b7280', fontFamily }}
                       onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
                       onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
-                      <Phone className="h-4 w-4 shrink-0" style={{ color: '#F47B20' }} /> {cmsPhone2}
+                      <Phone className="h-4 w-4 shrink-0" style={{ color: '#ED8214' }} /> {cmsPhone2}
                     </a>
                   </li>
                 )}
@@ -1113,7 +1113,7 @@ const Index = () => {
                     style={{ color: '#6b7280', fontFamily }}
                     onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
                     onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
-                    <Mail className="h-4 w-4 shrink-0" style={{ color: '#F47B20' }} /> {cmsEmail}
+                    <Mail className="h-4 w-4 shrink-0" style={{ color: '#ED8214' }} /> {cmsEmail}
                   </a>
                 </li>
               </ul>

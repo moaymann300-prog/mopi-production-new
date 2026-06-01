@@ -26,8 +26,8 @@ const Reveal = ({ children, delay = 0, className = '' }: { children: React.React
 };
 
 const SectionLabel = ({ text }: { text: string }) => (
-  <div className="inline-flex items-center gap-3 text-xs font-bold tracking-[0.22em] uppercase mb-5" style={{ color: '#F4A300' }}>
-    <span className="w-8 h-px block" style={{ background: '#F4A300' }} />{text}<span className="w-8 h-px block" style={{ background: '#F4A300' }} />
+  <div className="inline-flex items-center gap-3 text-xs font-bold tracking-[0.22em] uppercase mb-5" style={{ color: '#ED8214' }}>
+    <span className="w-8 h-px block" style={{ background: '#ED8214' }} />{text}<span className="w-8 h-px block" style={{ background: '#ED8214' }} />
   </div>
 );
 
@@ -43,7 +43,7 @@ const SharedFooter = () => {
   const logoUrl = getLogoUrl(cms.footerLogo || cms.headerLogo);
   const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings.whatsapp_number.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
   return (
-  <footer style={{ background: '#000000', borderTop: '3px solid #F4A300' }} className="py-14 px-5">
+  <footer style={{ background: '#000000', borderTop: '3px solid #ED8214' }} className="py-14 px-5">
     <div className="max-w-7xl mx-auto">
       <div className="grid md:grid-cols-4 gap-10 mb-10">
         <div className="md:col-span-2">
@@ -59,9 +59,9 @@ const SharedFooter = () => {
             </a>
             <a href={`mailto:${email}`}
               className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full transition-all hover:scale-105"
-              style={{ background: 'rgba(244,163,0,0.1)', border: '1px solid rgba(244,163,0,0.25)', color: '#F4A300' }}
-              onMouseEnter={e => { (e.currentTarget.style.background = '#F4A300'); (e.currentTarget.style.color = '#fff'); }}
-              onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(244,163,0,0.1)'); (e.currentTarget.style.color = '#F4A300'); }}>
+              style={{ background: 'rgba(244,163,0,0.1)', border: '1px solid rgba(244,163,0,0.25)', color: '#ED8214' }}
+              onMouseEnter={e => { (e.currentTarget.style.background = '#ED8214'); (e.currentTarget.style.color = '#fff'); }}
+              onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(244,163,0,0.1)'); (e.currentTarget.style.color = '#ED8214'); }}>
               <Mail className="h-3.5 w-3.5" /> {isAr ? 'راسلنا' : 'Email Us'}
             </a>
           </div>
@@ -71,7 +71,7 @@ const SharedFooter = () => {
           <ul className="space-y-2.5">
             {(isAr ? ['تصميم أجنحة المعارض', 'تنفيذ الفعاليات', 'براند أكتيفيشن', 'تصنيع مخصص', 'هوية بصرية وجرافيك'] : ['Exhibition Booth Design', 'Event Production', 'Brand Activations', 'Custom Fabrication', 'Branding & Graphics']).map(s => (
               <li key={s}><Link to="/services" className="text-sm flex items-center gap-1.5" style={{ color: '#6b7280' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#F4A300')}
+                onMouseEnter={e => (e.currentTarget.style.color = '#ED8214')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
                 <span className="w-1 h-1 rounded-full" style={{ background: 'rgba(244,163,0,0.4)' }} />{s}
               </Link></li>
@@ -81,16 +81,16 @@ const SharedFooter = () => {
         <div>
           <h4 className="font-bold text-xs mb-5 uppercase tracking-widest text-white">{isAr ? 'تواصل معنا' : 'Contact'}</h4>
           <ul className="space-y-3">
-            <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}><MapPin className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {address}</li>
+            <li className="flex items-center gap-2.5 text-sm" style={{ color: '#6b7280' }}><MapPin className="h-4 w-4 shrink-0" style={{ color: '#ED8214' }} /> {address}</li>
 <li><a href={`tel:${phone.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#fff')} onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
-              <Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {phone}</a></li>
+              <Phone className="h-4 w-4 shrink-0" style={{ color: '#ED8214' }} /> {phone}</a></li>
             {phone2 && <li><a href={`tel:${phone2.replace(/\s/g, '')}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#fff')} onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
-              <Phone className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {phone2}</a></li>}
+              <Phone className="h-4 w-4 shrink-0" style={{ color: '#ED8214' }} /> {phone2}</a></li>}
             <li><a href={`mailto:${email}`} className="flex items-center gap-2.5 text-sm transition-colors" style={{ color: '#6b7280' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#fff')} onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
-              <Mail className="h-4 w-4 shrink-0" style={{ color: '#F4A300' }} /> {email}</a></li>
+              <Mail className="h-4 w-4 shrink-0" style={{ color: '#ED8214' }} /> {email}</a></li>
           </ul>
           <Link to="/admin" className="inline-flex items-center gap-1 mt-7 text-xs" style={{ color: '#374151' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#6b7280')} onMouseLeave={e => (e.currentTarget.style.color = '#374151')}>{isAr ? 'لوحة التحكم' : 'Admin Dashboard'} →</Link>
@@ -165,9 +165,9 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
       <style>{`
         @keyframes slowZoom { from{transform:scale(1.05)} to{transform:scale(1.13)} }
         @keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
-        .nav-link::after { content:''; display:block; height:2px; width:0; background:#F4A300; transition:width 0.3s ease; margin-top:2px; }
+        .nav-link::after { content:''; display:block; height:2px; width:0; background:#ED8214; transition:width 0.3s ease; margin-top:2px; }
         .nav-link:hover::after { width:100%; }
-        input:focus, textarea:focus, select:focus { outline:none; border-color:#F4A300 !important; box-shadow: 0 0 0 3px rgba(244,163,0,0.12); }
+        input:focus, textarea:focus, select:focus { outline:none; border-color:#ED8214 !important; box-shadow: 0 0 0 3px rgba(244,163,0,0.12); }
       `}</style>
 
       {/* ── NAV ── */}
@@ -183,7 +183,7 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
               className="flex items-center gap-2 text-white text-sm font-semibold px-4 py-2 rounded-full transition-all hover:scale-105" style={{ background: '#16a34a' }}>
               <MessageCircle className="h-4 w-4" /> {t('nav.whatsapp')}
             </a>
-            <Link to="/contact" className="flex items-center gap-2 text-white text-sm font-semibold px-5 py-2 rounded-full transition-all hover:scale-105" style={{ background: '#F4A300' }}>
+            <Link to="/contact" className="flex items-center gap-2 text-white text-sm font-semibold px-5 py-2 rounded-full transition-all hover:scale-105" style={{ background: '#ED8214' }}>
               {t('nav.quote')} <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
@@ -197,7 +197,7 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
             <div className="flex gap-3 pt-4">
               <a href={whatsappUrlContact} target="_blank" rel="noopener noreferrer"
                 className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#16a34a' }}>{t('nav.whatsapp')}</a>
-              <Link to="/contact" className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#F4A300' }}>{t('nav.quote')}</Link>
+              <Link to="/contact" className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#ED8214' }}>{t('nav.quote')}</Link>
             </div>
           </div>
         </div>
@@ -209,17 +209,17 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
           <img src={heroContact?.bg_image_url || IMAGES.BOOTH_5} alt="" className="w-full h-full object-cover" style={{ opacity: 0.22, animation: 'slowZoom 22s ease-in-out infinite alternate' }} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,1) 100%)' }} />
         </div>
-        <div className="absolute left-0 inset-y-0 w-[3px]" style={{ background: 'linear-gradient(to bottom, transparent, #F4A300, transparent)', opacity: 0.6 }} />
-        <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(to right, transparent, #F4A300, transparent)', opacity: 0.4 }} />
+        <div className="absolute left-0 inset-y-0 w-[3px]" style={{ background: 'linear-gradient(to bottom, transparent, #ED8214, transparent)', opacity: 0.6 }} />
+        <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)', opacity: 0.4 }} />
 
         <div className="relative z-10 text-center px-5 max-w-4xl mx-auto py-20">
           <div className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase px-4 py-2 rounded-full mb-8"
-            style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#F4A300', animation: 'fadeDown 0.8s ease 0.2s both' }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F4A300' }} />{heroContact?.badge_text || (isAr ? 'دائماً في خدمتك' : 'Always Ready to Help')}
+            style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#ED8214', animation: 'fadeDown 0.8s ease 0.2s both' }}>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#ED8214' }} />{heroContact?.badge_text || (isAr ? 'دائماً في خدمتك' : 'Always Ready to Help')}
           </div>
           <h1 className="font-black leading-tight text-white mb-6"
             style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both' }}>
-            {heroContact?.heading ? <span dangerouslySetInnerHTML={{ __html: heroContact.heading }} /> : isAr ? <>دعنا نبني<br /><span style={{ color: '#F4A300' }}>شيئاً استثنائياً</span></> : <>Let's Build<br /><span style={{ color: '#F4A300' }}>Something Amazing</span></>}
+            {heroContact?.heading ? <span dangerouslySetInnerHTML={{ __html: heroContact.heading }} /> : isAr ? <>دعنا نبني<br /><span style={{ color: '#ED8214' }}>شيئاً استثنائياً</span></> : <>Let's Build<br /><span style={{ color: '#ED8214' }}>Something Amazing</span></>}
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both', lineHeight: isAr ? '2' : '1.7' }}>
             {heroContact?.subheading || (isAr ? 'تواصل مع فريقنا للحصول على استشارة مجانية. سنناقش مشروعك ونقدم لك عرضاً مخصصاً خلال 24 ساعة.' : "Get in touch with our team for a free consultation. We'll discuss your project and create a custom proposal within 24 hours.")}
@@ -228,7 +228,7 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
       </section>
 
       {/* ══ § 2 · QUICK CONTACT STRIP — LIGHT GRAY ══ */}
-      <section style={{ background: '#F2F2F2', borderTop: '3px solid #F4A300' }}>
+      <section style={{ background: '#F2F2F2', borderTop: '3px solid #ED8214' }}>
         <div className="max-w-6xl mx-auto px-5 py-14 grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             { icon: Phone, label: isAr ? 'اتصل بنا' : 'Call Us', value: phone2Contact ? `${phoneContact} / ${phone2Contact}` : phoneContact, href: `tel:${phoneContact.replace(/\s/g, '')}`, sub: isAr ? 'الأحد – الجمعة 9 ص – 6 م' : 'Mon–Sat 9AM–6PM EET' },
@@ -239,15 +239,15 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
               <a href={c.href} target={c.icon === MessageCircle ? '_blank' : undefined} rel="noopener noreferrer"
                 className="group flex items-center gap-5 p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                 style={{ background: '#FFFFFF', border: '1.5px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
-                onMouseEnter={e => { (e.currentTarget.style.borderColor = '#F4A300'); (e.currentTarget.style.boxShadow = '0 10px 28px rgba(244,163,0,0.1)'); }}
+                onMouseEnter={e => { (e.currentTarget.style.borderColor = '#ED8214'); (e.currentTarget.style.boxShadow = '0 10px 28px rgba(244,163,0,0.1)'); }}
                 onMouseLeave={e => { (e.currentTarget.style.borderColor = '#e5e7eb'); (e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)'); }}>
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all group-hover:scale-110"
                   style={{ background: 'rgba(244,163,0,0.1)', border: '1.5px solid rgba(244,163,0,0.25)' }}>
-                  <c.icon className="h-5 w-5" style={{ color: '#F4A300' }} />
+                  <c.icon className="h-5 w-5" style={{ color: '#ED8214' }} />
                 </div>
                 <div>
                   <div className="text-[10px] font-bold tracking-widest uppercase mb-0.5" style={{ color: '#9ca3af' }}>{c.label}</div>
-                  <div className="font-bold text-sm transition-colors group-hover:text-[#F4A300]" style={{ color: '#000' }}>{c.value}</div>
+                  <div className="font-bold text-sm transition-colors group-hover:text-[#ED8214]" style={{ color: '#000' }}>{c.value}</div>
                   <div className="text-xs mt-0.5 flex items-center gap-1" style={{ color: '#9ca3af' }}><Clock className="h-3 w-3" />{c.sub}</div>
                 </div>
               </a>
@@ -258,8 +258,8 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
 
       {/* ══ § 3 · FORM + DETAILS — WHITE ══ */}
       <section className="py-28 px-5 relative overflow-hidden" style={{ background: '#FFFFFF' }}>
-        <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent, #F4A300, transparent)' }} />
-        <div className="absolute top-12 right-12 pointer-events-none" style={{ width: 150, height: 150, border: '1.5px solid #F4A300', opacity: 0.06, transform: 'rotate(45deg)' }} />
+        <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
+        <div className="absolute top-12 right-12 pointer-events-none" style={{ width: 150, height: 150, border: '1.5px solid #ED8214', opacity: 0.06, transform: 'rotate(45deg)' }} />
 
         <div className="max-w-7xl mx-auto grid lg:grid-cols-5 gap-14">
           {/* Form */}
@@ -318,7 +318,7 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
 
                   <button type="submit" disabled={submitting}
                     className="group w-full flex items-center justify-center gap-3 text-white font-bold text-base py-4 rounded-xl transition-all hover:scale-[1.02]"
-                    style={{ background: submitting ? '#aaa' : '#F4A300', boxShadow: submitting ? 'none' : '0 8px 24px rgba(244,163,0,0.3)' }}>
+                    style={{ background: submitting ? '#aaa' : '#ED8214', boxShadow: submitting ? 'none' : '0 8px 24px rgba(244,163,0,0.3)' }}>
                     {submitting ? (
                       <><span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />{isAr ? 'جاري الإرسال...' : 'Sending...'}</>
                     ) : (
@@ -344,11 +344,11 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
               ].map((c, i) => (
                 <div key={i} className="group flex items-start gap-4 p-5 rounded-xl transition-all duration-300 hover:-translate-y-0.5"
                   style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb' }}
-                  onMouseEnter={e => { (e.currentTarget.style.borderColor = '#F4A300'); (e.currentTarget.style.background = '#fffef9'); }}
+                  onMouseEnter={e => { (e.currentTarget.style.borderColor = '#ED8214'); (e.currentTarget.style.background = '#fffef9'); }}
                   onMouseLeave={e => { (e.currentTarget.style.borderColor = '#e5e7eb'); (e.currentTarget.style.background = '#f9fafb'); }}>
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-all group-hover:scale-110"
                     style={{ background: 'rgba(244,163,0,0.1)', border: '1.5px solid rgba(244,163,0,0.25)' }}>
-                    <c.icon className="h-4.5 w-4.5" style={{ color: '#F4A300' }} />
+                    <c.icon className="h-4.5 w-4.5" style={{ color: '#ED8214' }} />
                   </div>
                   <div>
                     <div className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: '#9ca3af' }}>{c.label}</div>
@@ -372,11 +372,11 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
                     <a key={s.label} href={s.href} aria-label={s.label}
                       className="w-10 h-10 rounded-lg flex items-center justify-center transition-all hover:scale-110"
                       style={{ background: 'rgba(244,163,0,0.1)', border: '1.5px solid rgba(244,163,0,0.2)' }}
-                      onMouseEnter={e => { (e.currentTarget.style.background = '#F4A300'); }}
+                      onMouseEnter={e => { (e.currentTarget.style.background = '#ED8214'); }}
                       onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(244,163,0,0.1)'); }}>
-                      <s.icon className="h-4 w-4" style={{ color: '#F4A300' }}
+                      <s.icon className="h-4 w-4" style={{ color: '#ED8214' }}
                         onMouseEnter={e => ((e.currentTarget as SVGSVGElement).style.color = '#fff')}
-                        onMouseLeave={e => ((e.currentTarget as SVGSVGElement).style.color = '#F4A300')} />
+                        onMouseLeave={e => ((e.currentTarget as SVGSVGElement).style.color = '#ED8214')} />
                     </a>
                   ))}
                 </div>
@@ -388,7 +388,7 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
 
       {/* ══ § 4 · FAQ — LIGHT GRAY ══ */}
       <section className="py-28 px-5 relative overflow-hidden" style={{ background: '#F2F2F2' }}>
-        <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent, #F4A300, transparent)' }} />
+        <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
 
         <div className="max-w-4xl mx-auto">
           <Reveal className="text-center mb-12">
@@ -412,10 +412,10 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
             ]).map((faq, i) => (
               <Reveal key={i} delay={i * 60}>
                 <details className="group rounded-xl overflow-hidden" style={{ background: '#FFFFFF', border: '1.5px solid #e5e7eb' }}>
-                  <summary className="flex items-center justify-between p-6 font-bold text-base cursor-pointer transition-colors group-open:text-[#F4A300]"
+                  <summary className="flex items-center justify-between p-6 font-bold text-base cursor-pointer transition-colors group-open:text-[#ED8214]"
                     style={{ color: '#000', listStyle: 'none' }}>
                     {faq.q}
-                    <ChevronRight className="h-5 w-5 shrink-0 transition-transform group-open:rotate-90" style={{ color: '#F4A300' }} />
+                    <ChevronRight className="h-5 w-5 shrink-0 transition-transform group-open:rotate-90" style={{ color: '#ED8214' }} />
                   </summary>
                   <div className="px-6 pb-6 text-sm leading-relaxed" style={{ color: '#555', borderTop: '1px solid #f3f4f6', lineHeight: isAr ? '2' : '1.7' }}>
                     <div className="pt-4">{faq.a}</div>
@@ -429,11 +429,11 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
 
       {/* ══ § 5 · CTA — DARK ══ */}
       <section className="relative py-24 px-5 overflow-hidden" style={{ background: '#1A1A1A' }}>
-        <div className="absolute left-0 inset-y-0 w-[4px]" style={{ background: '#F4A300' }} />
+        <div className="absolute left-0 inset-y-0 w-[4px]" style={{ background: '#ED8214' }} />
         <Reveal className="relative max-w-3xl mx-auto text-center">
           <SectionLabel text={isAr ? 'ابدأ اليوم' : 'Start Today'} />
           <h2 className="font-black text-white leading-tight mb-5" style={{ fontSize: 'clamp(2rem, 4.5vw, 3.5rem)' }}>
-            {isAr ? <>معرضك<br /><span style={{ color: '#F4A300' }}>في انتظارك</span></> : <>Your Exhibition<br /><span style={{ color: '#F4A300' }}>Awaits</span></>}
+            {isAr ? <>معرضك<br /><span style={{ color: '#ED8214' }}>في انتظارك</span></> : <>Your Exhibition<br /><span style={{ color: '#ED8214' }}>Awaits</span></>}
           </h2>
           <p className="text-base mb-9" style={{ color: '#9ca3af', lineHeight: isAr ? '2' : '1.7' }}>{isAr ? 'لا تفوّت فرصة فعالتك القادمة. تواصل معنا اليوم للحصول على استشارة مجانية.' : "Don't miss your next event opportunity. Contact us today for a free consultation."}</p>
           <a href={whatsappUrlContact} target="_blank" rel="noopener noreferrer"
