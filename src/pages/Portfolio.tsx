@@ -379,14 +379,20 @@ const Portfolio = () => {
           <div className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase px-4 py-2 rounded-full mb-8"
             style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#ED8214', animation: 'fadeDown 0.8s ease 0.2s both' }}>
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#ED8214' }} />
-            {ct('portfolio','hero','badge', heroPortfolio?.badge_text || (isAr ? '+500 مشروع تم تسليمه' : '500+ Projects Delivered'))}
+            {heroPortfolio?.badge_text || (isAr ? '+500 مشروع تم تسليمه' : '500+ Projects Delivered')}
           </div>
           <h1 className="font-black leading-tight text-white mb-6"
             style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both', lineHeight: isAr ? '1.4' : '1.15' }}>
-            {ct('portfolio','hero','heading', '') ? <span dangerouslySetInnerHTML={{ __html: ct('portfolio','hero','heading','') }} /> : heroPortfolio?.heading ? <span dangerouslySetInnerHTML={{ __html: heroPortfolio.heading }} /> : isAr ? <>أعمالنا تتحدث<br /><span style={{ color: '#ED8214' }}>عنا</span></> : <>Showcasing <span style={{ color: '#ED8214' }}>Excellence</span><br />Across Industries</>}
+            {heroPortfolio?.heading
+              ? <span dangerouslySetInnerHTML={{ __html: heroPortfolio.heading }} />
+              : isAr
+                ? <>أعمالنا تتحدث<br /><span style={{ color: '#ED8214' }}>عنا</span></>
+                : <>Showcasing <span style={{ color: '#ED8214' }}>Excellence</span><br />Across Industries</>}
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both', lineHeight: isAr ? '2' : '1.7' }}>
-            {ct('portfolio','hero','subtitle', isAr ? 'مشاريع حائزة على جوائز حوّلت البراندات وصنعت تجارب لا تُنسى في مصر ومنطقة الشرق الأوسط.' : 'Award-winning projects that have transformed brands and created memorable experiences across Egypt and the MENA region.')}
+            {isAr
+              ? 'مشاريع حائزة على جوائز حوّلت البراندات وصنعت تجارب لا تُنسى في مصر ومنطقة الشرق الأوسط.'
+              : 'Award-winning projects that have transformed brands and created memorable experiences across Egypt and the MENA region.'}
           </p>
         </div>
       </section>

@@ -121,10 +121,8 @@ const About = () => {
   const [scrolled, setScrolled] = useState(false);
   const cms = useCMS();
   const { t: _t, isAr, dir, fontFamily, lang } = useLocalLanguage();
-  // CMS text helper with language-aware fallback
   const ct = (page: string, section: string, field: string, fallback: string) =>
     getCMSText(cms.pageContent, page, section, field, lang as 'en' | 'ar', fallback);
-  // CMS image helper
   const ci = (page: string, section: string, key: string, fallback: string) =>
     getCMSImage(cms.pageImages, page, section, key, fallback);
   const t = _t;
@@ -253,10 +251,10 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
           </div>
           <h1 className="font-black leading-tight text-white mb-6"
             style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both' }}>
-            {ct('about','hero','heading','') ? <span dangerouslySetInnerHTML={{ __html: ct('about','hero','heading','') }} /> : hero?.heading ? <span dangerouslySetInnerHTML={{ __html: hero.heading }} /> : isAr ? <>{' '}نصنع التميز<br /><span style={{ color: '#ED8214' }}>منذ 2016</span></> : <>Crafting Excellence<br /><span style={{ color: '#ED8214' }}>Since 2016</span></>}
+            {hero?.heading ? <span dangerouslySetInnerHTML={{ __html: hero.heading }} /> : isAr ? <>{' '}نصنع التميز<br /><span style={{ color: '#ED8214' }}>منذ 2016</span></> : <>Crafting Excellence<br /><span style={{ color: '#ED8214' }}>Since 2016</span></>}
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both', lineHeight: isAr ? '2' : '1.7' }}>
-            {ct('about','hero','subtitle', hero?.subheading || (isAr ? 'مبدعون شغوفون ومصممون مبتكرون وبنّاؤون دقيقون نحوّل رؤية براندك إلى تجارب استثنائية.' : 'Passionate creators, innovative designers, and meticulous builders dedicated to transforming your brand vision into extraordinary experiences.'))}
+            {hero?.subheading || (isAr ? 'مبدعون شغوفون ومصممون مبتكرون وبنّاؤون دقيقون نحوّل رؤية براندك إلى تجارب استثنائية.' : 'Passionate creators, innovative designers, and meticulous builders dedicated to transforming your brand vision into extraordinary experiences.')}
           </p>
         </div>
       </section>
@@ -275,7 +273,7 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
               <h2 className="text-3xl font-black" style={{ color: '#000' }}>{isAr ? 'رسالتنا' : 'Our Mission'}</h2>
             </div>
             <p className="text-lg leading-relaxed mb-6" style={{ color: '#555', lineHeight: isAr ? '2' : '1.8' }}>
-              {ct('about','mission','content', missionContent?.content || (isAr ? 'نسعى لإحداث نقلة نوعية في صناعة المعارض والفعاليات بمصر والمنطقة، من خلال تجارب مبتكرة تربط الشركات بجمهورها بطرق حقيقية وقابلة للقياس.' : "To revolutionize Egypt's exhibition and event industry by creating immersive, innovative experiences that connect brands with their audiences in meaningful, measurable ways."))}
+              {missionContent?.content || (isAr ? 'نسعى لإحداث نقلة نوعية في صناعة المعارض والفعاليات بمصر والمنطقة، من خلال تجارب مبتكرة تربط الشركات بجمهورها بطرق حقيقية وقابلة للقياس.' : "To revolutionize Egypt's exhibition and event industry by creating immersive, innovative experiences that connect brands with their audiences in meaningful, measurable ways.")}
             </p>
             <div className="space-y-3">
               {(isAr ? ['تقديم حلول معارض عالمية المستوى', 'بناء شراكات طويلة المدى مع العملاء', 'قيادة الابتكار في التصميم والتنفيذ', 'الالتزام بأعلى معايير الجودة'] : ['Deliver world-class exhibition solutions', 'Foster long-term client partnerships', 'Drive innovation in design and production', 'Maintain the highest quality standards']).map(item => (
@@ -295,7 +293,7 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
               <h2 className="text-3xl font-black" style={{ color: '#000' }}>{isAr ? 'رؤيتنا' : 'Our Vision'}</h2>
             </div>
             <p className="text-lg leading-relaxed mb-7" style={{ color: '#555', lineHeight: isAr ? '2' : '1.8' }}>
-              {ct('about','mission','vision', visionContent?.content || (isAr ? 'أن نكون الشريك الأول في المنطقة لتصميم المعارض وإنتاج الفعاليات، معروفين بالإبداع والموثوقية وتحويل الفضاءات إلى تجارب براند استثنائية.' : "To be the MENA region's premier exhibition design and event production company, recognized for creativity, reliability, and the ability to transform spaces into powerful brand experiences."))}
+              {visionContent?.content || (isAr ? 'أن نكون الشريك الأول في المنطقة لتصميم المعارض وإنتاج الفعاليات، معروفين بالإبداع والموثوقية وتحويل الفضاءات إلى تجارب براند استثنائية.' : "To be the MENA region's premier exhibition design and event production company, recognized for creativity, reliability, and the ability to transform spaces into powerful brand experiences.")}
             </p>
             <div className="p-6 rounded-2xl" style={{ background: '#000', border: '1.5px solid #1A1A1A' }}>
               <h3 className="font-bold text-base mb-3 text-white">{isAr ? 'نظرتنا حتى 2030' : 'Looking Ahead to 2030'}</h3>

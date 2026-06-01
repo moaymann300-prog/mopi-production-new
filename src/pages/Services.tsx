@@ -190,10 +190,9 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
 const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
   const phoneDisplay2 = cms.settings.phone_2 || '';
   const hero = cms.heroes['services'];
-  // Optionally override hero badge/heading with cms page content
-  const heroBadge = ct('services','hero','badge', hero?.badge_text || (isAr ? 'خدماتنا' : 'Our Services'));
-  const heroHeading = ct('services','hero','heading', hero?.heading || '');
-  const heroSubtitle = ct('services','hero','subtitle', hero?.subheading || '');
+
+  // CMS services (available for future dynamic service cards)
+  const _cmsServices = cms.services;
 
   return (
     <div className="overflow-x-hidden" dir={dir} style={{ fontFamily }}>
@@ -257,14 +256,14 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
         <div className="relative z-10 text-center px-5 max-w-4xl mx-auto py-24">
           <div className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase px-4 py-2 rounded-full mb-8"
             style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#ED8214', animation: 'fadeDown 0.8s ease 0.2s both' }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#ED8214' }} />{heroBadge}
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#ED8214' }} />{ct('services','hero','badge', hero?.badge_text || (isAr ? 'حلول متكاملة' : 'End-to-End Solutions'))}
           </div>
           <h1 className="font-black leading-tight text-white mb-6"
             style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both' }}>
-            {heroHeading ? <span dangerouslySetInnerHTML={{ __html: heroHeading }} /> : isAr ? <>حلول معارض<br /><span style={{ color: '#ED8214' }}>شاملة ومتكاملة</span></> : <>Comprehensive<br /><span style={{ color: '#ED8214' }}>Exhibition Solutions</span></>}
+            {hero?.heading ? <span dangerouslySetInnerHTML={{ __html: hero.heading }} /> : isAr ? <>حلول معارض<br /><span style={{ color: '#ED8214' }}>شاملة ومتكاملة</span></> : <>Comprehensive<br /><span style={{ color: '#ED8214' }}>Exhibition Solutions</span></>}
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both', lineHeight: isAr ? '2' : '1.7' }}>
-            {heroSubtitle || (isAr ? 'من الفكرة للتنفيذ — نقدم خدمات متكاملة تحوّل رؤية براندك إلى تجارب قوية ومؤثرة.' : 'From concept to completion — we provide end-to-end services that transform your brand vision into powerful, engaging experiences.')}
+            {hero?.subheading || (isAr ? 'من الفكرة للتنفيذ — نقدم خدمات متكاملة تحوّل رؤية براندك إلى تجارب قوية ومؤثرة.' : 'From concept to completion — we provide end-to-end services that transform your brand vision into powerful, engaging experiences.')}
           </p>
           <Link to="/contact"
             className="inline-flex items-center gap-3 text-white font-bold text-base px-9 py-4 rounded-full transition-all hover:scale-105"
