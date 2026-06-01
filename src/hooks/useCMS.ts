@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// ─── Types (v2: CMSPageContent + CMSPageImage + getCMSText + getCMSImage) ─────
 export interface CMSSetting { key: string; value: string; }
 export interface CMSSocialLink { platform: string; url: string; icon: string; is_active: boolean; sort_order: number; }
 export interface CMSLogo { placement: string; url: string; alt_text: string; is_active: boolean; }
