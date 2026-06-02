@@ -1,0 +1,1 @@
+SELECT page, section, field, value_en, value_ar FROM cms_page_content_2026_06_01 WHERE page = 'about' ORDER BY section, field;

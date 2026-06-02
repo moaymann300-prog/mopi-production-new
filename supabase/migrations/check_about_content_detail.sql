@@ -1,0 +1,1 @@
+SELECT id, page, section, field, LEFT(value_en, 60) as en_preview, LEFT(value_ar, 60) as ar_preview FROM cms_page_content_2026_06_01 WHERE page = 'about' ORDER BY section, field LIMIT 50;

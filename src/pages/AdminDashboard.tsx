@@ -929,31 +929,81 @@ export default function AdminDashboard() {
 
       <PageSection pageName="about" sectionName="hero" sectionLabel="🚀 Hero Banner" icon={Megaphone} color="#ED8214" defaultOpen={true}
         fields={[
-          { field: 'badge', label: 'Badge Text' },
-          { field: 'heading', label: 'Main Heading' },
-          { field: 'subtitle', label: 'Subtitle' },
+          { field: 'badge', label: 'Badge Text (e.g. Our Story)' },
+          { field: 'heading', label: 'Main Heading (e.g. Crafting Excellence Since 2016)' },
+          { field: 'subtitle', label: 'Hero Subtitle / Description', multiline: true, rows: 3 },
         ]}
         imageKeys={[{ key: 'background', label: 'Hero Background Photo', size: 'lg' }]}
       />
 
-      <PageSection pageName="about" sectionName="story" sectionLabel="📖 Our Story Section" icon={BookOpen} color="#3b82f6"
+      <PageSection pageName="about" sectionName="mission" sectionLabel="🎯 Mission Section" icon={Zap} color="#f59e0b"
         fields={[
-          { field: 'heading', label: 'Section Heading' },
-          { field: 'content', label: 'Story Text', multiline: true, rows: 6 },
-        ]}
-        imageKeys={[{ key: 'image', label: 'Story Photo', size: 'md' }]}
-      />
-
-      <PageSection pageName="about" sectionName="mission" sectionLabel="🎯 Mission & Vision Section" icon={Zap} color="#f59e0b"
-        fields={[
-          { field: 'heading', label: 'Section Heading' },
-          { field: 'content', label: 'Mission Text', multiline: true, rows: 4 },
+          { field: 'heading', label: 'Mission Heading' },
+          { field: 'content', label: 'Mission Description', multiline: true, rows: 4 },
+          { field: 'point1', label: 'Mission Point 1' },
+          { field: 'point2', label: 'Mission Point 2' },
+          { field: 'point3', label: 'Mission Point 3' },
+          { field: 'point4', label: 'Mission Point 4' },
         ]}
       />
 
-      <PageSection pageName="about" sectionName="values" sectionLabel="⭐ Core Values Section" icon={Star} color="#10b981"
+      <PageSection pageName="about" sectionName="vision" sectionLabel="🔭 Vision Section" icon={Star} color="#8b5cf6"
         fields={[
+          { field: 'heading', label: 'Vision Heading' },
+          { field: 'content', label: 'Vision Description', multiline: true, rows: 4 },
+          { field: 'future_heading', label: 'Future Outlook Heading (e.g. Looking Ahead to 2030)' },
+          { field: 'future_content', label: 'Future Outlook Text', multiline: true, rows: 3 },
+        ]}
+      />
+
+      <PageSection pageName="about" sectionName="values" sectionLabel="⭐ Core Values Section" icon={Globe} color="#10b981"
+        fields={[
+          { field: 'label', label: 'Section Label (small text above heading)' },
           { field: 'heading', label: 'Section Heading' },
+          { field: 'subtitle', label: 'Section Subtitle' },
+          { field: 'val1_title', label: 'Value 1: Title' },
+          { field: 'val1_desc', label: 'Value 1: Description', multiline: true, rows: 2 },
+          { field: 'val2_title', label: 'Value 2: Title' },
+          { field: 'val2_desc', label: 'Value 2: Description', multiline: true, rows: 2 },
+          { field: 'val3_title', label: 'Value 3: Title' },
+          { field: 'val3_desc', label: 'Value 3: Description', multiline: true, rows: 2 },
+          { field: 'val4_title', label: 'Value 4: Title' },
+          { field: 'val4_desc', label: 'Value 4: Description', multiline: true, rows: 2 },
+        ]}
+      />
+
+      <PageSection pageName="about" sectionName="timeline" sectionLabel="🗓️ Company Timeline" icon={BookOpen} color="#3b82f6"
+        fields={[
+          { field: 'label', label: 'Section Label' },
+          { field: 'heading', label: 'Section Heading' },
+          { field: 'subtitle', label: 'Section Subtitle' },
+          { field: 'year1', label: 'Milestone 1: Year' }, { field: 'event1', label: 'Milestone 1: Event' },
+          { field: 'year2', label: 'Milestone 2: Year' }, { field: 'event2', label: 'Milestone 2: Event' },
+          { field: 'year3', label: 'Milestone 3: Year' }, { field: 'event3', label: 'Milestone 3: Event' },
+          { field: 'year4', label: 'Milestone 4: Year' }, { field: 'event4', label: 'Milestone 4: Event' },
+          { field: 'year5', label: 'Milestone 5: Year' }, { field: 'event5', label: 'Milestone 5: Event' },
+          { field: 'year6', label: 'Milestone 6: Year' }, { field: 'event6', label: 'Milestone 6: Event' },
+        ]}
+      />
+
+      <PageSection pageName="about" sectionName="awards" sectionLabel="🏆 Awards & Achievements" icon={Award} color="#f59e0b"
+        fields={[
+          { field: 'label', label: 'Section Label' },
+          { field: 'heading', label: 'Section Heading' },
+          { field: 'subtitle', label: 'Section Subtitle' },
+          { field: 'award1_year', label: 'Award 1: Year' }, { field: 'award1_title', label: 'Award 1: Title' }, { field: 'award1_org', label: 'Award 1: Organization' }, { field: 'award1_desc', label: 'Award 1: Description', multiline: true, rows: 2 },
+          { field: 'award2_year', label: 'Award 2: Year' }, { field: 'award2_title', label: 'Award 2: Title' }, { field: 'award2_org', label: 'Award 2: Organization' }, { field: 'award2_desc', label: 'Award 2: Description', multiline: true, rows: 2 },
+          { field: 'award3_year', label: 'Award 3: Year' }, { field: 'award3_title', label: 'Award 3: Title' }, { field: 'award3_org', label: 'Award 3: Organization' }, { field: 'award3_desc', label: 'Award 3: Description', multiline: true, rows: 2 },
+          { field: 'award4_year', label: 'Award 4: Year' }, { field: 'award4_title', label: 'Award 4: Title' }, { field: 'award4_org', label: 'Award 4: Organization' }, { field: 'award4_desc', label: 'Award 4: Description', multiline: true, rows: 2 },
+        ]}
+      />
+
+      <PageSection pageName="about" sectionName="cta" sectionLabel="🔗 Call to Action Section" icon={MousePointerClick} color="#f43f5e"
+        fields={[
+          { field: 'heading', label: 'CTA Heading' },
+          { field: 'subtitle', label: 'CTA Subtitle' },
+          { field: 'cta_primary', label: 'Primary Button Text' },
+          { field: 'cta_secondary', label: 'Secondary Button Text (WhatsApp)' },
         ]}
       />
 
