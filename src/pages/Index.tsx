@@ -115,6 +115,12 @@ const Index = () => {
   const cms = useCMS();
   const { lang, setLang, t, isAr, dir, fontFamily } = useLocalLanguage();
 
+  // CMS text + image helpers
+  const ct = (page: string, section: string, field: string, fallback: string) =>
+    getCMSText(cms.pageContent, page, section, field, lang as 'en' | 'ar', fallback);
+  const ci = (page: string, section: string, key: string, fallback: string) =>
+    getCMSImage(cms.pageImages, page, section, key, fallback);
+
   const companyName = cms.settings.company_name || 'MOPi Production';
   const cmsPhone    = cms.settings.phone_1 || '+20 100 000 0000';
   const cmsPhone2   = cms.settings.phone_2 || '';
