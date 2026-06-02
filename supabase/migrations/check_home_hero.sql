@@ -1,0 +1,1 @@
+SELECT id, page, badge_text, bg_image_url FROM cms_hero_sections_2026_04_21 ORDER BY id;
