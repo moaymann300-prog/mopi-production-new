@@ -780,22 +780,27 @@ export default function AdminDashboard() {
 
       {/* About Section */}
       <PageSection
-        pageName="home" sectionName="about" sectionLabel="👥 About Section"
-        icon={Info} color="#3b82f6"
+        pageName="home" sectionName="about" sectionLabel="👥 About Us Section (Homepage)"
+        icon={Info} color="#3b82f6" defaultOpen={false}
         fields={[
-          { field: 'label', label: 'Section Label (small text above heading)' },
-          { field: 'heading1', label: 'Heading — Line 1' },
-          { field: 'heading2', label: 'Heading — Line 2' },
-          { field: 'heading3', label: 'Heading — Line 3' },
-          { field: 'paragraph1', label: 'Paragraph 1', multiline: true, rows: 3 },
-          { field: 'paragraph2', label: 'Paragraph 2', multiline: true, rows: 3 },
-          { field: 'point1', label: '✓ Feature Point 1' },
-          { field: 'point2', label: '✓ Feature Point 2' },
-          { field: 'point3', label: '✓ Feature Point 3' },
-          { field: 'point4', label: '✓ Feature Point 4' },
-          { field: 'cta', label: 'CTA Button Text' },
+          { field: 'label',      label: 'Section Label (small badge above heading)' },
+          { field: 'heading1',   label: 'Heading — Line 1 (e.g. Where Vision)' },
+          { field: 'heading2',   label: 'Heading — Line 2 in Orange (e.g. Meets Execution)' },
+          { field: 'heading3',   label: 'Heading — Line 3 (e.g. Excellence)' },
+          { field: 'paragraph1', label: 'Main Paragraph', multiline: true, rows: 4 },
+          { field: 'paragraph2', label: 'Supporting Paragraph', multiline: true, rows: 3 },
+          { field: 'point1', label: '✓ Feature Point 1 (e.g. 400+ Projects Delivered)' },
+          { field: 'point2', label: '✓ Feature Point 2 (e.g. 10+ Years of Excellence)' },
+          { field: 'point3', label: '✓ Feature Point 3 (e.g. Egypt & MENA Coverage)' },
+          { field: 'point4', label: '✓ Feature Point 4 (e.g. International Standards)' },
+          { field: 'cta',    label: 'Button Text (e.g. Work With Us)' },
         ]}
-        imageKeys={[{ key: 'main_image', label: 'About Section Photo', size: 'md' }]}
+        imageKeys={[
+          { key: 'image1', label: 'Photo 1 — Top Left', size: 'sm' },
+          { key: 'image2', label: 'Photo 2 — Top Right', size: 'sm' },
+          { key: 'image3', label: 'Photo 3 — Bottom Left', size: 'sm' },
+          { key: 'image4', label: 'Photo 4 — Bottom Right', size: 'sm' },
+        ]}
       />
 
       {/* Services Section Header */}

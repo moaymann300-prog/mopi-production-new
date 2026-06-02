@@ -482,22 +482,27 @@ const Index = () => {
 
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 items-center">
           <Reveal>
-            <SectionLabel text={t('about.label')} />
+            <SectionLabel text={ct('home','about','label','Who We Are')} />
             <h2 className="font-black leading-tight mb-7"
               style={{ fontSize: 'clamp(2rem,4vw,3.2rem)', color: '#111111', fontFamily }}>
-              {t('about.h1')}<br />
-              <span style={{ color: '#ED8214' }}>{t('about.h2')}</span><br />
-              {t('about.h3')}
+              {ct('home','about','heading1','Where Vision')}<br />
+              <span style={{ color: '#ED8214' }}>{ct('home','about','heading2','Meets Execution')}</span><br />
+              {ct('home','about','heading3','Excellence')}
             </h2>
             <p className="text-lg leading-relaxed mb-5" style={{ color: '#2B2B2B', fontFamily, lineHeight: isAr ? 2.1 : 1.75 }}>
-              {t('about.p1')}
+              {ct('home','about','paragraph1',"MOPI Production is Egypt's leading exhibition and event production company. Since 2016, we have been transforming spaces into extraordinary brand experiences across Egypt and the MENA region.")}
             </p>
             <p className="leading-relaxed mb-10" style={{ color: '#555555', fontFamily, lineHeight: isAr ? 2 : 1.7 }}>
-              {t('about.p2')}
+              {ct('home','about','paragraph2','From concept to completion, our team of designers, engineers, and project managers deliver world-class results that exceed expectations every time.')}
             </p>
 
             <div className="grid grid-cols-2 gap-3.5 mb-10">
-              {[t('about.p1a'), t('about.p1b'), t('about.p1c'), t('about.p1d')].map(p => (
+              {[
+                ct('home','about','point1','400+ Projects Delivered'),
+                ct('home','about','point2','10+ Years of Excellence'),
+                ct('home','about','point3','Egypt & MENA Coverage'),
+                ct('home','about','point4','International Standards'),
+              ].map(p => (
                 <div key={p} className="flex items-center gap-2.5 text-sm group cursor-default" style={{ color: '#111111', fontFamily }}>
                   <CheckCircle className="h-4 w-4 shrink-0 group-hover:scale-110 transition-transform" style={{ color: '#ED8214' }} />
                   {p}
@@ -510,7 +515,7 @@ const Index = () => {
               style={{ background: '#ED8214', boxShadow: '0 8px 24px rgba(244,123,32,0.25)', fontFamily }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#d96b18'); (e.currentTarget.style.boxShadow = '0 12px 32px rgba(244,123,32,0.4)'); }}
               onMouseLeave={e => { (e.currentTarget.style.background = '#ED8214'); (e.currentTarget.style.boxShadow = '0 8px 24px rgba(244,123,32,0.25)'); }}>
-              {t('about.cta')}
+              {ct('home','about','cta','Work With Us')}
               {isAr ? <MoveRight className="h-4 w-4 rotate-180 transition-transform group-hover:-translate-x-1" /> : <MoveRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />}
             </button>
           </Reveal>
@@ -521,10 +526,10 @@ const Index = () => {
                 style={{ background: 'radial-gradient(ellipse at center, rgba(244,123,32,0.06) 0%, transparent 70%)' }} />
               <div className="relative grid grid-cols-2 gap-3">
                 {[
-                  { src: IMAGES.BOOTH_8, cls: '' },
-                  { src: IMAGES.EVENT_1, cls: 'mt-8' },
-                  { src: IMAGES.CORPORATE_4, cls: '-mt-8' },
-                  { src: IMAGES.EVENT_3, cls: '' },
+                  { src: ci('home','about','image1', IMAGES.BOOTH_8), cls: '' },
+                  { src: ci('home','about','image2', IMAGES.EVENT_1), cls: 'mt-8' },
+                  { src: ci('home','about','image3', IMAGES.CORPORATE_4), cls: '-mt-8' },
+                  { src: ci('home','about','image4', IMAGES.EVENT_3), cls: '' },
                 ].map((img, i) => (
                   <div key={i} className={`overflow-hidden rounded-2xl ${img.cls} group`}
                     style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
