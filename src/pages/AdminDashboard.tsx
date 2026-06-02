@@ -5,11 +5,12 @@ import {
   LayoutDashboard, Settings, Image, Globe, FileText, Briefcase,
   Users, MessageSquare, Star, BarChart2, LogIn, LogOut, Eye,
   EyeOff, Save, Plus, Trash2, Upload, X, Check,
-  ChevronDown, Menu, AlertCircle, Loader2,
+  ChevronDown, ChevronRight, Menu, AlertCircle, Loader2,
   Instagram, Facebook, Youtube, Linkedin, Phone, Mail, MapPin,
   Hash, Link2, Layers, Zap, Award, Wrench, Palette, Package,
   Home, Info, Server, RefreshCw, ExternalLink, Type, PenLine,
-  BookOpen, Megaphone, MessageCircle,
+  BookOpen, Megaphone, MessageCircle, ImageIcon, ToggleLeft, ToggleRight,
+  MousePointerClick, AlignLeft, Heading, Layout, Camera,
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -29,27 +30,27 @@ interface PageContent { id: number; page: string; section: string; field: string
 interface PageImage { id: number; page: string; section: string; image_key: string; image_url: string; alt_en: string; alt_ar: string; sort_order: number; }
 
 type Section =
-  | 'dashboard' | 'site-settings' | 'social-links' | 'logos'
-  | 'hero-sections' | 'stats' | 'services' | 'portfolio'
-  | 'team' | 'testimonials' | 'media' | 'about' | 'inbox'
-  | 'page-home' | 'page-about' | 'page-services' | 'page-portfolio' | 'page-contact';
+  | 'dashboard'
+  | 'page-home' | 'page-about' | 'page-services' | 'page-portfolio' | 'page-contact'
+  | 'site-settings' | 'social-links' | 'logos' | 'hero-sections'
+  | 'stats' | 'services' | 'portfolio' | 'team' | 'testimonials' | 'media' | 'about' | 'inbox';
 
-// ─── Toast ────────────────────────────────────────────────────────────────────
+// ─── Micro Components ─────────────────────────────────────────────────────────
+
 const Toast = ({ msg, type, onClose }: { msg: string; type: 'success' | 'error'; onClose: () => void }) => (
-  <div className="fixed bottom-6 right-6 z-[999] flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl text-sm font-semibold animate-[fadeUp_0.3s_ease]"
-    style={{ background: type === 'success' ? '#16a34a' : '#dc2626', color: '#fff', maxWidth: 320 }}>
-    {type === 'success' ? <Check className="h-4 w-4 shrink-0" /> : <AlertCircle className="h-4 w-4 shrink-0" />}
-    <span className="flex-1">{msg}</span>
-    <button onClick={onClose} className="ml-2 opacity-70 hover:opacity-100"><X className="h-4 w-4" /></button>
+  <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl text-sm font-semibold transition-all"
+    style={{ background: type === 'success' ? '#064e3b' : '#7f1d1d', border: `1px solid ${type === 'success' ? '#10b981' : '#ef4444'}`, color: type === 'success' ? '#a7f3d0' : '#fca5a5', animation: 'fadeUp 0.3s ease' }}>
+    {type === 'success' ? <Check className="h-4 w-4 shrink-0" style={{ color: '#10b981' }} /> : <AlertCircle className="h-4 w-4 shrink-0" style={{ color: '#ef4444' }} />}
+    {msg}
+    <button onClick={onClose} className="ml-2" style={{ color: '#6b7280' }}><X className="h-3.5 w-3.5" /></button>
   </div>
 );
 
-// ─── ImageUploader ─────────────────────────────────────────────────────────────
 const ImageUploader = ({
-  currentUrl, onUploaded, label = 'Click or drag to upload photo', folder = 'general', compact = false
+  currentUrl, onUploaded, label = 'Click or drag to upload photo', folder = 'general', compact = false, size = 'md'
 }: {
   currentUrl?: string; onUploaded: (url: string) => void;
-  label?: string; folder?: string; compact?: boolean;
+  label?: string; folder?: string; compact?: boolean; size?: 'sm' | 'md' | 'lg';
 }) => {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState(currentUrl || '');
@@ -76,43 +77,52 @@ const ImageUploader = ({
     setUploading(false);
   };
 
+  const heights = { sm: 'h-20', md: 'h-32', lg: 'h-48' };
+
   return (
     <div>
       <div
         onClick={() => inputRef.current?.click()}
-        className="relative cursor-pointer rounded-xl overflow-hidden border-2 border-dashed transition-all hover:border-[#ED8214] group"
-        style={{ borderColor: preview ? '#ED8214' : '#374151', background: '#0a0e1a', minHeight: compact ? 72 : 110 }}
+        className={`relative cursor-pointer rounded-xl overflow-hidden border-2 border-dashed transition-all hover:border-[#ED8214] group ${heights[size]}`}
+        style={{ borderColor: preview ? '#ED8214' : '#374151', background: '#0a0e1a' }}
         onDragOver={e => e.preventDefault()}
         onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}>
         {preview ? (
-          <img src={preview} alt="preview" className={`w-full object-cover ${compact ? 'h-20' : 'h-28'}`} />
+          <img src={preview} alt="preview" className="w-full h-full object-cover" />
         ) : (
-          <div className={`flex flex-col items-center justify-center gap-2 ${compact ? 'h-16' : 'h-24'}`}>
-            <Upload className="h-5 w-5" style={{ color: '#4b5563' }} />
-            <span className="text-xs text-center px-3" style={{ color: '#6b7280' }}>{label}</span>
+          <div className="flex flex-col items-center justify-center gap-2 h-full">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(237,130,20,0.1)' }}>
+              <Camera className="h-5 w-5" style={{ color: '#ED8214' }} />
+            </div>
+            <span className="text-xs text-center px-4 font-medium" style={{ color: '#6b7280' }}>{label}</span>
+            <span className="text-[10px]" style={{ color: '#374151' }}>JPG, PNG, WEBP up to 10MB</span>
           </div>
         )}
         {uploading && (
-          <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.75)' }}>
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2" style={{ background: 'rgba(0,0,0,0.8)' }}>
             <Loader2 className="h-6 w-6 animate-spin" style={{ color: '#ED8214' }} />
+            <span className="text-xs text-white">Uploading...</span>
           </div>
         )}
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-lg font-bold" style={{ background: '#ED8214', color: '#000' }}>
-            <Upload className="h-3 w-3" />Upload
-          </span>
-        </div>
+        {preview && !uploading && (
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2" style={{ background: 'rgba(0,0,0,0.6)' }}>
+            <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-bold" style={{ background: '#ED8214', color: '#000' }}>
+              <Upload className="h-3 w-3" />Change Photo
+            </span>
+          </div>
+        )}
       </div>
       <input ref={inputRef} type="file" accept="image/*" className="hidden"
         onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
       {preview && (
         <div className="mt-2 flex gap-2 items-center">
-          <span className="flex-1 text-xs truncate px-2 py-1 rounded" style={{ background: '#111827', color: '#6b7280', border: '1px solid #1f2937' }}>
-            ✓ Photo uploaded
-          </span>
+          <div className="flex-1 flex items-center gap-2 text-xs px-2.5 py-1.5 rounded-lg" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+            <Check className="h-3.5 w-3.5 shrink-0" style={{ color: '#10b981' }} />
+            <span style={{ color: '#9ca3af' }} className="truncate">Photo uploaded successfully</span>
+          </div>
           <button onClick={(e) => { e.stopPropagation(); setPreview(''); onUploaded(''); }}
-            className="p-1.5 rounded hover:bg-red-900/30 shrink-0" style={{ color: '#ef4444' }}>
-            <X className="h-3.5 w-3.5" />
+            className="p-1.5 rounded-lg hover:bg-red-900/20 shrink-0 transition-colors" style={{ color: '#ef4444', border: '1px solid #374151' }}>
+            <Trash2 className="h-3.5 w-3.5" />
           </button>
         </div>
       )}
@@ -120,73 +130,121 @@ const ImageUploader = ({
   );
 };
 
-// ─── UI Helpers ───────────────────────────────────────────────────────────────
-const Field = ({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) => (
+const SectionCard = ({ title, icon: Icon, color = '#ED8214', children, defaultOpen = false, badge }: {
+  title: string; icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+  color?: string; children: React.ReactNode; defaultOpen?: boolean; badge?: string;
+}) => {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="rounded-2xl overflow-hidden mb-4" style={{ background: '#111827', border: `1px solid ${open ? color + '33' : '#1f2937'}`, transition: 'border-color 0.2s' }}>
+      <button onClick={() => setOpen(p => !p)} className="w-full flex items-center justify-between px-5 py-4 text-left group">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${color}18` }}>
+            <Icon className="h-4 w-4" style={{ color }} />
+          </div>
+          <div>
+            <span className="font-bold text-sm text-white group-hover:text-[#ED8214] transition-colors">{title}</span>
+            {badge && <span className="ml-2 text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: `${color}20`, color }}>{badge}</span>}
+          </div>
+        </div>
+        <ChevronDown className="h-4 w-4 shrink-0 transition-transform" style={{ color: '#4b5563', transform: open ? 'rotate(180deg)' : 'none' }} />
+      </button>
+      {open && (
+        <div className="px-5 pb-5" style={{ borderTop: `1px solid #1f2937` }}>
+          <div className="pt-4">{children}</div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Field = ({ label, children, hint, required }: { label: string; children: React.ReactNode; hint?: string; required?: boolean }) => (
   <div>
-    <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>{label}</label>
+    <label className="flex items-center gap-1.5 text-xs font-bold mb-2 uppercase tracking-widest" style={{ color: '#9ca3af' }}>
+      {label}{required && <span style={{ color: '#ef4444' }}>*</span>}
+    </label>
     {children}
-    {hint && <p className="text-xs mt-1" style={{ color: '#6b7280' }}>{hint}</p>}
+    {hint && <p className="text-[11px] mt-1.5" style={{ color: '#4b5563' }}>{hint}</p>}
   </div>
 );
 
 const Input = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
-  <input {...props} className="w-full px-3 py-2.5 rounded-lg text-sm transition-all"
-    style={{ background: '#111827', border: '1px solid #374151', color: '#f3f4f6', ...props.style }}
-    onFocus={e => (e.currentTarget.style.borderColor = '#ED8214')}
-    onBlur={e => (e.currentTarget.style.borderColor = '#374151')} />
+  <input {...props} className={`w-full px-3 py-2.5 rounded-lg text-sm transition-all outline-none ${props.className || ''}`}
+    style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6', ...props.style }}
+    onFocus={e => { e.currentTarget.style.borderColor = '#ED8214'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(237,130,20,0.08)'; }}
+    onBlur={e => { e.currentTarget.style.borderColor = '#374151'; e.currentTarget.style.boxShadow = 'none'; }} />
 );
 
 const Textarea = (props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
-  <textarea {...props} className="w-full px-3 py-2.5 rounded-lg text-sm transition-all resize-none" rows={props.rows || 3}
-    style={{ background: '#111827', border: '1px solid #374151', color: '#f3f4f6', ...props.style }}
-    onFocus={e => (e.currentTarget.style.borderColor = '#ED8214')}
-    onBlur={e => (e.currentTarget.style.borderColor = '#374151')} />
+  <textarea {...props} className={`w-full px-3 py-2.5 rounded-lg text-sm resize-none transition-all outline-none ${props.className || ''}`}
+    style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6', ...props.style }}
+    onFocus={e => { e.currentTarget.style.borderColor = '#ED8214'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(237,130,20,0.08)'; }}
+    onBlur={e => { e.currentTarget.style.borderColor = '#374151'; e.currentTarget.style.boxShadow = 'none'; }} />
 );
 
-const Toggle = ({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) => (
-  <button onClick={() => onChange(!checked)} className="relative inline-flex h-6 w-11 rounded-full transition-colors"
-    style={{ background: checked ? '#ED8214' : '#374151' }}>
-    <span className="inline-block h-5 w-5 rounded-full bg-white shadow transition-transform mt-0.5"
-      style={{ transform: checked ? 'translateX(22px)' : 'translateX(2px)' }} />
-  </button>
-);
-
-// Bilingual text editor (EN + AR side by side)
-const BilingualField = ({
-  label, valueEn, valueAr, onChangeEn, onChangeAr, multiline = false, rows = 3
-}: {
-  label: string; valueEn: string; valueAr: string;
-  onChangeEn: (v: string) => void; onChangeAr: (v: string) => void;
-  multiline?: boolean; rows?: number;
-}) => (
-  <div>
-    <label className="block text-xs font-bold mb-2 uppercase tracking-widest" style={{ color: '#9ca3af' }}>{label}</label>
-    <div className="grid grid-cols-2 gap-2">
-      <div>
-        <p className="text-[10px] mb-1 flex items-center gap-1 font-semibold" style={{ color: '#ED8214' }}>
-          🇬🇧 English
-        </p>
-        {multiline
-          ? <Textarea rows={rows} value={valueEn} onChange={e => onChangeEn(e.target.value)} placeholder="English text..." />
-          : <Input value={valueEn} onChange={e => onChangeEn(e.target.value)} placeholder="English text..." />
-        }
+const Toggle = ({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label?: string }) => (
+  <div className="flex items-center gap-2">
+    <button onClick={() => onChange(!checked)} className="flex items-center gap-2 transition-all">
+      <div className="w-10 h-5 rounded-full relative transition-colors" style={{ background: checked ? '#ED8214' : '#374151' }}>
+        <div className="absolute top-0.5 transition-all w-4 h-4 rounded-full bg-white shadow" style={{ left: checked ? '22px' : '2px' }} />
       </div>
-      <div>
-        <p className="text-[10px] mb-1 flex items-center gap-1 font-semibold" style={{ color: '#60a5fa' }}>
-          🇸🇦 Arabic
-        </p>
-        {multiline
-          ? <Textarea rows={rows} value={valueAr} onChange={e => onChangeAr(e.target.value)}
-              placeholder="النص العربي..." style={{ direction: 'rtl', fontFamily: "'Cairo', sans-serif" }} />
-          : <Input value={valueAr} onChange={e => onChangeAr(e.target.value)}
-              placeholder="النص العربي..." style={{ direction: 'rtl', fontFamily: "'Cairo', sans-serif" }} />
-        }
-      </div>
-    </div>
+    </button>
+    {label && <span className="text-xs font-medium" style={{ color: checked ? '#ED8214' : '#6b7280' }}>{label}</span>}
   </div>
 );
 
-// ─── Main Admin Dashboard ──────────────────────────────────────────────────────
+const BilingualField = ({
+  label, valueEn, valueAr, onChangeEn, onChangeAr, multiline = false, rows = 2, hint
+}: {
+  label: string; valueEn: string; valueAr: string;
+  onChangeEn: (v: string) => void; onChangeAr: (v: string) => void;
+  multiline?: boolean; rows?: number; hint?: string;
+}) => (
+  <div>
+    <label className="flex items-center gap-1.5 text-xs font-bold mb-2.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>
+      {label}
+    </label>
+    <div className="grid grid-cols-2 gap-3">
+      <div>
+        <div className="flex items-center gap-1.5 mb-1.5">
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{ background: 'rgba(59,130,246,0.15)', color: '#60a5fa' }}>🇬🇧 English</span>
+        </div>
+        {multiline
+          ? <Textarea value={valueEn} onChange={e => onChangeEn(e.target.value)} rows={rows} placeholder="English text..." />
+          : <Input value={valueEn} onChange={e => onChangeEn(e.target.value)} placeholder="English text..." />}
+      </div>
+      <div>
+        <div className="flex items-center gap-1.5 mb-1.5">
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{ background: 'rgba(237,130,20,0.15)', color: '#ED8214' }}>🇸🇦 Arabic</span>
+        </div>
+        {multiline
+          ? <Textarea value={valueAr} onChange={e => onChangeAr(e.target.value)} rows={rows} dir="rtl" placeholder="النص العربي..." style={{ fontFamily: "'Cairo', sans-serif" }} />
+          : <Input value={valueAr} onChange={e => onChangeAr(e.target.value)} dir="rtl" placeholder="النص العربي..." style={{ fontFamily: "'Cairo', sans-serif" }} />}
+      </div>
+    </div>
+    {hint && <p className="text-[11px] mt-1.5" style={{ color: '#4b5563' }}>{hint}</p>}
+  </div>
+);
+
+const SaveBtn = ({ onClick, saving, label = 'Save Changes' }: { onClick: () => void; saving: boolean; label?: string }) => (
+  <button onClick={onClick} disabled={saving}
+    className="flex items-center gap-2 text-sm font-bold px-5 py-2.5 rounded-xl text-black transition-all hover:scale-[1.02] hover:shadow-lg disabled:opacity-60"
+    style={{ background: '#ED8214', boxShadow: '0 4px 14px rgba(237,130,20,0.25)' }}>
+    {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+    {saving ? 'Saving...' : label}
+  </button>
+);
+
+const Divider = ({ label }: { label?: string }) => (
+  <div className="flex items-center gap-3 my-4">
+    <div className="flex-1 h-px" style={{ background: '#1f2937' }} />
+    {label && <span className="text-[10px] font-bold uppercase tracking-widest shrink-0" style={{ color: '#374151' }}>{label}</span>}
+    <div className="flex-1 h-px" style={{ background: '#1f2937' }} />
+  </div>
+);
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 export default function AdminDashboard() {
   const [authed, setAuthed] = useState(false);
   const [loginEmail, setLoginEmail] = useState('');
@@ -199,7 +257,6 @@ export default function AdminDashboard() {
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Data state
   const [settings, setSettings] = useState<SiteSetting[]>([]);
   const [socials, setSocials] = useState<SocialLink[]>([]);
   const [logos, setLogos] = useState<Logo[]>([]);
@@ -221,7 +278,6 @@ export default function AdminDashboard() {
     setTimeout(() => setToast(null), 4000);
   };
 
-  // ── Login ──
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginLoading(true); setLoginError('');
@@ -235,7 +291,6 @@ export default function AdminDashboard() {
     supabase.auth.onAuthStateChange((_, session) => { setAuthed(!!session); });
   }, []);
 
-  // ── Fetch all data ──
   const fetchAll = useCallback(async () => {
     const [s, sl, lg, h, st, sv, pf, tm, ts, md, ab, ib, pc, pi] = await Promise.all([
       supabase.from('cms_site_settings_2026_04_21').select('*').order('group_name').order('id'),
@@ -274,12 +329,11 @@ export default function AdminDashboard() {
 
   const logout = async () => { await supabase.auth.signOut(); setAuthed(false); };
 
-  // ════════════════ SAVE HANDLERS ════════════════
-
+  // ── Save Handlers ──
   const saveSetting = async (item: SiteSetting) => {
     setSaving(true);
     const { error } = await supabase.from('cms_site_settings_2026_04_21').update({ value: item.value, updated_at: new Date().toISOString() }).eq('id', item.id);
-    if (error) notify('Save failed: ' + error.message, 'error'); else notify('Setting saved!');
+    if (error) notify('Save failed: ' + error.message, 'error'); else notify('Saved!');
     setSaving(false);
   };
 
@@ -298,7 +352,7 @@ export default function AdminDashboard() {
   const saveHero = async (item: HeroSection) => {
     setSaving(true);
     const { error } = await supabase.from('cms_hero_sections_2026_04_21').update({ badge_text: item.badge_text, heading: item.heading, subheading: item.subheading, cta_primary_label: item.cta_primary_label, cta_primary_url: item.cta_primary_url, cta_secondary_label: item.cta_secondary_label, cta_secondary_url: item.cta_secondary_url, bg_image_url: item.bg_image_url, updated_at: new Date().toISOString() }).eq('id', item.id);
-    if (error) notify('Save failed: ' + error.message, 'error'); else notify('Hero section saved!');
+    if (error) notify('Save failed: ' + error.message, 'error'); else notify('Hero saved!');
     setSaving(false);
   };
 
@@ -312,7 +366,7 @@ export default function AdminDashboard() {
   const deleteStat = async (id: number) => {
     if (!confirm('Delete this stat?')) return;
     await supabase.from('cms_stats_2026_04_21').delete().eq('id', id);
-    notify('Stat deleted!'); fetchAll();
+    notify('Deleted!'); fetchAll();
   };
 
   const saveService = async (item: Service) => {
@@ -325,7 +379,7 @@ export default function AdminDashboard() {
   const deleteService = async (id: number) => {
     if (!confirm('Delete this service?')) return;
     await supabase.from('cms_services_2026_04_21').delete().eq('id', id);
-    notify('Service deleted!'); fetchAll();
+    notify('Deleted!'); fetchAll();
   };
 
   const savePortfolio = async (item: Portfolio) => {
@@ -338,7 +392,7 @@ export default function AdminDashboard() {
   const deletePortfolio = async (id: number) => {
     if (!confirm('Delete this project?')) return;
     await supabase.from('cms_portfolio_2026_04_21').delete().eq('id', id);
-    notify('Project deleted!'); fetchAll();
+    notify('Deleted!'); fetchAll();
   };
 
   const saveTeam = async (item: TeamMember) => {
@@ -346,7 +400,7 @@ export default function AdminDashboard() {
     const { error } = item.id
       ? await supabase.from('cms_team_2026_04_21').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', item.id)
       : await supabase.from('cms_team_2026_04_21').insert([payload]);
-    if (error) notify('Save failed: ' + error.message, 'error'); else { notify('Team member saved!'); fetchAll(); }
+    if (error) notify('Save failed: ' + error.message, 'error'); else { notify('Saved!'); fetchAll(); }
   };
   const deleteTeam = async (id: number) => {
     if (!confirm('Delete this team member?')) return;
@@ -359,7 +413,7 @@ export default function AdminDashboard() {
     const { error } = item.id
       ? await supabase.from('cms_testimonials_2026_04_21').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', item.id)
       : await supabase.from('cms_testimonials_2026_04_21').insert([payload]);
-    if (error) notify('Save failed: ' + error.message, 'error'); else { notify('Testimonial saved!'); fetchAll(); }
+    if (error) notify('Save failed: ' + error.message, 'error'); else { notify('Saved!'); fetchAll(); }
   };
   const deleteTestimonial = async (id: number) => {
     if (!confirm('Delete this testimonial?')) return;
@@ -369,17 +423,17 @@ export default function AdminDashboard() {
 
   const saveAbout = async (item: AboutContent) => {
     const { error } = await supabase.from('cms_about_content_2026_04_21').update({ title: item.title, content: item.content, image_url: item.image_url, updated_at: new Date().toISOString() }).eq('id', item.id);
-    if (error) notify('Save failed: ' + error.message, 'error'); else notify('About section saved!');
+    if (error) notify('Save failed: ' + error.message, 'error'); else notify('Saved!');
   };
 
   const updateInboxStatus = async (id: number, status: string) => {
     await supabase.from('cms_contact_submissions_2026_04_21').update({ status, updated_at: new Date().toISOString() }).eq('id', id);
-    notify('Status updated!'); fetchAll();
+    notify('Updated!'); fetchAll();
   };
   const deleteInbox = async (id: number) => {
     if (!confirm('Delete this message?')) return;
     await supabase.from('cms_contact_submissions_2026_04_21').delete().eq('id', id);
-    notify('Message deleted!'); fetchAll();
+    notify('Deleted!'); fetchAll();
   };
 
   const handleMediaUpload = async (file: File) => {
@@ -391,24 +445,12 @@ export default function AdminDashboard() {
       const { data } = supabase.storage.from('cms-media').getPublicUrl(filename);
       await supabase.from('cms_media_2026_04_21').insert([{ filename: file.name, url: data.publicUrl, alt_text: file.name.replace(`.${ext}`, ''), category: 'general', file_type: 'image', file_size: file.size }]);
       notify('Image uploaded!'); fetchAll();
-    } catch {
-      notify('Upload failed', 'error');
-    }
+    } catch { notify('Upload failed', 'error'); }
   };
   const deleteMedia = async (item: MediaItem) => {
     if (!confirm('Delete this image?')) return;
     await supabase.from('cms_media_2026_04_21').delete().eq('id', item.id);
     notify('Deleted!'); fetchAll();
-  };
-
-  // Page content save
-  const savePageContent = async (item: PageContent) => {
-    setSaving(true);
-    const { error } = await supabase.from('cms_page_content_2026_06_01')
-      .update({ value_en: item.value_en, value_ar: item.value_ar, updated_at: new Date().toISOString() })
-      .eq('id', item.id);
-    if (error) notify('Save failed: ' + error.message, 'error'); else notify('Content saved!');
-    setSaving(false);
   };
 
   const savePageContentBulk = async (items: PageContent[]) => {
@@ -418,148 +460,52 @@ export default function AdminDashboard() {
       const { error } = await supabase.from('cms_page_content_2026_06_01')
         .update({ value_en: item.value_en, value_ar: item.value_ar, updated_at: new Date().toISOString() })
         .eq('id', item.id);
-      if (error) { hasError = true; }
+      if (error) hasError = true;
     }
-    if (hasError) notify('Some items failed to save', 'error'); else notify('All content saved!');
+    if (hasError) notify('Some items failed to save', 'error'); else notify('All content saved! ✓');
     setSaving(false);
   };
 
-  // Page image save
   const savePageImage = async (item: PageImage) => {
     setSaving(true);
     const { error } = await supabase.from('cms_page_images_2026_06_01')
       .update({ image_url: item.image_url, alt_en: item.alt_en, alt_ar: item.alt_ar, updated_at: new Date().toISOString() })
       .eq('id', item.id);
-    if (error) notify('Save failed: ' + error.message, 'error'); else notify('Image saved!');
+    if (error) notify('Save failed: ' + error.message, 'error'); else notify('Image saved! ✓');
     setSaving(false);
   };
 
-  // Helper: get page content item
-  const getPC = (page: string, section: string, field: string) =>
-    pageContent.find(p => p.page === page && p.section === section && p.field === field);
+  const getPC = (page: string, sec: string, field: string) =>
+    pageContent.find(p => p.page === page && p.section === sec && p.field === field);
 
   const updatePC = (id: number, en: string, ar: string) => {
     setPageContent(prev => prev.map(p => p.id === id ? { ...p, value_en: en, value_ar: ar } : p));
   };
 
-  const getPI = (page: string, section: string, key: string) =>
-    pageImages.find(p => p.page === page && p.section === section && p.image_key === key);
+  const getPI = (page: string, sec: string, key: string) =>
+    pageImages.find(p => p.page === page && p.section === sec && p.image_key === key);
 
   const updatePI = (id: number, url: string) => {
     setPageImages(prev => prev.map(p => p.id === id ? { ...p, image_url: url } : p));
   };
 
-  // ════════════════ LOGIN SCREEN ════════════════
-  if (!authed) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#000', fontFamily: "'Inter', sans-serif" }}>
-        <style>{`@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }`}</style>
-        <div className="w-full max-w-sm" style={{ animation: 'fadeUp 0.5s ease' }}>
-          <div className="text-center mb-8">
-            <img src="/images/mopi_logo_20260101_112924.png" alt="MOPi" className="h-14 w-auto object-contain mx-auto mb-4" />
-            <h1 className="text-xl font-black text-white mb-1" style={{ fontFamily: "'Poppins', sans-serif" }}>Admin Dashboard</h1>
-            <p className="text-sm" style={{ color: '#6b7280' }}>Sign in to manage your website</p>
-          </div>
-          <form onSubmit={handleLogin} className="space-y-4 p-7 rounded-2xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Email</label>
-              <Input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} placeholder="admin@mopiproduction.com" required />
-            </div>
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Password</label>
-              <div className="relative">
-                <Input type={showPwd ? 'text' : 'password'} value={loginPwd} onChange={e => setLoginPwd(e.target.value)} placeholder="••••••••" required />
-                <button type="button" onClick={() => setShowPwd(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: '#6b7280' }}>
-                  {showPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-            </div>
-            {loginError && <p className="text-xs py-2 px-3 rounded-lg flex items-center gap-2" style={{ background: 'rgba(220,38,38,0.1)', color: '#ef4444', border: '1px solid rgba(220,38,38,0.2)' }}><AlertCircle className="h-3.5 w-3.5" />{loginError}</p>}
-            <button type="submit" disabled={loginLoading}
-              className="w-full py-3 rounded-xl text-white font-bold text-sm transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
-              style={{ background: '#ED8214', boxShadow: '0 6px 20px rgba(237,130,20,0.3)' }}>
-              {loginLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
-              {loginLoading ? 'Signing in...' : 'Sign In'}
-            </button>
-            <p className="text-center text-xs mt-3">
-              <Link to="/" className="hover:underline" style={{ color: '#6b7280' }}>← Back to Website</Link>
-            </p>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
-  // ════════════════ SIDEBAR CONFIG ════════════════
-  const sidebarGroups = [
-    {
-      label: 'Overview', items: [
-        { id: 'dashboard' as Section, icon: LayoutDashboard, label: 'Dashboard' },
-      ]
-    },
-    {
-      label: 'Global', items: [
-        { id: 'site-settings' as Section, icon: Settings, label: 'Site Settings' },
-        { id: 'social-links' as Section, icon: Globe, label: 'Social Media' },
-        { id: 'logos' as Section, icon: Image, label: 'Logos' },
-      ]
-    },
-    {
-      label: 'Page Content', items: [
-        { id: 'page-home' as Section, icon: Home, label: 'Homepage Texts' },
-        { id: 'page-about' as Section, icon: Info, label: 'About Page Texts' },
-        { id: 'page-services' as Section, icon: Briefcase, label: 'Services Page Texts' },
-        { id: 'page-portfolio' as Section, icon: Layers, label: 'Portfolio Page Texts' },
-        { id: 'page-contact' as Section, icon: MessageCircle, label: 'Contact Page Texts' },
-      ]
-    },
-    {
-      label: 'Data & Content', items: [
-        { id: 'hero-sections' as Section, icon: Megaphone, label: 'Hero Sections' },
-        { id: 'stats' as Section, icon: BarChart2, label: 'Stats & Numbers' },
-        { id: 'about' as Section, icon: BookOpen, label: 'About Content' },
-        { id: 'services' as Section, icon: Wrench, label: 'Services' },
-        { id: 'portfolio' as Section, icon: Palette, label: 'Portfolio' },
-        { id: 'team' as Section, icon: Users, label: 'Team Members' },
-        { id: 'testimonials' as Section, icon: Star, label: 'Testimonials' },
-        { id: 'media' as Section, icon: Image, label: 'Media Library' },
-        { id: 'inbox' as Section, icon: MessageSquare, label: `Inbox ${inbox.filter(m => m.status === 'new').length > 0 ? `(${inbox.filter(m => m.status === 'new').length})` : ''}` },
-      ]
-    },
-  ];
-
-  const unreadCount = inbox.filter(m => m.status === 'new').length;
-
-  // ════════════════ PAGE CONTENT EDITOR HELPER ════════════════
-
-  const renderPageContentSection = (
-    pageName: string,
-    sectionName: string,
-    sectionLabel: string,
-    fields: { field: string; label: string; multiline?: boolean; rows?: number }[],
-    imageKeys?: { key: string; label: string }[],
-    accent?: string
-  ) => {
+  // Helper: render a full page section with fields + images
+  const PageSection = ({
+    pageName, sectionName, sectionLabel, icon: Icon, color = '#ED8214', defaultOpen = false,
+    fields, imageKeys, badge
+  }: {
+    pageName: string; sectionName: string; sectionLabel: string;
+    icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+    color?: string; defaultOpen?: boolean;
+    fields: { field: string; label: string; multiline?: boolean; rows?: number; hint?: string }[];
+    imageKeys?: { key: string; label: string; size?: 'sm' | 'md' | 'lg' }[];
+    badge?: string;
+  }) => {
     const sectionItems = fields.map(f => getPC(pageName, sectionName, f.field)).filter(Boolean) as PageContent[];
-    const sectionImageItems = (imageKeys || []).map(k => getPI(pageName, sectionName, k.key)).filter(Boolean) as PageImage[];
-
     return (
-      <div key={`${pageName}-${sectionName}`} className="mb-6 p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2" style={{ color: accent || '#ED8214' }}>
-            <span className="w-4 h-px block" style={{ background: accent || '#ED8214' }} />{sectionLabel}
-          </h3>
-          <button
-            onClick={() => savePageContentBulk(sectionItems)}
-            disabled={saving}
-            className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg text-white transition-all hover:scale-105"
-            style={{ background: '#ED8214' }}>
-            {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
-            Save Section
-          </button>
-        </div>
-
-        <div className="space-y-4">
+      <SectionCard title={sectionLabel} icon={Icon} color={color} defaultOpen={defaultOpen} badge={badge}>
+        <div className="space-y-5">
+          {/* Text Fields */}
           {fields.map(f => {
             const item = getPC(pageName, sectionName, f.field);
             if (!item) return null;
@@ -573,18 +519,27 @@ export default function AdminDashboard() {
                 onChangeAr={v => updatePC(item.id, item.value_en, v)}
                 multiline={f.multiline}
                 rows={f.rows}
+                hint={f.hint}
               />
             );
           })}
 
-          {/* Image uploads for this section */}
-          {imageKeys && imageKeys.length > 0 && sectionImageItems.length > 0 && (
-            <div className="pt-2 border-t" style={{ borderColor: '#1f2937' }}>
-              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#6b7280' }}>Section Photos</p>
-              <div className="grid grid-cols-2 gap-4">
+          {/* Image Uploads */}
+          {imageKeys && imageKeys.length > 0 && (
+            <>
+              <Divider label="Photos" />
+              <div className={`grid gap-4 ${imageKeys.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
                 {imageKeys.map(ik => {
                   const imgItem = getPI(pageName, sectionName, ik.key);
-                  if (!imgItem) return null;
+                  if (!imgItem) return (
+                    <div key={ik.key}>
+                      <Field label={ik.label}>
+                        <div className="h-32 rounded-xl flex items-center justify-center text-xs" style={{ background: '#0a0e1a', border: '1px dashed #374151', color: '#4b5563' }}>
+                          No image record found in DB
+                        </div>
+                      </Field>
+                    </div>
+                  );
                   return (
                     <div key={ik.key}>
                       <Field label={ik.label}>
@@ -596,110 +551,199 @@ export default function AdminDashboard() {
                           }}
                           folder={`pages/${pageName}`}
                           label={`Upload ${ik.label}`}
+                          size={ik.size || 'md'}
                         />
                       </Field>
                     </div>
                   );
                 })}
               </div>
-            </div>
+            </>
           )}
+
+          {/* Save Button */}
+          <div className="flex justify-end pt-2">
+            <SaveBtn onClick={() => savePageContentBulk(sectionItems)} saving={saving} label="Save Section" />
+          </div>
         </div>
-      </div>
+      </SectionCard>
     );
   };
 
-  // ════════════════ SECTION RENDERERS ════════════════
+  // ── LOGIN ──
+  if (!authed) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'linear-gradient(135deg, #000 0%, #0a0a0a 50%, #111 100%)', fontFamily: "'Inter', sans-serif" }}>
+        <style>{`@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }`}</style>
+        <div className="w-full max-w-sm" style={{ animation: 'fadeUp 0.5s ease' }}>
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center overflow-hidden" style={{ background: 'rgba(237,130,20,0.1)', border: '1px solid rgba(237,130,20,0.2)' }}>
+              <img src="/images/mopi_logo_20260101_112924.png" alt="MOPi" className="h-10 w-auto object-contain" />
+            </div>
+            <h1 className="text-2xl font-black text-white mb-1" style={{ fontFamily: "'Poppins', sans-serif" }}>Admin Dashboard</h1>
+            <p className="text-sm" style={{ color: '#6b7280' }}>Sign in to manage your website content</p>
+          </div>
+          <form onSubmit={handleLogin} className="space-y-4 p-7 rounded-2xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+            <Field label="Email">
+              <Input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} placeholder="admin@mopiproduction.com" required />
+            </Field>
+            <Field label="Password">
+              <div className="relative">
+                <Input type={showPwd ? 'text' : 'password'} value={loginPwd} onChange={e => setLoginPwd(e.target.value)} placeholder="••••••••" required />
+                <button type="button" onClick={() => setShowPwd(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: '#6b7280' }}>
+                  {showPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </Field>
+            {loginError && <p className="text-xs py-2.5 px-3.5 rounded-xl flex items-center gap-2" style={{ background: 'rgba(220,38,38,0.08)', color: '#ef4444', border: '1px solid rgba(220,38,38,0.15)' }}><AlertCircle className="h-3.5 w-3.5" />{loginError}</p>}
+            <button type="submit" disabled={loginLoading}
+              className="w-full py-3 rounded-xl text-black font-bold text-sm transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
+              style={{ background: '#ED8214', boxShadow: '0 8px 24px rgba(237,130,20,0.3)' }}>
+              {loginLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
+              {loginLoading ? 'Signing in...' : 'Sign In'}
+            </button>
+            <p className="text-center text-xs mt-3">
+              <Link to="/" className="hover:text-white transition-colors" style={{ color: '#6b7280' }}>← Back to Website</Link>
+            </p>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
+  const unreadCount = inbox.filter(m => m.status === 'new').length;
+
+  // ── SIDEBAR ──
+  const navGroups = [
+    {
+      label: 'Overview',
+      items: [{ id: 'dashboard' as Section, icon: LayoutDashboard, label: 'Dashboard' }]
+    },
+    {
+      label: 'Pages',
+      items: [
+        { id: 'page-home' as Section, icon: Home, label: 'Home Page' },
+        { id: 'page-about' as Section, icon: Info, label: 'About Page' },
+        { id: 'page-services' as Section, icon: Briefcase, label: 'Services Page' },
+        { id: 'page-portfolio' as Section, icon: Layers, label: 'Portfolio Page' },
+        { id: 'page-contact' as Section, icon: MessageCircle, label: 'Contact Page' },
+      ]
+    },
+    {
+      label: 'Content',
+      items: [
+        { id: 'services' as Section, icon: Wrench, label: 'Services Cards' },
+        { id: 'portfolio' as Section, icon: Palette, label: 'Portfolio Projects' },
+        { id: 'team' as Section, icon: Users, label: 'Team Members' },
+        { id: 'testimonials' as Section, icon: Star, label: 'Testimonials' },
+        { id: 'stats' as Section, icon: BarChart2, label: 'Stats & Numbers' },
+      ]
+    },
+    {
+      label: 'Global',
+      items: [
+        { id: 'site-settings' as Section, icon: Settings, label: 'Site Settings' },
+        { id: 'logos' as Section, icon: ImageIcon, label: 'Logos & Favicon' },
+        { id: 'social-links' as Section, icon: Globe, label: 'Social Media' },
+        { id: 'media' as Section, icon: Image, label: 'Media Library' },
+        { id: 'inbox' as Section, icon: MessageSquare, label: `Inbox${unreadCount > 0 ? ` (${unreadCount})` : ''}` },
+      ]
+    },
+  ];
+
+  // ── DASHBOARD ──
   const renderDashboard = () => (
     <div>
-      <h2 className="text-2xl font-black text-white mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>Dashboard</h2>
+      <div className="mb-8">
+        <h1 className="text-3xl font-black text-white mb-1" style={{ fontFamily: "'Poppins', sans-serif" }}>Welcome back 👋</h1>
+        <p className="text-sm" style={{ color: '#6b7280' }}>Manage every aspect of your MOPI Production website from here.</p>
+      </div>
+
+      {/* Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: 'Services', count: services.length, icon: Briefcase, color: '#3b82f6' },
-          { label: 'Portfolio', count: portfolio.length, icon: Layers, color: '#8b5cf6' },
-          { label: 'Team', count: team.length, icon: Users, color: '#10b981' },
-          { label: 'New Messages', count: unreadCount, icon: MessageSquare, color: '#ED8214' },
+          { label: 'Services', count: services.length, icon: Wrench, color: '#3b82f6', id: 'services' as Section },
+          { label: 'Projects', count: portfolio.length, icon: Layers, color: '#8b5cf6', id: 'portfolio' as Section },
+          { label: 'Team', count: team.length, icon: Users, color: '#10b981', id: 'team' as Section },
+          { label: 'New Messages', count: unreadCount, icon: MessageSquare, color: '#ED8214', id: 'inbox' as Section },
         ].map(c => (
-          <div key={c.label} className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: `${c.color}20` }}>
-                <c.icon className="h-4 w-4" style={{ color: c.color }} />
+          <button key={c.label} onClick={() => setSection(c.id)}
+            className="p-5 rounded-2xl text-left transition-all hover:scale-[1.02] group"
+            style={{ background: '#111827', border: '1px solid #1f2937' }}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${c.color}15` }}>
+                <c.icon className="h-5 w-5" style={{ color: c.color }} />
               </div>
-              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#6b7280' }}>{c.label}</span>
+              <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: c.color }} />
             </div>
-            <div className="text-3xl font-black" style={{ color: c.color, fontFamily: "'Poppins', sans-serif" }}>{c.count}</div>
-          </div>
+            <div className="text-3xl font-black mb-1" style={{ color: c.color, fontFamily: "'Poppins', sans-serif" }}>{c.count}</div>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: '#6b7280' }}>{c.label}</div>
+          </button>
         ))}
       </div>
-      {/* Quick access guide */}
-      <div className="grid md:grid-cols-2 gap-4 mb-4">
-        <div className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-          <h3 className="font-bold text-sm mb-4 text-white flex items-center gap-2"><Type className="h-4 w-4" style={{ color: '#ED8214' }} />Text & Content Control</h3>
-          <div className="space-y-1.5">
-            {[
-              { id: 'page-home', label: '🏠 Homepage — Every text, every word', desc: 'Hero, About, Services, Why Us, Process, CTA, Footer' },
-              { id: 'page-about', label: '👥 About Page — Full content control', desc: 'Hero, Story, Mission, Values sections' },
-              { id: 'page-services', label: '⚙️ Services Page — All text blocks', desc: 'Hero, CTA sections' },
-              { id: 'page-portfolio', label: '🖼️ Portfolio Page — Page texts', desc: 'Hero section, category labels' },
-              { id: 'page-contact', label: '📞 Contact Page — All labels', desc: 'Hero, contact info labels' },
-            ].map(item => (
-              <button key={item.id} onClick={() => setSection(item.id as Section)}
-                className="w-full text-left px-3 py-2 rounded-lg transition-all hover:text-[#ED8214] group"
-                style={{ background: '#0f172a' }}>
-                <p className="text-sm font-semibold text-white group-hover:text-[#ED8214] transition-colors">{item.label}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: '#4b5563' }}>{item.desc}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-          <h3 className="font-bold text-sm mb-4 text-white flex items-center gap-2"><Image className="h-4 w-4" style={{ color: '#ED8214' }} />Data & Photos Control</h3>
-          <div className="space-y-1.5">
-            {[
-              { id: 'services', label: '⚙️ Services — Title, desc, photo per service' },
-              { id: 'portfolio', label: '🖼️ Portfolio — Project photos & details' },
-              { id: 'team', label: '👤 Team — Member photos & bios' },
-              { id: 'testimonials', label: '⭐ Testimonials — Client photos & quotes' },
-              { id: 'logos', label: '🔰 Logos — Header, footer, favicon upload' },
-              { id: 'media', label: '📁 Media Library — All uploaded photos' },
-            ].map(item => (
-              <button key={item.id} onClick={() => setSection(item.id as Section)}
-                className="w-full text-left px-3 py-2 rounded-lg transition-all text-sm font-semibold text-white hover:text-[#ED8214] transition-colors"
-                style={{ background: '#0f172a' }}>
-                {item.label}
-              </button>
-            ))}
-          </div>
+
+      {/* Page Editors */}
+      <div className="mb-6">
+        <h2 className="text-xs font-black uppercase tracking-[0.25em] mb-4" style={{ color: '#374151' }}>Edit Pages</h2>
+        <div className="grid md:grid-cols-5 gap-3">
+          {[
+            { id: 'page-home' as Section, label: 'Home', icon: Home, color: '#ED8214', desc: 'Hero, About, Services, CTA, Footer' },
+            { id: 'page-about' as Section, label: 'About', icon: Info, color: '#3b82f6', desc: 'Story, Mission, Values, Team' },
+            { id: 'page-services' as Section, label: 'Services', icon: Briefcase, color: '#8b5cf6', desc: 'Hero, Service cards, CTA' },
+            { id: 'page-portfolio' as Section, label: 'Portfolio', icon: Layers, color: '#10b981', desc: 'Hero, Projects, Stats' },
+            { id: 'page-contact' as Section, label: 'Contact', icon: MessageCircle, color: '#f43f5e', desc: 'Hero, Form, Info labels' },
+          ].map(p => (
+            <button key={p.id} onClick={() => setSection(p.id)}
+              className="p-4 rounded-2xl text-left transition-all hover:scale-[1.02] group"
+              style={{ background: '#111827', border: '1px solid #1f2937' }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: `${p.color}15` }}>
+                <p.icon className="h-5 w-5" style={{ color: p.color }} />
+              </div>
+              <p className="font-black text-sm text-white group-hover:text-[#ED8214] transition-colors">{p.label}</p>
+              <p className="text-[10px] mt-1 leading-relaxed" style={{ color: '#4b5563' }}>{p.desc}</p>
+            </button>
+          ))}
         </div>
       </div>
+
+      {/* Recent Messages + Quick Links */}
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-          <h3 className="font-bold text-sm mb-4 text-white flex items-center gap-2"><MessageSquare className="h-4 w-4" style={{ color: '#ED8214' }} />Recent Messages</h3>
-          {inbox.slice(0, 4).map(m => (
-            <div key={m.id} className="flex items-start gap-3 py-2.5" style={{ borderBottom: '1px solid #1f2937' }}>
-              <span className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{ background: m.status === 'new' ? '#ED8214' : '#374151' }} />
+        <div className="p-5 rounded-2xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-bold text-sm text-white flex items-center gap-2"><MessageSquare className="h-4 w-4" style={{ color: '#ED8214' }} />Recent Messages</h3>
+            <button onClick={() => setSection('inbox')} className="text-xs font-bold hover:text-white transition-colors" style={{ color: '#ED8214' }}>View all →</button>
+          </div>
+          {inbox.slice(0, 5).map(m => (
+            <div key={m.id} className="flex items-start gap-3 py-3" style={{ borderBottom: '1px solid #1f2937' }}>
+              <span className="w-2 h-2 rounded-full mt-2 shrink-0" style={{ background: m.status === 'new' ? '#ED8214' : '#374151' }} />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white truncate">{m.name}</p>
-                <p className="text-xs truncate" style={{ color: '#6b7280' }}>{m.message}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-white truncate">{m.name}</p>
+                  {m.status === 'new' && <span className="text-[9px] font-black px-1.5 py-0.5 rounded shrink-0" style={{ background: 'rgba(237,130,20,0.15)', color: '#ED8214' }}>NEW</span>}
+                </div>
+                <p className="text-xs truncate mt-0.5" style={{ color: '#6b7280' }}>{m.email}</p>
+                <p className="text-xs truncate" style={{ color: '#4b5563' }}>{m.message?.slice(0, 60)}...</p>
               </div>
-              <span className="text-[10px] shrink-0" style={{ color: '#4b5563' }}>{new Date(m.created_at).toLocaleDateString()}</span>
+              <span className="text-[10px] shrink-0" style={{ color: '#374151' }}>{new Date(m.created_at).toLocaleDateString()}</span>
             </div>
           ))}
-          {inbox.length === 0 && <p className="text-sm" style={{ color: '#4b5563' }}>No messages yet.</p>}
+          {inbox.length === 0 && <p className="text-sm py-4 text-center" style={{ color: '#4b5563' }}>No messages yet.</p>}
         </div>
-        <div className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-          <h3 className="font-bold text-sm mb-4 text-white flex items-center gap-2"><Server className="h-4 w-4" style={{ color: '#ED8214' }} />Quick Links</h3>
+        <div className="p-5 rounded-2xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+          <h3 className="font-bold text-sm text-white flex items-center gap-2 mb-4"><ExternalLink className="h-4 w-4" style={{ color: '#ED8214' }} />Preview Pages</h3>
           <div className="space-y-2">
             {[
-              { label: 'Homepage', url: '/' }, { label: 'About Page', url: '/about' },
-              { label: 'Services Page', url: '/services' }, { label: 'Portfolio Page', url: '/portfolio' },
-              { label: 'Contact Page', url: '/contact' },
+              { label: '🏠 Homepage', url: '/' },
+              { label: '👥 About Page', url: '/about' },
+              { label: '⚙️ Services Page', url: '/services' },
+              { label: '🖼️ Portfolio Page', url: '/portfolio' },
+              { label: '📞 Contact Page', url: '/contact' },
             ].map(l => (
               <Link key={l.url} to={l.url} target="_blank"
-                className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg transition-all hover:text-[#ED8214]"
+                className="flex items-center justify-between text-sm px-3 py-2.5 rounded-xl transition-all hover:text-[#ED8214] group"
                 style={{ color: '#9ca3af', background: '#0f172a' }}>
-                <ExternalLink className="h-3.5 w-3.5" />{l.label}
+                <span>{l.label}</span>
+                <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
               </Link>
             ))}
           </div>
@@ -708,219 +752,487 @@ export default function AdminDashboard() {
     </div>
   );
 
+  // ── HOME PAGE ──
+  const renderPageHome = () => (
+    <div>
+      <PageHeader
+        title="Home Page"
+        subtitle="Edit every section of the homepage — texts, images, buttons, all in English & Arabic"
+        icon={Home} color="#ED8214"
+        page="home" liveUrl="/"
+      />
+
+      {/* Hero Section */}
+      <PageSection
+        pageName="home" sectionName="hero" sectionLabel="🚀 Hero Section — Top Banner"
+        icon={Megaphone} color="#ED8214" defaultOpen={true}
+        badge="Background Image + Text"
+        fields={[
+          { field: 'badge', label: 'Badge Text (top label)', hint: 'Short label shown above the main headline' },
+          { field: 'line1', label: 'Headline — Line 1', hint: 'First line of the big hero headline' },
+          { field: 'line2', label: 'Headline — Line 2', hint: 'Second line of the big hero headline' },
+          { field: 'subtitle', label: 'Subtitle / Tagline', hint: 'Short description below the headline' },
+          { field: 'cta_primary', label: 'Primary Button Text', hint: 'Main CTA button (e.g. "Get a Quote")' },
+          { field: 'cta_secondary', label: 'Secondary Button Text', hint: 'Second button (e.g. "View Our Work")' },
+        ]}
+        imageKeys={[{ key: 'background', label: 'Hero Background Photo', size: 'lg' }]}
+      />
+
+      {/* About Section */}
+      <PageSection
+        pageName="home" sectionName="about" sectionLabel="👥 About Section"
+        icon={Info} color="#3b82f6"
+        fields={[
+          { field: 'label', label: 'Section Label (small text above heading)' },
+          { field: 'heading1', label: 'Heading — Line 1' },
+          { field: 'heading2', label: 'Heading — Line 2' },
+          { field: 'heading3', label: 'Heading — Line 3' },
+          { field: 'paragraph1', label: 'Paragraph 1', multiline: true, rows: 3 },
+          { field: 'paragraph2', label: 'Paragraph 2', multiline: true, rows: 3 },
+          { field: 'point1', label: '✓ Feature Point 1' },
+          { field: 'point2', label: '✓ Feature Point 2' },
+          { field: 'point3', label: '✓ Feature Point 3' },
+          { field: 'point4', label: '✓ Feature Point 4' },
+          { field: 'cta', label: 'CTA Button Text' },
+        ]}
+        imageKeys={[{ key: 'main_image', label: 'About Section Photo', size: 'md' }]}
+      />
+
+      {/* Services Section Header */}
+      <PageSection
+        pageName="home" sectionName="services" sectionLabel="⚙️ Services Section — Header Text"
+        icon={Wrench} color="#8b5cf6"
+        fields={[
+          { field: 'label', label: 'Section Label' },
+          { field: 'heading', label: 'Section Heading' },
+          { field: 'subtitle', label: 'Section Subtitle' },
+        ]}
+      />
+
+      {/* Info tip for service cards */}
+      <div className="mb-4 px-4 py-3.5 rounded-xl flex items-center gap-3" style={{ background: '#0f172a', border: '1px dashed #374151' }}>
+        <Wrench className="h-4 w-4 shrink-0" style={{ color: '#8b5cf6' }} />
+        <div>
+          <p className="text-sm font-semibold text-white">Service Cards (individual services with photos)</p>
+          <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>
+            Edit individual service titles, descriptions and photos in{' '}
+            <button onClick={() => setSection('services')} className="underline" style={{ color: '#ED8214' }}>Services Cards →</button>
+          </p>
+        </div>
+      </div>
+
+      {/* Portfolio Section Header */}
+      <PageSection
+        pageName="home" sectionName="portfolio" sectionLabel="🖼️ Portfolio Section — Header Text"
+        icon={Layers} color="#10b981"
+        fields={[
+          { field: 'label', label: 'Section Label' },
+          { field: 'heading', label: 'Section Heading' },
+          { field: 'subtitle', label: 'Section Subtitle' },
+          { field: 'cta', label: '"View All" Button Text' },
+        ]}
+      />
+
+      {/* Why Us */}
+      <PageSection
+        pageName="home" sectionName="why" sectionLabel="✅ Why Choose Us Section"
+        icon={Award} color="#f59e0b"
+        fields={[
+          { field: 'label', label: 'Section Label' },
+          { field: 'heading1', label: 'Heading Line 1' },
+          { field: 'heading2', label: 'Heading Line 2' },
+          { field: 'subtitle', label: 'Subtitle' },
+          { field: 'item1_title', label: 'Point 1 — Title' },
+          { field: 'item1_desc', label: 'Point 1 — Description', multiline: true, rows: 2 },
+          { field: 'item2_title', label: 'Point 2 — Title' },
+          { field: 'item2_desc', label: 'Point 2 — Description', multiline: true, rows: 2 },
+          { field: 'item3_title', label: 'Point 3 — Title' },
+          { field: 'item3_desc', label: 'Point 3 — Description', multiline: true, rows: 2 },
+          { field: 'item4_title', label: 'Point 4 — Title' },
+          { field: 'item4_desc', label: 'Point 4 — Description', multiline: true, rows: 2 },
+          { field: 'item5_title', label: 'Point 5 — Title' },
+          { field: 'item5_desc', label: 'Point 5 — Description', multiline: true, rows: 2 },
+          { field: 'item6_title', label: 'Point 6 — Title' },
+          { field: 'item6_desc', label: 'Point 6 — Description', multiline: true, rows: 2 },
+        ]}
+      />
+
+      {/* Process */}
+      <PageSection
+        pageName="home" sectionName="process" sectionLabel="📋 Our Process Section"
+        icon={FileText} color="#06b6d4"
+        fields={[
+          { field: 'label', label: 'Section Label' },
+          { field: 'heading', label: 'Heading' },
+          { field: 'subtitle', label: 'Subtitle' },
+          { field: 'step1_title', label: 'Step 1 — Title' },
+          { field: 'step1_desc', label: 'Step 1 — Description', multiline: true, rows: 2 },
+          { field: 'step2_title', label: 'Step 2 — Title' },
+          { field: 'step2_desc', label: 'Step 2 — Description', multiline: true, rows: 2 },
+          { field: 'step3_title', label: 'Step 3 — Title' },
+          { field: 'step3_desc', label: 'Step 3 — Description', multiline: true, rows: 2 },
+          { field: 'step4_title', label: 'Step 4 — Title' },
+          { field: 'step4_desc', label: 'Step 4 — Description', multiline: true, rows: 2 },
+          { field: 'step5_title', label: 'Step 5 — Title' },
+          { field: 'step5_desc', label: 'Step 5 — Description', multiline: true, rows: 2 },
+        ]}
+      />
+
+      {/* CTA Band */}
+      <PageSection
+        pageName="home" sectionName="cta" sectionLabel="🎯 CTA Band — Call to Action"
+        icon={MousePointerClick} color="#f43f5e"
+        fields={[
+          { field: 'heading', label: 'Heading Line 1' },
+          { field: 'heading2', label: 'Heading Line 2' },
+          { field: 'subtitle', label: 'Subtitle' },
+          { field: 'cta_primary', label: 'Primary Button Text' },
+          { field: 'cta_secondary', label: 'Secondary Button Text' },
+        ]}
+      />
+
+      {/* Contact Section */}
+      <PageSection
+        pageName="home" sectionName="contact" sectionLabel="📬 Contact Section — Form & Labels"
+        icon={Mail} color="#a78bfa"
+        fields={[
+          { field: 'label', label: 'Section Label' },
+          { field: 'heading', label: 'Heading Line 1' },
+          { field: 'heading2', label: 'Heading Line 2' },
+          { field: 'subtitle', label: 'Subtitle' },
+          { field: 'form_name', label: 'Form — Name Field Label' },
+          { field: 'form_email', label: 'Form — Email Field Label' },
+          { field: 'form_phone', label: 'Form — Phone Field Label' },
+          { field: 'form_company', label: 'Form — Company Field Label' },
+          { field: 'form_service', label: 'Form — Service Field Label' },
+          { field: 'form_message', label: 'Form — Message Field Label' },
+          { field: 'form_submit', label: 'Form — Submit Button Text' },
+        ]}
+      />
+
+      {/* Footer */}
+      <PageSection
+        pageName="home" sectionName="footer" sectionLabel="🔽 Footer Text"
+        icon={AlignLeft} color="#6b7280"
+        fields={[
+          { field: 'tagline', label: 'Footer Tagline', multiline: true, rows: 2 },
+          { field: 'copyright', label: 'Copyright Text', hint: 'e.g. © 2026 MOPI Production. All rights reserved.' },
+        ]}
+      />
+    </div>
+  );
+
+  // ── ABOUT PAGE ──
+  const renderPageAbout = () => (
+    <div>
+      <PageHeader title="About Page" subtitle="Edit all content on the About page" icon={Info} color="#3b82f6" page="about" liveUrl="/about" />
+
+      <PageSection pageName="about" sectionName="hero" sectionLabel="🚀 Hero Banner" icon={Megaphone} color="#ED8214" defaultOpen={true}
+        fields={[
+          { field: 'badge', label: 'Badge Text' },
+          { field: 'heading', label: 'Main Heading' },
+          { field: 'subtitle', label: 'Subtitle' },
+        ]}
+        imageKeys={[{ key: 'background', label: 'Hero Background Photo', size: 'lg' }]}
+      />
+
+      <PageSection pageName="about" sectionName="story" sectionLabel="📖 Our Story Section" icon={BookOpen} color="#3b82f6"
+        fields={[
+          { field: 'heading', label: 'Section Heading' },
+          { field: 'content', label: 'Story Text', multiline: true, rows: 6 },
+        ]}
+        imageKeys={[{ key: 'image', label: 'Story Photo', size: 'md' }]}
+      />
+
+      <PageSection pageName="about" sectionName="mission" sectionLabel="🎯 Mission & Vision Section" icon={Zap} color="#f59e0b"
+        fields={[
+          { field: 'heading', label: 'Section Heading' },
+          { field: 'content', label: 'Mission Text', multiline: true, rows: 4 },
+        ]}
+      />
+
+      <PageSection pageName="about" sectionName="values" sectionLabel="⭐ Core Values Section" icon={Star} color="#10b981"
+        fields={[
+          { field: 'heading', label: 'Section Heading' },
+        ]}
+      />
+
+      <div className="mb-4 px-4 py-3.5 rounded-xl flex items-center gap-3" style={{ background: '#0f172a', border: '1px dashed #374151' }}>
+        <Users className="h-4 w-4 shrink-0" style={{ color: '#10b981' }} />
+        <div>
+          <p className="text-sm font-semibold text-white">Team Members (photos, names, bios)</p>
+          <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>
+            Edit team profiles in{' '}
+            <button onClick={() => setSection('team')} className="underline" style={{ color: '#ED8214' }}>Team Members →</button>
+          </p>
+        </div>
+      </div>
+
+      <div className="mb-4 px-4 py-3.5 rounded-xl flex items-center gap-3" style={{ background: '#0f172a', border: '1px dashed #374151' }}>
+        <Star className="h-4 w-4 shrink-0" style={{ color: '#f59e0b' }} />
+        <div>
+          <p className="text-sm font-semibold text-white">Client Testimonials</p>
+          <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>
+            Edit testimonials in{' '}
+            <button onClick={() => setSection('testimonials')} className="underline" style={{ color: '#ED8214' }}>Testimonials →</button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── SERVICES PAGE ──
+  const renderPageServices = () => (
+    <div>
+      <PageHeader title="Services Page" subtitle="Edit all content on the Services page" icon={Briefcase} color="#8b5cf6" page="services" liveUrl="/services" />
+
+      <PageSection pageName="services" sectionName="hero" sectionLabel="🚀 Hero Banner" icon={Megaphone} color="#ED8214" defaultOpen={true}
+        fields={[
+          { field: 'badge', label: 'Badge Text' },
+          { field: 'heading', label: 'Main Heading' },
+          { field: 'subtitle', label: 'Subtitle' },
+        ]}
+        imageKeys={[{ key: 'background', label: 'Hero Background Photo', size: 'lg' }]}
+      />
+
+      <PageSection pageName="services" sectionName="cta" sectionLabel="🎯 CTA Section" icon={MousePointerClick} color="#f43f5e"
+        fields={[
+          { field: 'heading', label: 'CTA Heading' },
+          { field: 'subtitle', label: 'CTA Subtitle' },
+          { field: 'cta_primary', label: 'CTA Button Text' },
+        ]}
+      />
+
+      <div className="mb-4 px-4 py-3.5 rounded-xl flex items-center gap-3" style={{ background: '#0f172a', border: '1px dashed #374151' }}>
+        <Wrench className="h-4 w-4 shrink-0" style={{ color: '#8b5cf6' }} />
+        <div>
+          <p className="text-sm font-semibold text-white">Individual Service Cards</p>
+          <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>
+            Edit titles, descriptions and photos per service in{' '}
+            <button onClick={() => setSection('services')} className="underline" style={{ color: '#ED8214' }}>Services Cards →</button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── PORTFOLIO PAGE ──
+  const renderPagePortfolio = () => (
+    <div>
+      <PageHeader title="Portfolio Page" subtitle="Edit all content on the Portfolio page" icon={Layers} color="#10b981" page="portfolio" liveUrl="/portfolio" />
+
+      <PageSection pageName="portfolio" sectionName="hero" sectionLabel="🚀 Hero Banner" icon={Megaphone} color="#ED8214" defaultOpen={true}
+        fields={[
+          { field: 'badge', label: 'Badge Text' },
+          { field: 'heading', label: 'Main Heading' },
+          { field: 'subtitle', label: 'Subtitle' },
+        ]}
+        imageKeys={[{ key: 'background', label: 'Hero Background Photo', size: 'lg' }]}
+      />
+
+      <div className="mb-4 px-4 py-3.5 rounded-xl flex items-center gap-3" style={{ background: '#0f172a', border: '1px dashed #374151' }}>
+        <Palette className="h-4 w-4 shrink-0" style={{ color: '#10b981' }} />
+        <div>
+          <p className="text-sm font-semibold text-white">Portfolio Projects (photos, titles, descriptions)</p>
+          <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>
+            Add/edit individual projects in{' '}
+            <button onClick={() => setSection('portfolio')} className="underline" style={{ color: '#ED8214' }}>Portfolio Projects →</button>
+          </p>
+        </div>
+      </div>
+
+      <div className="mb-4 px-4 py-3.5 rounded-xl flex items-center gap-3" style={{ background: '#0f172a', border: '1px dashed #374151' }}>
+        <BarChart2 className="h-4 w-4 shrink-0" style={{ color: '#3b82f6' }} />
+        <div>
+          <p className="text-sm font-semibold text-white">Stats & Numbers (500+ Projects, etc.)</p>
+          <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>
+            Edit numbers in{' '}
+            <button onClick={() => setSection('stats')} className="underline" style={{ color: '#ED8214' }}>Stats & Numbers →</button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── CONTACT PAGE ──
+  const renderPageContact = () => (
+    <div>
+      <PageHeader title="Contact Page" subtitle="Edit all content on the Contact page" icon={MessageCircle} color="#f43f5e" page="contact" liveUrl="/contact" />
+
+      <PageSection pageName="contact" sectionName="hero" sectionLabel="🚀 Hero Banner" icon={Megaphone} color="#ED8214" defaultOpen={true}
+        fields={[
+          { field: 'badge', label: 'Badge Text' },
+          { field: 'heading', label: 'Main Heading' },
+          { field: 'subtitle', label: 'Subtitle' },
+        ]}
+        imageKeys={[{ key: 'background', label: 'Hero Background Photo', size: 'lg' }]}
+      />
+
+      <PageSection pageName="contact" sectionName="info" sectionLabel="📋 Contact Info Labels" icon={FileText} color="#06b6d4"
+        fields={[
+          { field: 'address_label', label: 'Address Label', hint: 'e.g. "Our Location" / "موقعنا"' },
+          { field: 'phone_label', label: 'Phone Label' },
+          { field: 'email_label', label: 'Email Label' },
+          { field: 'whatsapp_label', label: 'WhatsApp Label' },
+        ]}
+      />
+
+      <div className="mb-4 px-4 py-3.5 rounded-xl flex items-center gap-3" style={{ background: '#0f172a', border: '1px dashed #374151' }}>
+        <Phone className="h-4 w-4 shrink-0" style={{ color: '#10b981' }} />
+        <div>
+          <p className="text-sm font-semibold text-white">Contact Details (Phone, Email, Address, WhatsApp)</p>
+          <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>
+            Edit actual contact information in{' '}
+            <button onClick={() => setSection('site-settings')} className="underline" style={{ color: '#ED8214' }}>Site Settings →</button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── SITE SETTINGS ──
   const renderSiteSettings = () => {
     const groups = [...new Set(settings.map(s => s.group_name))];
+    const groupIcons: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
+      'contact': Phone, 'company': Briefcase, 'seo': Globe, 'social': Globe,
+    };
+    const groupColors: Record<string, string> = {
+      'contact': '#10b981', 'company': '#3b82f6', 'seo': '#8b5cf6', 'social': '#ED8214',
+    };
     return (
       <div>
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Site Settings</h2>
-            <p className="text-sm mt-1" style={{ color: '#6b7280' }}>Contact info, company name, WhatsApp number, email addresses</p>
-          </div>
-          <button onClick={fetchAll} className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg transition-all hover:text-[#ED8214]" style={{ color: '#6b7280', background: '#111827', border: '1px solid #1f2937' }}>
-            <RefreshCw className="h-3.5 w-3.5" />Refresh
-          </button>
-        </div>
-        {groups.map(g => (
-          <div key={g} className="mb-7 p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-            <h3 className="text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2" style={{ color: '#ED8214' }}>
-              <span className="w-4 h-px block" style={{ background: '#ED8214' }} />{g}
-            </h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              {settings.filter(s => s.group_name === g).map(s => (
-                <div key={s.id}>
-                  <Field label={s.label}>
-                    <div className="flex gap-2">
-                      <Input value={s.value || ''} onChange={e => setSettings(prev => prev.map(x => x.id === s.id ? { ...x, value: e.target.value } : x))} />
-                      <button onClick={() => saveSetting(s)} className="px-3 py-2 rounded-lg text-white text-xs font-bold shrink-0 transition-all hover:scale-105" style={{ background: '#ED8214' }}>
-                        <Save className="h-4 w-4" />
+        <PageHeader title="Site Settings" subtitle="Edit company info, contact details, and global settings" icon={Settings} color="#ED8214" />
+        {groups.map(group => {
+          const groupItems = settings.filter(s => s.group_name === group);
+          const GIcon = groupIcons[group] || Settings;
+          return (
+            <SectionCard key={group} title={group.charAt(0).toUpperCase() + group.slice(1)} icon={GIcon} color={groupColors[group] || '#ED8214'} defaultOpen={true}>
+              <div className="space-y-4">
+                {groupItems.map(item => (
+                  <div key={item.id}>
+                    <Field label={item.label || item.key}>
+                      <Input value={item.value} onChange={e => setSettings(prev => prev.map(s => s.id === item.id ? { ...s, value: e.target.value } : s))} />
+                    </Field>
+                    <div className="flex justify-end mt-2">
+                      <button onClick={() => saveSetting(item)}
+                        className="text-xs font-bold px-3 py-1.5 rounded-lg text-black flex items-center gap-1.5 hover:scale-105 transition-all"
+                        style={{ background: '#ED8214' }}>
+                        <Save className="h-3 w-3" />Save
                       </button>
                     </div>
-                  </Field>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+                  </div>
+                ))}
+              </div>
+            </SectionCard>
+          );
+        })}
       </div>
     );
   };
 
-  const renderSocialLinks = () => (
-    <div>
-      <h2 className="text-2xl font-black text-white mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>Social Media Links</h2>
-      <p className="text-sm mb-6" style={{ color: '#6b7280' }}>Manage your social media profile links.</p>
-      <div className="grid md:grid-cols-2 gap-4">
-        {socials.map(s => (
-          <div key={s.id} className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(237,130,20,0.1)', border: '1px solid rgba(237,130,20,0.2)' }}>
-                  {s.platform === 'Instagram' && <Instagram className="h-4 w-4" style={{ color: '#ED8214' }} />}
-                  {s.platform === 'Facebook' && <Facebook className="h-4 w-4" style={{ color: '#ED8214' }} />}
-                  {s.platform === 'LinkedIn' && <Linkedin className="h-4 w-4" style={{ color: '#ED8214' }} />}
-                  {s.platform === 'YouTube' && <Youtube className="h-4 w-4" style={{ color: '#ED8214' }} />}
-                  {!['Instagram', 'Facebook', 'LinkedIn', 'YouTube'].includes(s.platform) && <Link2 className="h-4 w-4" style={{ color: '#ED8214' }} />}
-                </div>
-                <span className="font-bold text-sm text-white">{s.platform}</span>
-              </div>
-              <Toggle checked={s.is_active} onChange={v => setSocials(prev => prev.map(x => x.id === s.id ? { ...x, is_active: v } : x))} />
-            </div>
-            <Field label="Profile / Page URL">
-              <div className="flex gap-2">
-                <Input value={s.url} onChange={e => setSocials(prev => prev.map(x => x.id === s.id ? { ...x, url: e.target.value } : x))} />
-                <button onClick={() => saveSocial(s)} className="px-3 rounded-lg text-white shrink-0 transition-all hover:scale-105" style={{ background: '#ED8214' }}>
-                  <Save className="h-4 w-4" />
-                </button>
-              </div>
-            </Field>
-          </div>
-        ))}
-      </div>
-      <div className="mt-4 p-5 rounded-xl" style={{ background: '#111827', border: '1px dashed #374151' }}>
-        <h3 className="font-bold text-sm text-white mb-4 flex items-center gap-2"><Plus className="h-4 w-4" style={{ color: '#ED8214' }} />Add New Social Link</h3>
-        <NewSocialForm onSave={async (item) => { await saveSocial({ ...item, id: 0 }); }} />
-      </div>
-    </div>
-  );
-
+  // ── LOGOS ──
   const renderLogos = () => (
     <div>
-      <h2 className="text-2xl font-black text-white mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>Logo Management</h2>
-      <p className="text-sm mb-6" style={{ color: '#6b7280' }}>Upload logos for the header, footer, and favicon (browser tab icon).</p>
-      <div className="grid md:grid-cols-2 gap-5">
+      <PageHeader title="Logos & Favicon" subtitle="Upload your logo files and favicon for the website" icon={ImageIcon} color="#ED8214" />
+      <div className="space-y-4">
         {logos.map(logo => (
-          <div key={logo.id} className="p-6 rounded-xl" style={{ background: '#111827', border: logo.placement === 'favicon' ? '1px solid rgba(237,130,20,0.4)' : '1px solid #1f2937' }}>
-            <div className="flex items-center justify-between mb-4">
+          <SectionCard key={logo.id} title={logo.name || logo.placement} icon={ImageIcon} color="#ED8214" defaultOpen={true}>
+            <div className="grid md:grid-cols-2 gap-5 items-start">
               <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-bold text-white">{logo.name}</h3>
-                  {logo.placement === 'favicon' && (
-                    <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: 'rgba(237,130,20,0.15)', color: '#ED8214', border: '1px solid rgba(237,130,20,0.3)' }}>Browser Tab</span>
-                  )}
+                <Field label="Logo File — Upload Photo">
+                  <ImageUploader
+                    currentUrl={logo.url}
+                    onUploaded={url => setLogos(prev => prev.map(x => x.id === logo.id ? { ...x, url } : x))}
+                    label="Click to upload logo file"
+                    folder="logos"
+                    size="md"
+                  />
+                </Field>
+              </div>
+              <div className="space-y-3">
+                <Field label="Alt Text" hint="Description of the logo for accessibility">
+                  <Input value={logo.alt_text} onChange={e => setLogos(prev => prev.map(x => x.id === logo.id ? { ...x, alt_text: e.target.value } : x))} />
+                </Field>
+                <Field label="Placement">
+                  <Input value={logo.placement} disabled style={{ color: '#4b5563' }} />
+                </Field>
+                <div className="flex items-center justify-between">
+                  <Toggle checked={logo.is_active} onChange={v => setLogos(prev => prev.map(x => x.id === logo.id ? { ...x, is_active: v } : x))} label="Active" />
                 </div>
-                <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(237,130,20,0.1)', color: '#ED8214' }}>{logo.placement}</span>
               </div>
-              <Toggle checked={logo.is_active} onChange={v => setLogos(prev => prev.map(x => x.id === logo.id ? { ...x, is_active: v } : x))} />
             </div>
-            {logo.placement === 'favicon' ? (
-              <div className="mb-4 space-y-2">
-                <div className="p-3 rounded-lg flex items-center justify-center" style={{ background: '#000', border: '1px solid #374151', minHeight: 70 }}>
-                  {logo.url ? <img src={logo.url} alt={logo.alt_text} className="object-contain" style={{ width: 32, height: 32 }} /> : <span className="text-xs" style={{ color: '#4b5563' }}>No favicon set</span>}
-                </div>
-              </div>
-            ) : (
-              <div className="mb-4 p-4 rounded-lg flex items-center justify-center" style={{ background: '#000', border: '1px solid #374151', minHeight: 90 }}>
-                {logo.url ? <img src={logo.url} alt={logo.alt_text} className="max-h-16 max-w-full object-contain" /> : <span className="text-xs" style={{ color: '#4b5563' }}>No logo set</span>}
-              </div>
-            )}
-            <div className="space-y-3">
-              <Field label={logo.placement === 'favicon' ? 'Upload Favicon (32×32 PNG/ICO recommended)' : 'Upload New Logo'}>
-                <ImageUploader currentUrl="" onUploaded={url => setLogos(prev => prev.map(x => x.id === logo.id ? { ...x, url } : x))} label="Click to upload logo file" folder="logos" />
-              </Field>
-              <Field label="Alt Text">
-                <Input value={logo.alt_text} onChange={e => setLogos(prev => prev.map(x => x.id === logo.id ? { ...x, alt_text: e.target.value } : x))} />
-              </Field>
-              <button onClick={() => saveLogo(logo)} className="w-full py-2.5 rounded-lg text-white font-bold text-sm transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
-                style={{ background: '#ED8214' }}>
-                <Save className="h-4 w-4" />{logo.placement === 'favicon' ? 'Save Favicon' : 'Save Logo'}
-              </button>
+            <div className="flex justify-end mt-4">
+              <SaveBtn onClick={() => saveLogo(logo)} saving={saving} />
             </div>
-          </div>
+          </SectionCard>
         ))}
       </div>
     </div>
   );
 
-  const renderHeroSections = () => (
+  // ── SOCIAL LINKS ──
+  const renderSocialLinks = () => (
     <div>
-      <h2 className="text-2xl font-black text-white mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>Hero Sections</h2>
-      <p className="text-sm mb-6" style={{ color: '#6b7280' }}>Control the hero banner on each page — text, CTA buttons, and background image.</p>
-      <div className="space-y-5">
-        {heroes.map(hero => (
-          <HeroEditor key={hero.id} hero={hero} onSave={saveHero} saving={saving} />
+      <PageHeader title="Social Media Links" subtitle="Manage all social media profiles and links" icon={Globe} color="#ED8214" />
+      <div className="space-y-4">
+        {socials.map(social => (
+          <SectionCard key={social.id} title={social.platform} icon={Globe} color="#ED8214" defaultOpen={false}>
+            <div className="space-y-4">
+              <Field label="Profile URL">
+                <Input value={social.url} onChange={e => setSocials(prev => prev.map(s => s.id === social.id ? { ...s, url: e.target.value } : s))} placeholder="https://..." />
+              </Field>
+              <div className="flex items-center justify-between">
+                <Toggle checked={social.is_active} onChange={v => setSocials(prev => prev.map(s => s.id === social.id ? { ...s, is_active: v } : s))} label={social.is_active ? 'Visible on website' : 'Hidden'} />
+                <SaveBtn onClick={() => saveSocial(social)} saving={saving} />
+              </div>
+            </div>
+          </SectionCard>
         ))}
       </div>
+
+      {/* Add new */}
+      <SectionCard title="Add New Social Link" icon={Plus} color="#10b981" defaultOpen={false}>
+        <AddSocialForm onSave={item => saveSocial({ ...item, id: 0 })} />
+      </SectionCard>
     </div>
   );
 
+  // ── STATS ──
   const renderStats = () => (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Stats & Numbers</h2>
-          <p className="text-sm mt-1" style={{ color: '#6b7280' }}>Numbers shown in the achievements section (e.g. 500+ Projects)</p>
-        </div>
+      <PageHeader title="Stats & Numbers" subtitle="The achievement numbers shown on the website (e.g. 500+ Projects)" icon={BarChart2} color="#ED8214" />
+      <div className="flex justify-end mb-4">
         <button onClick={() => setStats(prev => [...prev, { id: 0, label: 'New Stat', value: 0, suffix: '+', sort_order: prev.length, is_active: true }])}
-          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white transition-all hover:scale-105"
+          className="flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl text-black hover:scale-105 transition-all"
           style={{ background: '#ED8214' }}>
           <Plus className="h-4 w-4" />Add Stat
         </button>
       </div>
       <div className="grid md:grid-cols-2 gap-4">
         {stats.map((stat, i) => (
-          <div key={stat.id || `new-${i}`} className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+          <div key={stat.id || `new-${i}`} className="p-5 rounded-2xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
             <div className="flex items-center justify-between mb-4">
-              <div className="text-3xl font-black" style={{ color: '#ED8214', fontFamily: "'Poppins', sans-serif" }}>{stat.value}{stat.suffix}</div>
+              <div className="text-2xl font-black" style={{ color: '#ED8214' }}>{stat.value}{stat.suffix}</div>
               <div className="flex items-center gap-2">
                 <Toggle checked={stat.is_active} onChange={v => setStats(prev => prev.map((x, xi) => xi === i ? { ...x, is_active: v } : x))} />
-                {stat.id > 0 && <button onClick={() => deleteStat(stat.id)} className="p-1.5 rounded-lg hover:bg-red-900/30" style={{ color: '#ef4444' }}><Trash2 className="h-4 w-4" /></button>}
+                {stat.id > 0 && <button onClick={() => deleteStat(stat.id)} className="p-1.5 rounded-lg hover:bg-red-900/20 transition-colors" style={{ color: '#ef4444' }}><Trash2 className="h-4 w-4" /></button>}
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="col-span-2">
-                <Field label="Label">
-                  <Input value={stat.label} onChange={e => setStats(prev => prev.map((x, xi) => xi === i ? { ...x, label: e.target.value } : x))} placeholder="Projects Completed" />
-                </Field>
-              </div>
-              <div>
-                <Field label="Suffix">
-                  <Input value={stat.suffix} onChange={e => setStats(prev => prev.map((x, xi) => xi === i ? { ...x, suffix: e.target.value } : x))} placeholder="+" />
-                </Field>
-              </div>
-              <div className="col-span-2">
-                <Field label="Number">
-                  <Input type="number" value={stat.value} onChange={e => setStats(prev => prev.map((x, xi) => xi === i ? { ...x, value: parseInt(e.target.value) || 0 } : x))} />
-                </Field>
-              </div>
-              <div>
-                <Field label="Order">
-                  <Input type="number" value={stat.sort_order} onChange={e => setStats(prev => prev.map((x, xi) => xi === i ? { ...x, sort_order: parseInt(e.target.value) || 0 } : x))} />
-                </Field>
-              </div>
-            </div>
-            <button onClick={() => saveStat(stat)} className="mt-4 w-full py-2 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" style={{ background: '#ED8214' }}>
-              <Save className="h-4 w-4" />{stat.id ? 'Save Changes' : 'Create Stat'}
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const renderAbout = () => (
-    <div>
-      <h2 className="text-2xl font-black text-white mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>About Page Content</h2>
-      <p className="text-sm mb-6" style={{ color: '#6b7280' }}>Manage sections and images for the About page.</p>
-      <div className="grid md:grid-cols-2 gap-5">
-        {aboutContent.map(ab => (
-          <div key={ab.id} className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-            <h3 className="font-black text-sm uppercase tracking-widest mb-4 flex items-center gap-2" style={{ color: '#ED8214' }}>
-              <span className="w-3 h-px block" style={{ background: '#ED8214' }} />{ab.section}
-            </h3>
             <div className="space-y-3">
-              <Field label="Section Title">
-                <Input value={ab.title || ''} onChange={e => setAboutContent(prev => prev.map(x => x.id === ab.id ? { ...x, title: e.target.value } : x))} />
+              <Field label="Label">
+                <Input value={stat.label} onChange={e => setStats(prev => prev.map((x, xi) => xi === i ? { ...x, label: e.target.value } : x))} />
               </Field>
-              <Field label="Content">
-                <Textarea rows={4} value={ab.content || ''} onChange={e => setAboutContent(prev => prev.map(x => x.id === ab.id ? { ...x, content: e.target.value } : x))} />
-              </Field>
-              <Field label="Section Photo (Upload)">
-                <ImageUploader currentUrl={ab.image_url || ''} onUploaded={url => setAboutContent(prev => prev.map(x => x.id === ab.id ? { ...x, image_url: url } : x))} folder="about" label="Click to upload section photo" />
-              </Field>
-              <button onClick={() => saveAbout(ab)} className="w-full py-2.5 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" style={{ background: '#ED8214' }}>
-                <Save className="h-4 w-4" />Save Section
-              </button>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Number">
+                  <Input type="number" value={stat.value} onChange={e => setStats(prev => prev.map((x, xi) => xi === i ? { ...x, value: +e.target.value } : x))} />
+                </Field>
+                <Field label="Suffix (e.g. +, %)">
+                  <Input value={stat.suffix} onChange={e => setStats(prev => prev.map((x, xi) => xi === i ? { ...x, suffix: e.target.value } : x))} />
+                </Field>
+              </div>
+              <div className="flex justify-end">
+                <SaveBtn onClick={() => saveStat(stat)} saving={saving} />
+              </div>
             </div>
           </div>
         ))}
@@ -928,452 +1240,348 @@ export default function AdminDashboard() {
     </div>
   );
 
+  // ── SERVICES CARDS ──
   const renderServices = () => (
     <div>
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Services</h2>
-        <button onClick={() => setServices(prev => [...prev, { id: 0, title: 'New Service', subtitle: '', description: '', icon: 'Layers', image_url: '', sort_order: prev.length + 1, is_active: true, is_featured: false }])}
-          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#ED8214' }}>
+      <PageHeader title="Service Cards" subtitle="Edit each service — title, description, and photo. All shown on the Services page." icon={Wrench} color="#8b5cf6" />
+      <div className="flex justify-end mb-4">
+        <button onClick={() => setServices(prev => [...prev, { id: 0, title: 'New Service', subtitle: '', description: '', icon: 'Zap', image_url: '', sort_order: prev.length, is_active: true, is_featured: false }])}
+          className="flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl text-black hover:scale-105 transition-all"
+          style={{ background: '#ED8214' }}>
           <Plus className="h-4 w-4" />Add Service
         </button>
       </div>
-      <p className="text-sm mb-6" style={{ color: '#6b7280' }}>Each service has a title, description, and photo. Upload a photo for each service.</p>
       <div className="space-y-4">
         {services.map((svc, i) => (
-          <ServiceEditor key={svc.id || `new-${i}`} service={svc} index={i}
-            onChange={updated => setServices(prev => prev.map((x, xi) => xi === i ? updated : x))}
-            onSave={() => saveService(svc)}
-            onDelete={() => svc.id ? deleteService(svc.id) : setServices(prev => prev.filter((_, xi) => xi !== i))} />
+          <SectionCard key={svc.id || `new-${i}`} title={svc.title} icon={Wrench} color="#8b5cf6" defaultOpen={!svc.id} badge={svc.is_featured ? 'Featured' : undefined}>
+            <div className="space-y-4">
+              <div>
+                <Field label="Service Photo">
+                  <ImageUploader currentUrl={svc.image_url || ''} onUploaded={url => setServices(prev => prev.map((x, xi) => xi === i ? { ...x, image_url: url } : x))} folder="services" label="Click to upload service photo" size="md" />
+                </Field>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <Field label="Title">
+                  <Input value={svc.title} onChange={e => setServices(prev => prev.map((x, xi) => xi === i ? { ...x, title: e.target.value } : x))} />
+                </Field>
+                <Field label="Subtitle / Short Desc">
+                  <Input value={svc.subtitle} onChange={e => setServices(prev => prev.map((x, xi) => xi === i ? { ...x, subtitle: e.target.value } : x))} />
+                </Field>
+              </div>
+              <Field label="Full Description">
+                <Textarea value={svc.description} onChange={e => setServices(prev => prev.map((x, xi) => xi === i ? { ...x, description: e.target.value } : x))} rows={3} />
+              </Field>
+              <div className="flex items-center gap-6">
+                <Toggle checked={svc.is_active} onChange={v => setServices(prev => prev.map((x, xi) => xi === i ? { ...x, is_active: v } : x))} label="Visible" />
+                <Toggle checked={svc.is_featured} onChange={v => setServices(prev => prev.map((x, xi) => xi === i ? { ...x, is_featured: v } : x))} label="Featured" />
+              </div>
+              <div className="flex items-center justify-between pt-2">
+                {svc.id > 0 && <button onClick={() => deleteService(svc.id)} className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-red-900/20 transition-colors" style={{ color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}><Trash2 className="h-3.5 w-3.5" />Delete Service</button>}
+                <SaveBtn onClick={() => saveService(svc)} saving={saving} />
+              </div>
+            </div>
+          </SectionCard>
         ))}
       </div>
     </div>
   );
 
+  // ── PORTFOLIO ──
   const renderPortfolio = () => (
     <div>
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Portfolio Projects</h2>
-        <button onClick={() => setPortfolio(prev => [...prev, { id: 0, title: 'New Project', category: 'Exhibition', client: '', location: 'Cairo, Egypt', project_date: '2026', visitors: '', description: '', image_url: '', award: '', is_featured: false, is_active: true, sort_order: prev.length + 1 }])}
-          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#ED8214' }}>
+      <PageHeader title="Portfolio Projects" subtitle="Edit all projects — photo, title, category, description, client info" icon={Palette} color="#10b981" />
+      <div className="flex justify-end mb-4">
+        <button onClick={() => setPortfolio(prev => [...prev, { id: 0, title: 'New Project', category: 'exhibition', client: '', location: '', project_date: '', visitors: '', description: '', image_url: '', award: '', is_featured: false, is_active: true, sort_order: prev.length }])}
+          className="flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl text-black hover:scale-105 transition-all"
+          style={{ background: '#ED8214' }}>
           <Plus className="h-4 w-4" />Add Project
         </button>
       </div>
-      <p className="text-sm mb-6" style={{ color: '#6b7280' }}>Upload a project photo for each portfolio item. This photo appears in the portfolio grid and spotlight.</p>
       <div className="space-y-4">
         {portfolio.map((proj, i) => (
-          <PortfolioEditor key={proj.id || `new-${i}`} project={proj} index={i}
-            onChange={updated => setPortfolio(prev => prev.map((x, xi) => xi === i ? updated : x))}
-            onSave={() => savePortfolio(proj)}
-            onDelete={() => proj.id ? deletePortfolio(proj.id) : setPortfolio(prev => prev.filter((_, xi) => xi !== i))} />
+          <SectionCard key={proj.id || `new-${i}`} title={proj.title} icon={Palette} color="#10b981" defaultOpen={!proj.id} badge={proj.is_featured ? 'Featured' : undefined}>
+            <div className="space-y-4">
+              <Field label="Project Photo" hint="Main image shown in the portfolio grid">
+                <ImageUploader currentUrl={proj.image_url || ''} onUploaded={url => setPortfolio(prev => prev.map((x, xi) => xi === i ? { ...x, image_url: url } : x))} folder="portfolio" label="Click to upload project photo" size="lg" />
+              </Field>
+              <div className="grid md:grid-cols-2 gap-4">
+                <Field label="Project Title">
+                  <Input value={proj.title} onChange={e => setPortfolio(prev => prev.map((x, xi) => xi === i ? { ...x, title: e.target.value } : x))} />
+                </Field>
+                <Field label="Category">
+                  <select value={proj.category}
+                    onChange={e => setPortfolio(prev => prev.map((x, xi) => xi === i ? { ...x, category: e.target.value } : x))}
+                    className="w-full px-3 py-2.5 rounded-lg text-sm"
+                    style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }}>
+                    <option value="exhibition">Exhibition</option>
+                    <option value="events">Events</option>
+                    <option value="brand-activation">Brand Activation</option>
+                    <option value="corporate">Corporate</option>
+                    <option value="booth-construction">Booth Construction</option>
+                  </select>
+                </Field>
+                <Field label="Client Name">
+                  <Input value={proj.client} onChange={e => setPortfolio(prev => prev.map((x, xi) => xi === i ? { ...x, client: e.target.value } : x))} />
+                </Field>
+                <Field label="Location">
+                  <Input value={proj.location} onChange={e => setPortfolio(prev => prev.map((x, xi) => xi === i ? { ...x, location: e.target.value } : x))} />
+                </Field>
+                <Field label="Project Date">
+                  <Input value={proj.project_date} onChange={e => setPortfolio(prev => prev.map((x, xi) => xi === i ? { ...x, project_date: e.target.value } : x))} placeholder="e.g. March 2025" />
+                </Field>
+                <Field label="Visitors / Attendance">
+                  <Input value={proj.visitors} onChange={e => setPortfolio(prev => prev.map((x, xi) => xi === i ? { ...x, visitors: e.target.value } : x))} placeholder="e.g. 50,000+" />
+                </Field>
+              </div>
+              <Field label="Project Description">
+                <Textarea value={proj.description} onChange={e => setPortfolio(prev => prev.map((x, xi) => xi === i ? { ...x, description: e.target.value } : x))} rows={4} />
+              </Field>
+              <Field label="Award / Achievement (optional)">
+                <Input value={proj.award} onChange={e => setPortfolio(prev => prev.map((x, xi) => xi === i ? { ...x, award: e.target.value } : x))} placeholder="e.g. Best Exhibition Stand 2025" />
+              </Field>
+              <div className="flex items-center gap-6">
+                <Toggle checked={proj.is_active} onChange={v => setPortfolio(prev => prev.map((x, xi) => xi === i ? { ...x, is_active: v } : x))} label="Visible" />
+                <Toggle checked={proj.is_featured} onChange={v => setPortfolio(prev => prev.map((x, xi) => xi === i ? { ...x, is_featured: v } : x))} label="Featured (Spotlight)" />
+              </div>
+              <div className="flex items-center justify-between pt-2">
+                {proj.id > 0 && <button onClick={() => deletePortfolio(proj.id)} className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-red-900/20 transition-colors" style={{ color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}><Trash2 className="h-3.5 w-3.5" />Delete Project</button>}
+                <SaveBtn onClick={() => savePortfolio(proj)} saving={saving} />
+              </div>
+            </div>
+          </SectionCard>
         ))}
       </div>
     </div>
   );
 
+  // ── TEAM ──
   const renderTeam = () => (
     <div>
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Team Members</h2>
-        <button onClick={() => setTeam(prev => [...prev, { id: 0, name: 'New Member', role: '', bio: '', image_url: '', email: '', linkedin_url: '', sort_order: prev.length + 1, is_active: true }])}
-          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#ED8214' }}>
+      <PageHeader title="Team Members" subtitle="Edit team member profiles, photos, and bios" icon={Users} color="#10b981" />
+      <div className="flex justify-end mb-4">
+        <button onClick={() => setTeam(prev => [...prev, { id: 0, name: 'New Member', role: '', bio: '', image_url: '', email: '', linkedin_url: '', sort_order: prev.length, is_active: true }])}
+          className="flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl text-black hover:scale-105 transition-all"
+          style={{ background: '#ED8214' }}>
           <Plus className="h-4 w-4" />Add Member
         </button>
       </div>
-      <p className="text-sm mb-6" style={{ color: '#6b7280' }}>Upload a professional photo for each team member.</p>
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="space-y-4">
         {team.map((member, i) => (
-          <div key={member.id || `new-${i}`} className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                {member.image_url ? <img src={member.image_url} className="w-10 h-10 rounded-full object-cover" alt={member.name} /> : <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: '#1f2937' }}><Users className="h-5 w-5" style={{ color: '#4b5563' }} /></div>}
-                <div>
-                  <p className="font-bold text-sm text-white">{member.name}</p>
-                  <p className="text-xs" style={{ color: '#6b7280' }}>{member.role}</p>
+          <SectionCard key={member.id || `new-${i}`} title={`${member.name} — ${member.role}`} icon={Users} color="#10b981" defaultOpen={!member.id}>
+            <div className="grid md:grid-cols-3 gap-5">
+              <div>
+                <Field label="Member Photo">
+                  <ImageUploader currentUrl={member.image_url} onUploaded={url => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, image_url: url } : x))} folder="team" label="Click to upload member photo" size="md" />
+                </Field>
+              </div>
+              <div className="md:col-span-2 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Full Name">
+                    <Input value={member.name} onChange={e => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, name: e.target.value } : x))} />
+                  </Field>
+                  <Field label="Job Title / Role">
+                    <Input value={member.role} onChange={e => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, role: e.target.value } : x))} />
+                  </Field>
+                </div>
+                <Field label="Bio / About">
+                  <Textarea value={member.bio} onChange={e => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, bio: e.target.value } : x))} rows={3} />
+                </Field>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Email">
+                    <Input value={member.email} onChange={e => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, email: e.target.value } : x))} />
+                  </Field>
+                  <Field label="LinkedIn URL">
+                    <Input value={member.linkedin_url} onChange={e => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, linkedin_url: e.target.value } : x))} />
+                  </Field>
+                </div>
+                <div className="flex items-center justify-between">
+                  <Toggle checked={member.is_active} onChange={v => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, is_active: v } : x))} label="Visible on website" />
+                  <div className="flex gap-2">
+                    {member.id > 0 && <button onClick={() => deleteTeam(member.id)} className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg" style={{ color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}><Trash2 className="h-3.5 w-3.5" />Delete</button>}
+                    <SaveBtn onClick={() => saveTeam(member)} saving={saving} />
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Toggle checked={member.is_active} onChange={v => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, is_active: v } : x))} />
-                <button onClick={() => member.id ? deleteTeam(member.id) : setTeam(prev => prev.filter((_, xi) => xi !== i))} className="p-1.5 rounded-lg" style={{ color: '#ef4444' }}><Trash2 className="h-4 w-4" /></button>
-              </div>
             </div>
-            <div className="space-y-3">
-              <Field label="Member Photo">
-                <ImageUploader currentUrl={member.image_url} onUploaded={url => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, image_url: url } : x))} folder="team" label="Click to upload member photo" />
-              </Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Name"><Input value={member.name} onChange={e => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, name: e.target.value } : x))} /></Field>
-                <Field label="Role"><Input value={member.role || ''} onChange={e => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, role: e.target.value } : x))} placeholder="CEO, Designer..." /></Field>
-                <Field label="Email"><Input value={member.email || ''} onChange={e => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, email: e.target.value } : x))} type="email" /></Field>
-                <Field label="LinkedIn URL"><Input value={member.linkedin_url || ''} onChange={e => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, linkedin_url: e.target.value } : x))} /></Field>
-              </div>
-              <Field label="Bio">
-                <Textarea value={member.bio || ''} onChange={e => setTeam(prev => prev.map((x, xi) => xi === i ? { ...x, bio: e.target.value } : x))} placeholder="Short biography..." />
-              </Field>
-              <button onClick={() => saveTeam(member)} className="w-full py-2.5 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" style={{ background: '#ED8214' }}>
-                <Save className="h-4 w-4" />{member.id ? 'Save Changes' : 'Add Member'}
-              </button>
-            </div>
-          </div>
+          </SectionCard>
         ))}
       </div>
     </div>
   );
 
+  // ── TESTIMONIALS ──
   const renderTestimonials = () => (
     <div>
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Testimonials</h2>
-        <button onClick={() => setTestimonials(prev => [...prev, { id: 0, author_name: 'Client Name', author_role: 'CEO', company: 'Company', quote: '', rating: 5, image_url: '', is_active: true, sort_order: prev.length + 1 }])}
-          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#ED8214' }}>
+      <PageHeader title="Client Testimonials" subtitle="Edit client reviews, quotes, and photos" icon={Star} color="#f59e0b" />
+      <div className="flex justify-end mb-4">
+        <button onClick={() => setTestimonials(prev => [...prev, { id: 0, author_name: 'New Client', author_role: '', company: '', quote: '', rating: 5, image_url: '', is_active: true, sort_order: prev.length }])}
+          className="flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl text-black hover:scale-105 transition-all"
+          style={{ background: '#ED8214' }}>
           <Plus className="h-4 w-4" />Add Testimonial
         </button>
       </div>
-      <p className="text-sm mb-6" style={{ color: '#6b7280' }}>Upload client photos for testimonials.</p>
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="space-y-4">
         {testimonials.map((t, i) => (
-          <div key={t.id || `new-${i}`} className="p-5 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-            <div className="flex items-center justify-between mb-4">
-              <p className="font-bold text-sm text-white">{t.author_name}</p>
-              <div className="flex items-center gap-2">
-                <Toggle checked={t.is_active} onChange={v => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, is_active: v } : x))} />
-                <button onClick={() => t.id ? deleteTestimonial(t.id) : setTestimonials(prev => prev.filter((_, xi) => xi !== i))} className="p-1.5 rounded-lg" style={{ color: '#ef4444' }}><Trash2 className="h-4 w-4" /></button>
+          <SectionCard key={t.id || `new-${i}`} title={`${t.author_name} — ${t.company}`} icon={Star} color="#f59e0b" defaultOpen={!t.id}>
+            <div className="grid md:grid-cols-3 gap-5">
+              <div>
+                <Field label="Client Photo">
+                  <ImageUploader currentUrl={t.image_url || ''} onUploaded={url => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, image_url: url } : x))} folder="testimonials" label="Upload client photo" size="md" />
+                </Field>
+              </div>
+              <div className="md:col-span-2 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Client Name">
+                    <Input value={t.author_name} onChange={e => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, author_name: e.target.value } : x))} />
+                  </Field>
+                  <Field label="Job Title">
+                    <Input value={t.author_role} onChange={e => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, author_role: e.target.value } : x))} />
+                  </Field>
+                </div>
+                <Field label="Company">
+                  <Input value={t.company} onChange={e => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, company: e.target.value } : x))} />
+                </Field>
+                <Field label="Quote / Review">
+                  <Textarea value={t.quote} onChange={e => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, quote: e.target.value } : x))} rows={3} />
+                </Field>
+                <div className="flex items-center gap-4">
+                  <Field label="Rating (1-5)">
+                    <Input type="number" min="1" max="5" value={t.rating} onChange={e => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, rating: +e.target.value } : x))} style={{ width: 80 }} />
+                  </Field>
+                  <div className="mt-5">
+                    {'★'.repeat(t.rating).split('').map((_, si) => <span key={si} style={{ color: '#ED8214', fontSize: 18 }}>★</span>)}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <Toggle checked={t.is_active} onChange={v => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, is_active: v } : x))} label="Visible" />
+                  <div className="flex gap-2">
+                    {t.id > 0 && <button onClick={() => deleteTestimonial(t.id)} className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg" style={{ color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}><Trash2 className="h-3.5 w-3.5" />Delete</button>}
+                    <SaveBtn onClick={() => saveTestimonial(t)} saving={saving} />
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="space-y-3">
-              <Field label="Client Photo">
-                <ImageUploader currentUrl={t.image_url || ''} onUploaded={url => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, image_url: url } : x))} folder="testimonials" label="Click to upload client photo" compact />
-              </Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Name"><Input value={t.author_name} onChange={e => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, author_name: e.target.value } : x))} /></Field>
-                <Field label="Role / Title"><Input value={t.author_role || ''} onChange={e => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, author_role: e.target.value } : x))} /></Field>
-                <Field label="Company"><Input value={t.company || ''} onChange={e => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, company: e.target.value } : x))} /></Field>
-                <Field label="Rating (1-5)"><Input type="number" min={1} max={5} value={t.rating} onChange={e => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, rating: parseInt(e.target.value) || 5 } : x))} /></Field>
-              </div>
-              <Field label="Quote / Review">
-                <Textarea rows={4} value={t.quote || ''} onChange={e => setTestimonials(prev => prev.map((x, xi) => xi === i ? { ...x, quote: e.target.value } : x))} placeholder="What did the client say?" />
-              </Field>
-              <button onClick={() => saveTestimonial(t)} className="w-full py-2.5 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" style={{ background: '#ED8214' }}>
-                <Save className="h-4 w-4" />{t.id ? 'Save Changes' : 'Add Testimonial'}
-              </button>
-            </div>
-          </div>
+          </SectionCard>
         ))}
       </div>
     </div>
   );
 
+  // ── MEDIA ──
   const renderMedia = () => {
-    const inputRef2 = useRef<HTMLInputElement>(null);
+    const mediaRef = useRef<HTMLInputElement>(null);
     return (
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Media Library</h2>
-          <button onClick={() => inputRef2.current?.click()} className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#ED8214' }}>
-            <Upload className="h-4 w-4" />Upload Photos
-          </button>
-        </div>
-        <p className="text-sm mb-6" style={{ color: '#6b7280' }}>All uploaded photos. You can copy a photo URL and use it anywhere.</p>
-        <input ref={inputRef2} type="file" accept="image/*" multiple className="hidden"
-          onChange={e => { Array.from(e.target.files || []).forEach(handleMediaUpload); }} />
-        {media.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 rounded-xl" style={{ background: '#111827', border: '2px dashed #374151' }}>
-            <Upload className="h-10 w-10 mb-3" style={{ color: '#374151' }} />
-            <p className="font-bold text-white mb-1">No photos yet</p>
-            <p className="text-sm mb-4" style={{ color: '#6b7280' }}>Upload your first photo to get started</p>
-            <button onClick={() => inputRef2.current?.click()} className="px-5 py-2 rounded-lg text-white font-bold text-sm" style={{ background: '#ED8214' }}>Choose Files</button>
+        <PageHeader title="Media Library" subtitle="All uploaded photos. Copy URLs to use them anywhere on the site." icon={Image} color="#ED8214" />
+        <div
+          className="mb-6 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-[#ED8214] transition-all"
+          style={{ background: '#111827', borderColor: '#374151', padding: '40px 20px' }}
+          onClick={() => mediaRef.current?.click()}
+          onDragOver={e => e.preventDefault()}
+          onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleMediaUpload(f); }}>
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(237,130,20,0.1)' }}>
+            <Upload className="h-6 w-6" style={{ color: '#ED8214' }} />
           </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-            {media.map(m => (
-              <div key={m.id} className="group relative rounded-xl overflow-hidden" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-                <img src={m.url} alt={m.alt_text || m.filename} className="w-full h-28 object-cover" />
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2" style={{ background: 'rgba(0,0,0,0.75)' }}>
-                  <a href={m.url} target="_blank" rel="noopener noreferrer" className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.2)' }}>
-                    <ExternalLink className="h-3.5 w-3.5 text-white" />
-                  </a>
-                  <button onClick={() => deleteMedia(m)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'rgba(239,68,68,0.8)' }}>
-                    <Trash2 className="h-3.5 w-3.5 text-white" />
-                  </button>
-                </div>
-                <div className="p-2">
-                  <p className="text-[10px] truncate" style={{ color: '#6b7280' }}>{m.filename}</p>
-                </div>
+          <div className="text-center">
+            <p className="text-sm font-bold text-white">Click or drag to upload photos</p>
+            <p className="text-xs mt-1" style={{ color: '#6b7280' }}>JPG, PNG, WEBP, GIF — up to 10MB</p>
+          </div>
+          <input ref={mediaRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleMediaUpload(f); }} />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {media.map(item => (
+            <div key={item.id} className="group relative rounded-xl overflow-hidden" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+              <img src={item.url} alt={item.alt_text} className="w-full h-36 object-cover" />
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2" style={{ background: 'rgba(0,0,0,0.75)' }}>
+                <button onClick={() => { navigator.clipboard.writeText(item.url); notify('URL copied!'); }}
+                  className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg text-white w-full justify-center"
+                  style={{ background: '#ED8214', color: '#000' }}>
+                  <Link2 className="h-3 w-3" />Copy URL
+                </button>
+                <button onClick={() => deleteMedia(item)}
+                  className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg w-full justify-center"
+                  style={{ background: 'rgba(239,68,68,0.2)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)' }}>
+                  <Trash2 className="h-3 w-3" />Delete
+                </button>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const renderInbox = () => (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
-          Contact Inbox {unreadCount > 0 && <span className="ml-2 text-sm px-2.5 py-0.5 rounded-full" style={{ background: '#ED8214', color: '#000' }}>{unreadCount} new</span>}
-        </h2>
-      </div>
-      {inbox.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 rounded-xl" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-          <MessageSquare className="h-10 w-10 mb-3" style={{ color: '#374151' }} />
-          <p className="font-bold text-white">No messages yet</p>
-          <p className="text-sm mt-1" style={{ color: '#6b7280' }}>Contact form submissions will appear here</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {inbox.map(msg => (
-            <div key={msg.id} className="p-5 rounded-xl transition-all" style={{ background: '#111827', border: `1px solid ${msg.status === 'new' ? 'rgba(237,130,20,0.3)' : '#1f2937'}` }}>
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-start gap-4 flex-1 min-w-0">
-                  <span className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" style={{ background: msg.status === 'new' ? '#ED8214' : msg.status === 'replied' ? '#10b981' : '#374151' }} />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 flex-wrap mb-1">
-                      <span className="font-bold text-sm text-white">{msg.name}</span>
-                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: msg.status === 'new' ? 'rgba(237,130,20,0.15)' : 'rgba(255,255,255,0.05)', color: msg.status === 'new' ? '#ED8214' : '#6b7280' }}>{msg.status}</span>
-                      {msg.service && <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(59,130,246,0.1)', color: '#60a5fa' }}>{msg.service}</span>}
-                    </div>
-                    <div className="flex items-center gap-4 text-xs mb-2" style={{ color: '#6b7280' }}>
-                      <span className="flex items-center gap-1"><Mail className="h-3 w-3" />{msg.email}</span>
-                      {msg.phone && <span className="flex items-center gap-1"><Phone className="h-3 w-3" />{msg.phone}</span>}
-                      {msg.company && <span>{msg.company}</span>}
-                      <span>{new Date(msg.created_at).toLocaleDateString()}</span>
-                    </div>
-                    <p className="text-sm" style={{ color: '#d1d5db' }}>{msg.message}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <select value={msg.status} onChange={e => updateInboxStatus(msg.id, e.target.value)}
-                    className="text-xs px-2 py-1.5 rounded-lg" style={{ background: '#0f172a', border: '1px solid #374151', color: '#9ca3af' }}>
-                    <option value="new">New</option>
-                    <option value="read">Read</option>
-                    <option value="replied">Replied</option>
-                    <option value="archived">Archived</option>
-                  </select>
-                  <a href={`mailto:${msg.email}?subject=Re: Your inquiry via MOPi Production`}
-                    className="px-3 py-1.5 rounded-lg text-xs font-bold text-white flex items-center gap-1" style={{ background: '#1d4ed8' }}>
-                    <Mail className="h-3 w-3" />Reply
-                  </a>
-                  <button onClick={() => deleteInbox(msg.id)} className="p-1.5 rounded-lg" style={{ color: '#ef4444' }}><Trash2 className="h-4 w-4" /></button>
-                </div>
+              <div className="p-2">
+                <p className="text-[10px] truncate" style={{ color: '#6b7280' }}>{item.filename}</p>
               </div>
             </div>
           ))}
         </div>
-      )}
-    </div>
-  );
+        {media.length === 0 && <p className="text-center py-10 text-sm" style={{ color: '#4b5563' }}>No media uploaded yet. Upload your first photo above.</p>}
+      </div>
+    );
+  };
 
-  // ════════════════ PAGE CONTENT RENDERERS ════════════════
-
-  const renderPageHome = () => (
+  // ── INBOX ──
+  const renderInbox = () => (
     <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Homepage — All Text Content</h2>
-        <p className="text-sm mt-1" style={{ color: '#6b7280' }}>Edit every single word on the homepage in both English and Arabic. Each section has a "Save Section" button.</p>
-      </div>
-      <div className="mb-4 p-4 rounded-xl flex items-center gap-3" style={{ background: 'rgba(237,130,20,0.08)', border: '1px solid rgba(237,130,20,0.2)' }}>
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(237,130,20,0.2)' }}><Type className="h-4 w-4" style={{ color: '#ED8214' }} /></div>
-        <div>
-          <p className="text-sm font-bold" style={{ color: '#ED8214' }}>🇬🇧 Left = English · 🇸🇦 Right = Arabic</p>
-          <p className="text-xs" style={{ color: '#9ca3af' }}>Edit both sides and click "Save Section" to apply changes to the live website.</p>
-        </div>
-      </div>
-      {renderPageContentSection('home', 'hero', '🚀 Hero Section', [
-        { field: 'badge', label: 'Badge Text' },
-        { field: 'line1', label: 'Headline Line 1' },
-        { field: 'line2', label: 'Headline Line 2' },
-        { field: 'subtitle', label: 'Subtitle / Tagline' },
-        { field: 'cta_primary', label: 'Primary Button Text' },
-        { field: 'cta_secondary', label: 'Secondary Button Text' },
-      ], [{ key: 'background', label: 'Hero Background Photo' }])}
-      {renderPageContentSection('home', 'about', '👥 About Section', [
-        { field: 'label', label: 'Section Label' },
-        { field: 'heading1', label: 'Heading Line 1' },
-        { field: 'heading2', label: 'Heading Line 2' },
-        { field: 'heading3', label: 'Heading Line 3' },
-        { field: 'paragraph1', label: 'Paragraph 1', multiline: true, rows: 3 },
-        { field: 'paragraph2', label: 'Paragraph 2', multiline: true, rows: 3 },
-        { field: 'point1', label: 'Feature Point 1' },
-        { field: 'point2', label: 'Feature Point 2' },
-        { field: 'point3', label: 'Feature Point 3' },
-        { field: 'point4', label: 'Feature Point 4' },
-        { field: 'cta', label: 'CTA Button Text' },
-      ], [{ key: 'main_image', label: 'About Section Photo' }])}
-      {renderPageContentSection('home', 'services', '⚙️ Services Section Header', [
-        { field: 'label', label: 'Section Label' },
-        { field: 'heading', label: 'Heading' },
-        { field: 'subtitle', label: 'Subtitle' },
-      ])}
-      {renderPageContentSection('home', 'portfolio', '🖼️ Portfolio Section Header', [
-        { field: 'label', label: 'Section Label' },
-        { field: 'heading', label: 'Heading' },
-        { field: 'subtitle', label: 'Subtitle' },
-        { field: 'cta', label: 'View All Button Text' },
-      ])}
-      {renderPageContentSection('home', 'why', '✅ Why Choose Us Section', [
-        { field: 'label', label: 'Section Label' },
-        { field: 'heading1', label: 'Heading Line 1' },
-        { field: 'heading2', label: 'Heading Line 2' },
-        { field: 'subtitle', label: 'Subtitle' },
-        { field: 'item1_title', label: 'Point 1 — Title' },
-        { field: 'item1_desc', label: 'Point 1 — Description', multiline: true, rows: 2 },
-        { field: 'item2_title', label: 'Point 2 — Title' },
-        { field: 'item2_desc', label: 'Point 2 — Description', multiline: true, rows: 2 },
-        { field: 'item3_title', label: 'Point 3 — Title' },
-        { field: 'item3_desc', label: 'Point 3 — Description', multiline: true, rows: 2 },
-        { field: 'item4_title', label: 'Point 4 — Title' },
-        { field: 'item4_desc', label: 'Point 4 — Description', multiline: true, rows: 2 },
-        { field: 'item5_title', label: 'Point 5 — Title' },
-        { field: 'item5_desc', label: 'Point 5 — Description', multiline: true, rows: 2 },
-        { field: 'item6_title', label: 'Point 6 — Title' },
-        { field: 'item6_desc', label: 'Point 6 — Description', multiline: true, rows: 2 },
-      ])}
-      {renderPageContentSection('home', 'process', '📋 Process Section', [
-        { field: 'label', label: 'Section Label' },
-        { field: 'heading', label: 'Heading' },
-        { field: 'subtitle', label: 'Subtitle' },
-        { field: 'step1_title', label: 'Step 1 — Title' },
-        { field: 'step1_desc', label: 'Step 1 — Description', multiline: true, rows: 2 },
-        { field: 'step2_title', label: 'Step 2 — Title' },
-        { field: 'step2_desc', label: 'Step 2 — Description', multiline: true, rows: 2 },
-        { field: 'step3_title', label: 'Step 3 — Title' },
-        { field: 'step3_desc', label: 'Step 3 — Description', multiline: true, rows: 2 },
-        { field: 'step4_title', label: 'Step 4 — Title' },
-        { field: 'step4_desc', label: 'Step 4 — Description', multiline: true, rows: 2 },
-        { field: 'step5_title', label: 'Step 5 — Title' },
-        { field: 'step5_desc', label: 'Step 5 — Description', multiline: true, rows: 2 },
-      ])}
-      {renderPageContentSection('home', 'cta', '🎯 CTA Band Section', [
-        { field: 'heading', label: 'Heading Line 1' },
-        { field: 'heading2', label: 'Heading Line 2' },
-        { field: 'subtitle', label: 'Subtitle' },
-        { field: 'cta_primary', label: 'Primary Button' },
-        { field: 'cta_secondary', label: 'Secondary Button' },
-      ])}
-      {renderPageContentSection('home', 'contact', '📬 Contact Section', [
-        { field: 'label', label: 'Section Label' },
-        { field: 'heading', label: 'Heading Line 1' },
-        { field: 'heading2', label: 'Heading Line 2' },
-        { field: 'subtitle', label: 'Subtitle' },
-        { field: 'form_name', label: 'Form — Name Field Label' },
-        { field: 'form_email', label: 'Form — Email Field Label' },
-        { field: 'form_phone', label: 'Form — Phone Field Label' },
-        { field: 'form_company', label: 'Form — Company Field Label' },
-        { field: 'form_service', label: 'Form — Service Field Label' },
-        { field: 'form_message', label: 'Form — Message Field Label' },
-        { field: 'form_submit', label: 'Form — Submit Button' },
-      ])}
-      {renderPageContentSection('home', 'footer', '🔽 Footer', [
-        { field: 'tagline', label: 'Footer Tagline', multiline: true, rows: 2 },
-        { field: 'copyright', label: 'Copyright Text' },
-      ])}
-    </div>
-  );
-
-  const renderPageAbout = () => (
-    <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>About Page — All Text Content</h2>
-        <p className="text-sm mt-1" style={{ color: '#6b7280' }}>Edit every word on the About page in both English and Arabic.</p>
-      </div>
-      {renderPageContentSection('about', 'hero', '🚀 Hero Banner', [
-        { field: 'badge', label: 'Badge Text' },
-        { field: 'heading', label: 'Heading' },
-        { field: 'subtitle', label: 'Subtitle' },
-      ])}
-      {renderPageContentSection('about', 'story', '📖 Our Story Section', [
-        { field: 'heading', label: 'Section Heading' },
-        { field: 'content', label: 'Story Text', multiline: true, rows: 5 },
-      ], [{ key: 'image', label: 'Story Section Photo' }])}
-      {renderPageContentSection('about', 'mission', '🎯 Mission Section', [
-        { field: 'heading', label: 'Section Heading' },
-        { field: 'content', label: 'Mission Text', multiline: true, rows: 4 },
-      ])}
-      {renderPageContentSection('about', 'values', '⭐ Values Section', [
-        { field: 'heading', label: 'Section Heading' },
-      ])}
-    </div>
-  );
-
-  const renderPageServices = () => (
-    <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Services Page — Text Content</h2>
-        <p className="text-sm mt-1" style={{ color: '#6b7280' }}>Edit page-level texts. Individual service titles, descriptions and photos are managed in "Services" section.</p>
-      </div>
-      {renderPageContentSection('services', 'hero', '🚀 Hero Banner', [
-        { field: 'badge', label: 'Badge Text' },
-        { field: 'heading', label: 'Heading' },
-        { field: 'subtitle', label: 'Subtitle' },
-      ])}
-      {renderPageContentSection('services', 'cta', '🎯 CTA Section', [
-        { field: 'heading', label: 'CTA Heading' },
-        { field: 'subtitle', label: 'CTA Subtitle' },
-        { field: 'cta_primary', label: 'CTA Button Text' },
-      ])}
-      <div className="mt-4 p-4 rounded-xl" style={{ background: '#111827', border: '1px dashed #374151' }}>
-        <p className="text-sm font-bold text-white mb-1">📌 Service Cards (titles, descriptions, photos)</p>
-        <p className="text-sm" style={{ color: '#6b7280' }}>Edit individual service content in the <button onClick={() => setSection('services')} className="underline text-[#ED8214]">Services section →</button></p>
+      <PageHeader title={`Inbox${unreadCount > 0 ? ` — ${unreadCount} New` : ''}`} subtitle="Messages submitted through the contact form" icon={MessageSquare} color="#ED8214" />
+      <div className="space-y-3">
+        {inbox.map(msg => (
+          <div key={msg.id} className="p-5 rounded-2xl" style={{ background: '#111827', border: `1px solid ${msg.status === 'new' ? 'rgba(237,130,20,0.3)' : '#1f2937'}` }}>
+            <div className="flex items-start justify-between gap-4 mb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm" style={{ background: 'rgba(237,130,20,0.15)', color: '#ED8214' }}>
+                  {msg.name?.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="font-bold text-sm text-white">{msg.name}</p>
+                  <p className="text-xs" style={{ color: '#6b7280' }}>{msg.email} · {msg.phone}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[10px] font-black px-2 py-1 rounded-full" style={{ background: msg.status === 'new' ? 'rgba(237,130,20,0.15)' : 'rgba(255,255,255,0.05)', color: msg.status === 'new' ? '#ED8214' : '#6b7280' }}>
+                  {msg.status === 'new' ? '● NEW' : msg.status.toUpperCase()}
+                </span>
+                <span className="text-xs" style={{ color: '#374151' }}>{new Date(msg.created_at).toLocaleDateString()}</span>
+              </div>
+            </div>
+            {(msg.company || msg.service) && (
+              <div className="flex gap-3 mb-3">
+                {msg.company && <span className="text-xs px-2 py-1 rounded-lg" style={{ background: '#0f172a', color: '#9ca3af' }}>🏢 {msg.company}</span>}
+                {msg.service && <span className="text-xs px-2 py-1 rounded-lg" style={{ background: '#0f172a', color: '#9ca3af' }}>⚙️ {msg.service}</span>}
+              </div>
+            )}
+            <p className="text-sm mb-4 leading-relaxed" style={{ color: '#d1d5db' }}>{msg.message}</p>
+            <div className="flex items-center gap-2 pt-3" style={{ borderTop: '1px solid #1f2937' }}>
+              <a href={`mailto:${msg.email}`} className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors hover:bg-blue-900/20" style={{ color: '#60a5fa', border: '1px solid rgba(96,165,250,0.2)' }}>
+                <Mail className="h-3 w-3" />Reply via Email
+              </a>
+              <a href={`https://wa.me/${msg.phone?.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors hover:bg-green-900/20" style={{ color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' }}>
+                <Phone className="h-3 w-3" />WhatsApp
+              </a>
+              {msg.status === 'new' && (
+                <button onClick={() => updateInboxStatus(msg.id, 'read')} className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors" style={{ color: '#9ca3af', border: '1px solid #374151' }}>
+                  <Check className="h-3 w-3" />Mark Read
+                </button>
+              )}
+              <button onClick={() => deleteInbox(msg.id)} className="ml-auto flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg" style={{ color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
+                <Trash2 className="h-3 w-3" />Delete
+              </button>
+            </div>
+          </div>
+        ))}
+        {inbox.length === 0 && <p className="text-center py-16 text-sm" style={{ color: '#4b5563' }}>No messages yet. When someone fills the contact form, they'll appear here.</p>}
       </div>
     </div>
   );
 
-  const renderPagePortfolio = () => (
-    <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Portfolio Page — Text Content</h2>
-        <p className="text-sm mt-1" style={{ color: '#6b7280' }}>Edit page-level texts. Individual project photos and details are managed in "Portfolio" section.</p>
-      </div>
-      {renderPageContentSection('portfolio', 'hero', '🚀 Hero Banner', [
-        { field: 'badge', label: 'Badge Text' },
-        { field: 'heading', label: 'Heading' },
-        { field: 'subtitle', label: 'Subtitle' },
-      ])}
-      <div className="mt-4 p-4 rounded-xl" style={{ background: '#111827', border: '1px dashed #374151' }}>
-        <p className="text-sm font-bold text-white mb-1">📌 Project Cards (titles, descriptions, photos)</p>
-        <p className="text-sm" style={{ color: '#6b7280' }}>Edit individual projects in the <button onClick={() => setSection('portfolio')} className="underline text-[#ED8214]">Portfolio section →</button></p>
-      </div>
-    </div>
-  );
-
-  const renderPageContact = () => (
-    <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>Contact Page — Text Content</h2>
-        <p className="text-sm mt-1" style={{ color: '#6b7280' }}>Edit all text labels. Contact info (phone, email, address) is managed in Site Settings.</p>
-      </div>
-      {renderPageContentSection('contact', 'hero', '🚀 Hero Banner', [
-        { field: 'badge', label: 'Badge Text' },
-        { field: 'heading', label: 'Heading' },
-        { field: 'subtitle', label: 'Subtitle' },
-      ])}
-      {renderPageContentSection('contact', 'info', '📋 Contact Info Labels', [
-        { field: 'address_label', label: 'Address Label' },
-        { field: 'phone_label', label: 'Phone Label' },
-        { field: 'email_label', label: 'Email Label' },
-        { field: 'whatsapp_label', label: 'WhatsApp Label' },
-      ])}
-      <div className="mt-4 p-4 rounded-xl" style={{ background: '#111827', border: '1px dashed #374151' }}>
-        <p className="text-sm font-bold text-white mb-1">📌 Contact Details (phone number, email address, WhatsApp)</p>
-        <p className="text-sm" style={{ color: '#6b7280' }}>Edit actual contact values in <button onClick={() => setSection('site-settings')} className="underline text-[#ED8214]">Site Settings →</button></p>
-      </div>
-    </div>
-  );
-
-  // ════════════════ SECTION MAP ════════════════
   const sectionRenderer: Record<Section, () => React.ReactNode> = {
     'dashboard': renderDashboard,
     'site-settings': renderSiteSettings,
     'social-links': renderSocialLinks,
     'logos': renderLogos,
-    'hero-sections': renderHeroSections,
+    'hero-sections': () => <div />,
     'stats': renderStats,
     'services': renderServices,
     'portfolio': renderPortfolio,
     'team': renderTeam,
     'testimonials': renderTestimonials,
     'media': renderMedia,
-    'about': renderAbout,
+    'about': () => <div />,
     'inbox': renderInbox,
     'page-home': renderPageHome,
     'page-about': renderPageAbout,
@@ -1382,50 +1590,71 @@ export default function AdminDashboard() {
     'page-contact': renderPageContact,
   };
 
+  const sectionTitles: Record<Section, string> = {
+    'dashboard': 'Dashboard', 'page-home': 'Home Page', 'page-about': 'About Page',
+    'page-services': 'Services Page', 'page-portfolio': 'Portfolio Page', 'page-contact': 'Contact Page',
+    'site-settings': 'Site Settings', 'social-links': 'Social Media', 'logos': 'Logos & Favicon',
+    'hero-sections': 'Hero Sections', 'stats': 'Stats & Numbers', 'services': 'Service Cards',
+    'portfolio': 'Portfolio Projects', 'team': 'Team Members', 'testimonials': 'Testimonials',
+    'media': 'Media Library', 'about': 'About Content', 'inbox': 'Inbox',
+  };
+
   return (
-    <div className="min-h-screen flex" style={{ background: '#0a0a0a', fontFamily: "'Inter', sans-serif" }}>
+    <div className="min-h-screen flex" style={{ background: '#060608', fontFamily: "'Inter', sans-serif" }}>
       <style>{`
-        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: #0a0a0a; }
-        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #374151; }
+        select option { background: #0f172a; }
       `}</style>
 
-      {/* ── Sidebar ── */}
+      {/* Sidebar */}
       <aside className="shrink-0 flex flex-col transition-all duration-300 z-40"
-        style={{ width: sidebarOpen ? 240 : 64, background: '#0f0f0f', borderRight: '1px solid #1a1a1a', position: 'sticky', top: 0, height: '100vh', overflowY: 'auto', overflowX: 'hidden' }}>
-        <div className="flex items-center gap-3 p-4 shrink-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
-          <img src="/images/mopi_logo_20260101_112924.png" alt="MOPi" className="h-8 w-8 object-contain shrink-0" />
+        style={{ width: sidebarOpen ? 232 : 60, background: '#0c0c0e', borderRight: '1px solid #141418', position: 'sticky', top: 0, height: '100vh', overflowY: 'auto', overflowX: 'hidden' }}>
+
+        {/* Logo */}
+        <div className="flex items-center gap-3 p-4 shrink-0" style={{ borderBottom: '1px solid #141418' }}>
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 overflow-hidden" style={{ background: 'rgba(237,130,20,0.1)', border: '1px solid rgba(237,130,20,0.2)' }}>
+            <img src="/images/mopi_logo_20260101_112924.png" alt="MOPi" className="h-6 w-6 object-contain" />
+          </div>
           {sidebarOpen && <span className="font-black text-xs tracking-widest uppercase text-white truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>CMS Admin</span>}
-          <button onClick={() => setSidebarOpen(p => !p)} className="ml-auto shrink-0 p-1 rounded hover:bg-white/5" style={{ color: '#6b7280' }}>
+          <button onClick={() => setSidebarOpen(p => !p)} className="ml-auto shrink-0 p-1 rounded-lg hover:bg-white/5 transition-colors" style={{ color: '#4b5563' }}>
             <Menu className="h-4 w-4" />
           </button>
         </div>
-        <nav className="flex-1 py-3 px-2">
-          {sidebarGroups.map(group => (
-            <div key={group.label} className="mb-3">
-              {sidebarOpen && <p className="text-[9px] font-black uppercase tracking-[0.25em] px-3 py-1.5 mb-1" style={{ color: '#374151' }}>{group.label}</p>}
-              {group.items.map(item => (
-                <button key={item.id} onClick={() => setSection(item.id)}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg mb-0.5 transition-all text-left"
-                  style={{ background: section === item.id ? 'rgba(237,130,20,0.12)' : 'transparent', color: section === item.id ? '#ED8214' : '#6b7280', border: section === item.id ? '1px solid rgba(237,130,20,0.2)' : '1px solid transparent' }}
-                  onMouseEnter={e => { if (section !== item.id) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
-                  onMouseLeave={e => { if (section !== item.id) e.currentTarget.style.background = 'transparent'; }}>
-                  <item.icon className="h-4 w-4 shrink-0" />
-                  {sidebarOpen && <span className="text-sm font-medium truncate">{item.label}</span>}
-                </button>
-              ))}
+
+        {/* Nav */}
+        <nav className="flex-1 py-3 px-2 overflow-y-auto">
+          {navGroups.map(group => (
+            <div key={group.label} className="mb-4">
+              {sidebarOpen && <p className="text-[9px] font-black uppercase tracking-[0.3em] px-3 py-1 mb-1" style={{ color: '#2d2d35' }}>{group.label}</p>}
+              {group.items.map(item => {
+                const active = section === item.id;
+                return (
+                  <button key={item.id} onClick={() => setSection(item.id)}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl mb-0.5 transition-all text-left"
+                    style={{ background: active ? 'rgba(237,130,20,0.1)' : 'transparent', color: active ? '#ED8214' : '#4b5563', border: active ? '1px solid rgba(237,130,20,0.15)' : '1px solid transparent' }}
+                    onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.color = '#9ca3af'; } }}
+                    onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#4b5563'; } }}>
+                    <item.icon className="h-4 w-4 shrink-0" />
+                    {sidebarOpen && <span className="text-sm font-medium truncate">{item.label}</span>}
+                  </button>
+                );
+              })}
             </div>
           ))}
         </nav>
-        <div className="p-3 shrink-0" style={{ borderTop: '1px solid #1a1a1a' }}>
-          <Link to="/" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-all" style={{ color: '#4b5563' }}
+
+        {/* Bottom */}
+        <div className="p-2 shrink-0" style={{ borderTop: '1px solid #141418' }}>
+          <Link to="/" target="_blank" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl mb-0.5 transition-all" style={{ color: '#4b5563' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#9ca3af')} onMouseLeave={e => (e.currentTarget.style.color = '#4b5563')}>
             <ExternalLink className="h-4 w-4 shrink-0" />
             {sidebarOpen && <span className="text-sm">View Website</span>}
           </Link>
-          <button onClick={logout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all" style={{ color: '#4b5563' }}
+          <button onClick={logout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all" style={{ color: '#4b5563' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')} onMouseLeave={e => (e.currentTarget.style.color = '#4b5563')}>
             <LogOut className="h-4 w-4 shrink-0" />
             {sidebarOpen && <span className="text-sm">Sign Out</span>}
@@ -1433,32 +1662,37 @@ export default function AdminDashboard() {
         </div>
       </aside>
 
-      {/* ── Main Content ── */}
+      {/* Main */}
       <main className="flex-1 overflow-y-auto" style={{ minWidth: 0 }}>
-        <div className="sticky top-0 z-30 flex items-center justify-between px-6 py-4" style={{ background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #1a1a1a' }}>
+        {/* Top bar */}
+        <div className="sticky top-0 z-30 flex items-center justify-between px-6 py-3.5" style={{ background: 'rgba(6,6,8,0.95)', backdropFilter: 'blur(16px)', borderBottom: '1px solid #141418' }}>
           <div className="flex items-center gap-3">
-            <div className="text-sm font-bold text-white capitalize">{section.replace(/-/g, ' ')}</div>
-            {saving && <div className="flex items-center gap-1.5 text-xs" style={{ color: '#ED8214' }}><Loader2 className="h-3.5 w-3.5 animate-spin" />Saving...</div>}
+            <span className="text-sm font-bold text-white">{sectionTitles[section]}</span>
+            {saving && <div className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full" style={{ background: 'rgba(237,130,20,0.1)', color: '#ED8214', border: '1px solid rgba(237,130,20,0.2)' }}><Loader2 className="h-3 w-3 animate-spin" />Saving...</div>}
           </div>
-          <div className="flex items-center gap-3">
-            <button onClick={fetchAll} className="p-2 rounded-lg transition-all hover:text-[#ED8214]" style={{ color: '#4b5563', background: '#111827', border: '1px solid #1f2937' }}>
+          <div className="flex items-center gap-2">
+            <button onClick={fetchAll} className="p-2 rounded-lg transition-all hover:text-[#ED8214] hover:bg-white/5" style={{ color: '#4b5563', border: '1px solid #1f2937' }} title="Refresh data">
               <RefreshCw className="h-4 w-4" />
             </button>
-            <Link to="/" target="_blank" className="flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-lg transition-all hover:text-[#ED8214]" style={{ color: '#6b7280', background: '#111827', border: '1px solid #1f2937' }}>
+            <Link to="/" target="_blank" className="flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-lg transition-all hover:text-[#ED8214]" style={{ color: '#6b7280', border: '1px solid #1f2937' }}>
               <ExternalLink className="h-3.5 w-3.5" />Live Site
             </Link>
           </div>
         </div>
-        <div className="p-6 max-w-6xl">
+
+        {/* Content */}
+        <div className="p-6 max-w-5xl">
           {!loaded ? (
-            <div className="flex items-center justify-center py-32">
-              <div className="flex flex-col items-center gap-3">
-                <Loader2 className="h-8 w-8 animate-spin" style={{ color: '#ED8214' }} />
-                <p className="text-sm" style={{ color: '#6b7280' }}>Loading CMS data...</p>
+            <div className="flex flex-col items-center justify-center py-40 gap-4">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(237,130,20,0.1)' }}>
+                <Loader2 className="h-6 w-6 animate-spin" style={{ color: '#ED8214' }} />
               </div>
+              <p className="text-sm font-medium" style={{ color: '#6b7280' }}>Loading CMS data...</p>
             </div>
           ) : (
-            sectionRenderer[section]()
+            <div style={{ animation: 'fadeUp 0.3s ease' }}>
+              {sectionRenderer[section]()}
+            </div>
           )}
         </div>
       </main>
@@ -1468,277 +1702,63 @@ export default function AdminDashboard() {
   );
 }
 
-// ─── Sub-components ────────────────────────────────────────────────────────────
+// ── Sub-components ──────────────────────────────────────────────────────────────
 
-function NewSocialForm({ onSave }: { onSave: (item: Omit<{ id: number; platform: string; url: string; icon: string; is_active: boolean; sort_order: number; }, 'id'>) => void }) {
+function PageHeader({ title, subtitle, icon: Icon, color, page, liveUrl }: {
+  title: string; subtitle: string;
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+  color: string; page?: string; liveUrl?: string;
+}) {
+  return (
+    <div className="mb-7 pb-5" style={{ borderBottom: '1px solid #1f2937' }}>
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${color}15` }}>
+            <Icon className="h-5 w-5" style={{ color }} />
+          </div>
+          <div>
+            <h1 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>{title}</h1>
+            <p className="text-sm mt-0.5" style={{ color: '#6b7280' }}>{subtitle}</p>
+          </div>
+        </div>
+        {liveUrl && (
+          <Link to={liveUrl} target="_blank"
+            className="flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-xl transition-all hover:scale-105"
+            style={{ color: color, background: `${color}12`, border: `1px solid ${color}30` }}>
+            <ExternalLink className="h-3.5 w-3.5" />Preview Page
+          </Link>
+        )}
+      </div>
+      <div className="mt-4 flex items-center gap-2 text-xs px-3 py-2.5 rounded-xl" style={{ background: 'rgba(237,130,20,0.05)', border: '1px solid rgba(237,130,20,0.12)' }}>
+        <span style={{ color: '#ED8214' }}>💡</span>
+        <span style={{ color: '#9ca3af' }}>All changes save directly to your live website. Each section has its own "Save Section" button.</span>
+        <span className="ml-1 font-bold" style={{ color: '#ED8214' }}>🇬🇧 English (left) · 🇸🇦 Arabic (right)</span>
+      </div>
+    </div>
+  );
+}
+
+function AddSocialForm({ onSave }: { onSave: (item: { platform: string; url: string; icon: string; is_active: boolean; sort_order: number }) => void }) {
   const [form, setForm] = useState({ platform: '', url: '', icon: '', is_active: true, sort_order: 10 });
   return (
-    <div className="grid grid-cols-2 gap-3">
-      <div>
-        <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Platform</label>
-        <input value={form.platform} onChange={e => setForm(p => ({ ...p, platform: e.target.value }))} placeholder="e.g. TikTok"
-          className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#111827', border: '1px solid #374151', color: '#f3f4f6' }} />
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Platform Name</label>
+          <input value={form.platform} onChange={e => setForm(p => ({ ...p, platform: e.target.value }))} placeholder="e.g. TikTok, Snapchat"
+            className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+        </div>
+        <div>
+          <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Profile URL</label>
+          <input value={form.url} onChange={e => setForm(p => ({ ...p, url: e.target.value }))} placeholder="https://..."
+            className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+        </div>
       </div>
-      <div>
-        <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>URL</label>
-        <input value={form.url} onChange={e => setForm(p => ({ ...p, url: e.target.value }))} placeholder="https://..."
-          className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#111827', border: '1px solid #374151', color: '#f3f4f6' }} />
-      </div>
-      <div className="col-span-2">
-        <button onClick={() => { if (form.platform && form.url) { onSave({ ...form, icon: form.platform }); setForm({ platform: '', url: '', icon: '', is_active: true, sort_order: 10 }); } }}
-          className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg text-white" style={{ background: '#ED8214' }}>
-          <Plus className="h-4 w-4" />Add Social Link
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function HeroEditor({ hero, onSave, saving }: { hero: { id: number; page: string; badge_text: string; heading: string; subheading: string; cta_primary_label: string; cta_primary_url: string; cta_secondary_label: string; cta_secondary_url: string; bg_image_url: string; }; onSave: (h: typeof hero) => void; saving: boolean }) {
-  const [data, setData] = useState(hero);
-  const [open, setOpen] = useState(false);
-  const pageColors: Record<string, string> = { home: '#ED8214', about: '#3b82f6', services: '#8b5cf6', portfolio: '#10b981', contact: '#f43f5e' };
-
-  return (
-    <div className="rounded-xl overflow-hidden" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-      <button onClick={() => setOpen(p => !p)} className="w-full flex items-center justify-between p-5 text-left">
-        <div className="flex items-center gap-3">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ background: pageColors[hero.page] || '#ED8214' }} />
-          <span className="font-bold text-white capitalize">{hero.page} Page Hero</span>
-          {hero.badge_text && <span className="text-xs px-2 py-0.5 rounded-full hidden sm:inline" style={{ background: 'rgba(255,255,255,0.05)', color: '#9ca3af' }}>{hero.badge_text}</span>}
-        </div>
-        <ChevronDown className="h-4 w-4 transition-transform" style={{ color: '#6b7280', transform: open ? 'rotate(180deg)' : 'none' }} />
+      <button onClick={() => { if (form.platform && form.url) { onSave({ ...form, icon: form.platform }); setForm({ platform: '', url: '', icon: '', is_active: true, sort_order: 10 }); } }}
+        className="flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl text-black hover:scale-105 transition-all"
+        style={{ background: '#ED8214' }}>
+        <Plus className="h-4 w-4" />Add Social Link
       </button>
-      {open && (
-        <div className="px-5 pb-5 space-y-4" style={{ borderTop: '1px solid #1f2937' }}>
-          <div className="pt-4 grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Badge Text</label>
-              <input value={data.badge_text || ''} onChange={e => setData(p => ({ ...p, badge_text: e.target.value }))}
-                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-            </div>
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Page</label>
-              <input value={data.page} disabled className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#4b5563' }} />
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Heading</label>
-            <input value={data.heading || ''} onChange={e => setData(p => ({ ...p, heading: e.target.value }))}
-              className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }}
-              placeholder="Use <span>text</span> for orange highlight" />
-            <p className="text-xs mt-1" style={{ color: '#4b5563' }}>Tip: wrap text in {`<span>`} for orange highlight</p>
-          </div>
-          <div>
-            <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Subheading</label>
-            <textarea value={data.subheading || ''} onChange={e => setData(p => ({ ...p, subheading: e.target.value }))} rows={3}
-              className="w-full px-3 py-2.5 rounded-lg text-sm resize-none" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Primary CTA Label</label>
-              <input value={data.cta_primary_label || ''} onChange={e => setData(p => ({ ...p, cta_primary_label: e.target.value }))}
-                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-            </div>
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Primary CTA URL</label>
-              <input value={data.cta_primary_url || ''} onChange={e => setData(p => ({ ...p, cta_primary_url: e.target.value }))}
-                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} placeholder="/contact" />
-            </div>
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Secondary CTA Label</label>
-              <input value={data.cta_secondary_label || ''} onChange={e => setData(p => ({ ...p, cta_secondary_label: e.target.value }))}
-                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-            </div>
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Secondary CTA URL</label>
-              <input value={data.cta_secondary_url || ''} onChange={e => setData(p => ({ ...p, cta_secondary_url: e.target.value }))}
-                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Background Image — Upload Photo</label>
-            <ImageUploader currentUrl={data.bg_image_url || ''} onUploaded={url => setData(p => ({ ...p, bg_image_url: url }))} folder="heroes" label="Click to upload hero background photo" />
-          </div>
-          <button onClick={() => onSave(data)} disabled={saving}
-            className="flex items-center gap-2 text-sm font-bold px-5 py-2.5 rounded-lg text-white transition-all hover:scale-[1.02]"
-            style={{ background: '#ED8214' }}>
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            Save Hero Section
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ServiceEditor({ service, index, onChange, onSave, onDelete }: {
-  service: { id: number; title: string; subtitle: string; description: string; icon: string; image_url: string; sort_order: number; is_active: boolean; is_featured: boolean; };
-  index: number; onChange: (s: typeof service) => void; onSave: () => void; onDelete: () => void;
-}) {
-  const [open, setOpen] = useState(!service.id);
-  return (
-    <div className="rounded-xl overflow-hidden" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-      <button onClick={() => setOpen(p => !p)} className="w-full flex items-center justify-between p-5">
-        <div className="flex items-center gap-3">
-          <span className="w-2 h-2 rounded-full" style={{ background: service.is_active ? '#10b981' : '#374151' }} />
-          {service.image_url && <img src={service.image_url} className="w-8 h-8 rounded-lg object-cover" alt="" />}
-          <span className="font-bold text-sm text-white">{service.title}</span>
-          {service.is_featured && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(237,130,20,0.15)', color: '#ED8214' }}>Featured</span>}
-        </div>
-        <div className="flex items-center gap-3">
-          <button onClick={e => { e.stopPropagation(); onDelete(); }} className="p-1.5 rounded-lg hover:bg-red-900/30" style={{ color: '#ef4444' }}><Trash2 className="h-4 w-4" /></button>
-          <ChevronDown className="h-4 w-4" style={{ color: '#6b7280', transform: open ? 'rotate(180deg)' : 'none' }} />
-        </div>
-      </button>
-      {open && (
-        <div className="px-5 pb-5 space-y-4" style={{ borderTop: '1px solid #1f2937' }}>
-          <div className="pt-4">
-            <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Service Photo</label>
-            <ImageUploader currentUrl={service.image_url || ''} onUploaded={url => onChange({ ...service, image_url: url })} folder="services" label="Click to upload service photo" />
-          </div>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Title</label>
-              <input value={service.title} onChange={e => onChange({ ...service, title: e.target.value })}
-                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-            </div>
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Subtitle</label>
-              <input value={service.subtitle || ''} onChange={e => onChange({ ...service, subtitle: e.target.value })}
-                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Description</label>
-            <textarea value={service.description || ''} onChange={e => onChange({ ...service, description: e.target.value })} rows={3}
-              className="w-full px-3 py-2.5 rounded-lg text-sm resize-none" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-          </div>
-          <div className="grid md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Icon Name</label>
-              <input value={service.icon || ''} onChange={e => onChange({ ...service, icon: e.target.value })} placeholder="Layers, Zap, Award..."
-                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-            </div>
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Sort Order</label>
-              <input type="number" value={service.sort_order} onChange={e => onChange({ ...service, sort_order: parseInt(e.target.value) || 0 })}
-                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-            </div>
-            <div className="flex flex-col gap-3 justify-center">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#9ca3af' }}>Active</span>
-                <div onClick={() => onChange({ ...service, is_active: !service.is_active })} className="relative inline-flex h-6 w-11 rounded-full cursor-pointer transition-colors" style={{ background: service.is_active ? '#ED8214' : '#374151' }}>
-                  <span className="inline-block h-5 w-5 rounded-full bg-white shadow mt-0.5 transition-transform" style={{ transform: service.is_active ? 'translateX(22px)' : 'translateX(2px)' }} />
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#9ca3af' }}>Featured</span>
-                <div onClick={() => onChange({ ...service, is_featured: !service.is_featured })} className="relative inline-flex h-6 w-11 rounded-full cursor-pointer transition-colors" style={{ background: service.is_featured ? '#ED8214' : '#374151' }}>
-                  <span className="inline-block h-5 w-5 rounded-full bg-white shadow mt-0.5 transition-transform" style={{ transform: service.is_featured ? 'translateX(22px)' : 'translateX(2px)' }} />
-                </div>
-              </div>
-            </div>
-          </div>
-          <button onClick={onSave} className="flex items-center gap-2 text-sm font-bold px-5 py-2.5 rounded-lg text-white transition-all hover:scale-[1.02]" style={{ background: '#ED8214' }}>
-            <Save className="h-4 w-4" />{service.id ? 'Save Changes' : 'Create Service'}
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function PortfolioEditor({ project, index, onChange, onSave, onDelete }: {
-  project: { id: number; title: string; category: string; client: string; location: string; project_date: string; visitors: string; description: string; image_url: string; award: string; is_featured: boolean; is_active: boolean; sort_order: number; };
-  index: number; onChange: (p: typeof project) => void; onSave: () => void; onDelete: () => void;
-}) {
-  const [open, setOpen] = useState(!project.id);
-  const categories = ['Exhibition', 'Event', 'Booth', 'Corporate', 'Brand Activation', 'Other'];
-  return (
-    <div className="rounded-xl overflow-hidden" style={{ background: '#111827', border: '1px solid #1f2937' }}>
-      <button onClick={() => setOpen(p => !p)} className="w-full flex items-center justify-between p-5">
-        <div className="flex items-center gap-3">
-          {project.image_url && <img src={project.image_url} className="w-8 h-8 rounded-lg object-cover shrink-0" alt="" />}
-          <div className="text-left">
-            <p className="font-bold text-sm text-white">{project.title}</p>
-            <p className="text-xs" style={{ color: '#6b7280' }}>{project.category} · {project.location}</p>
-          </div>
-          {project.is_featured && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(237,130,20,0.15)', color: '#ED8214' }}>Featured</span>}
-        </div>
-        <div className="flex items-center gap-3">
-          <button onClick={e => { e.stopPropagation(); onDelete(); }} className="p-1.5 rounded-lg" style={{ color: '#ef4444' }}><Trash2 className="h-4 w-4" /></button>
-          <ChevronDown className="h-4 w-4" style={{ color: '#6b7280', transform: open ? 'rotate(180deg)' : 'none' }} />
-        </div>
-      </button>
-      {open && (
-        <div className="px-5 pb-5 space-y-4" style={{ borderTop: '1px solid #1f2937' }}>
-          <div className="pt-4">
-            <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Project Photo (Upload)</label>
-            <ImageUploader currentUrl={project.image_url || ''} onUploaded={url => onChange({ ...project, image_url: url })} folder="portfolio" label="Click to upload project photo" />
-          </div>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Project Title</label>
-              <input value={project.title} onChange={e => onChange({ ...project, title: e.target.value })}
-                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-            </div>
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Category</label>
-              <select value={project.category || ''} onChange={e => onChange({ ...project, category: e.target.value })}
-                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }}>
-                {categories.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Client</label>
-              <input value={project.client || ''} onChange={e => onChange({ ...project, client: e.target.value })}
-                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-            </div>
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Location</label>
-              <input value={project.location || ''} onChange={e => onChange({ ...project, location: e.target.value })}
-                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-            </div>
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Date</label>
-              <input value={project.project_date || ''} onChange={e => onChange({ ...project, project_date: e.target.value })} placeholder="March 2026"
-                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-            </div>
-            <div>
-              <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Visitors</label>
-              <input value={project.visitors || ''} onChange={e => onChange({ ...project, visitors: e.target.value })} placeholder="50,000+"
-                className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Award (optional)</label>
-            <input value={project.award || ''} onChange={e => onChange({ ...project, award: e.target.value })} placeholder="Best Innovation Award 2026"
-              className="w-full px-3 py-2.5 rounded-lg text-sm" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-          </div>
-          <div>
-            <label className="block text-xs font-bold mb-1.5 uppercase tracking-widest" style={{ color: '#9ca3af' }}>Description</label>
-            <textarea value={project.description || ''} onChange={e => onChange({ ...project, description: e.target.value })} rows={3}
-              className="w-full px-3 py-2.5 rounded-lg text-sm resize-none" style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
-          </div>
-          <div className="flex items-center gap-6">
-            {[['is_active', 'Active'], ['is_featured', 'Featured']].map(([key, label]) => (
-              <div key={key} className="flex items-center gap-2">
-                <div onClick={() => onChange({ ...project, [key]: !project[key as keyof typeof project] })}
-                  className="relative inline-flex h-6 w-11 rounded-full cursor-pointer transition-colors"
-                  style={{ background: project[key as keyof typeof project] ? '#ED8214' : '#374151' }}>
-                  <span className="inline-block h-5 w-5 rounded-full bg-white shadow mt-0.5 transition-transform"
-                    style={{ transform: project[key as keyof typeof project] ? 'translateX(22px)' : 'translateX(2px)' }} />
-                </div>
-                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#9ca3af' }}>{label}</span>
-              </div>
-            ))}
-          </div>
-          <button onClick={onSave} className="flex items-center gap-2 text-sm font-bold px-5 py-2.5 rounded-lg text-white transition-all hover:scale-[1.02]" style={{ background: '#ED8214' }}>
-            <Save className="h-4 w-4" />{project.id ? 'Save Changes' : 'Create Project'}
-          </button>
-        </div>
-      )}
     </div>
   );
 }
