@@ -112,7 +112,7 @@ const Services = () => {
   const [scrolled, setScrolled] = useState(false);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const cms = useCMS();
-  const { t: _t, isAr, dir, fontFamily, lang } = useLocalLanguage();
+  const { t: _t, isAr, dir, fontFamily, lang, setLang } = useLocalLanguage();
   const ct = (page: string, section: string, field: string, fallback: string) =>
     getCMSText(cms.pageContent, page, section, field, lang as 'en' | 'ar', fallback);
   const ci = (page: string, section: string, key: string, fallback: string) =>
@@ -217,6 +217,12 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
             ))}
           </nav>
           <div className="hidden md:flex items-center gap-3">
+            <button
+              onClick={() => setLang(isAr ? 'en' : 'ar')}
+              className="text-xs font-bold px-3 py-1.5 rounded-full transition-all hover:scale-105"
+              style={{ background: 'rgba(237,130,20,0.12)', border: '1px solid rgba(237,130,20,0.3)', color: '#ED8214' }}>
+              {isAr ? 'EN' : 'عربي'}
+            </button>
             <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 text-white text-sm font-semibold px-4 py-2 rounded-full transition-all hover:scale-105" style={{ background: '#16a34a' }}>
               <MessageCircle className="h-4 w-4" /> {t('nav.whatsapp')}
@@ -236,6 +242,12 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
               </Link>
             ))}
             <div className="flex gap-3 pt-4">
+              <button
+                onClick={() => setLang(isAr ? 'en' : 'ar')}
+                className="flex-1 text-center text-sm font-semibold px-4 py-3 rounded-full"
+                style={{ background: 'rgba(237,130,20,0.15)', color: '#ED8214', border: '1px solid rgba(237,130,20,0.3)' }}>
+                {isAr ? 'EN' : 'عربي'}
+              </button>
               <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
                 className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#16a34a' }}>{t('nav.whatsapp')}</a>
               <Link to="/contact" className="flex-1 text-center text-white text-sm font-semibold px-4 py-3 rounded-full" style={{ background: '#ED8214' }}>{t('nav.quote')}</Link>

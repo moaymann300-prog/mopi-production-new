@@ -149,7 +149,7 @@ const Portfolio = () => {
   const [spotlightTransition, setSpotlightTransition] = useState(false);
   const spotlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const cms = useCMS();
-  const { t: _t, isAr, dir, fontFamily, lang } = useLocalLanguage();
+  const { t: _t, isAr, dir, fontFamily, lang, setLang } = useLocalLanguage();
   const ct = (page: string, section: string, field: string, fallback: string) =>
     getCMSText(cms.pageContent, page, section, field, lang as 'en' | 'ar', fallback);
   const ci = (page: string, section: string, key: string, fallback: string) =>
@@ -330,7 +330,7 @@ const Portfolio = () => {
           <div className="hidden md:flex items-center gap-3">
             {/* Language Toggle */}
             <button
-              onClick={() => { const stored = localStorage.getItem('mopi_lang'); const next = stored === 'ar' ? 'en' : 'ar'; localStorage.setItem('mopi_lang', next); window.dispatchEvent(new Event('mopi-lang-change')); window.location.reload(); }}
+              onClick={() => setLang(isAr ? 'en' : 'ar')}
               className="text-xs font-bold px-3 py-1.5 rounded-full transition-all hover:scale-105"
               style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#ED8214' }}>
               {isAr ? 'EN' : 'عربي'}
@@ -352,7 +352,7 @@ const Portfolio = () => {
               {l.label} <ChevronRight className="h-4 w-4 opacity-50" /></Link>)}
             <div className="flex gap-3 pt-4">
               <button
-                onClick={() => { const stored = localStorage.getItem('mopi_lang'); const next = stored === 'ar' ? 'en' : 'ar'; localStorage.setItem('mopi_lang', next); window.dispatchEvent(new Event('mopi-lang-change')); window.location.reload(); }}
+                onClick={() => setLang(isAr ? 'en' : 'ar')}
                 className="flex-1 text-center text-sm font-semibold px-4 py-3 rounded-full"
                 style={{ background: 'rgba(244,163,0,0.15)', color: '#ED8214', border: '1px solid rgba(244,163,0,0.3)' }}>
                 {isAr ? 'EN' : 'عربي'}
