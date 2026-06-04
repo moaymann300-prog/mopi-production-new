@@ -475,10 +475,24 @@ export default function AdminDashboard() {
 
   const savePageImage = async (item: PageImage) => {
     setSaving(true);
-    const { error } = await supabase.from('cms_page_images_2026_06_01')
-      .update({ image_url: item.image_url, alt_en: item.alt_en, alt_ar: item.alt_ar, updated_at: new Date().toISOString() })
-      .eq('id', item.id);
-    if (error) notify('Save failed: ' + error.message, 'error'); else notify('Image saved! ✓');
+    if (item.id) {
+      // Record exists — update
+      const { error } = await supabase.from('cms_page_images_2026_06_01')
+        .update({ image_url: item.image_url, alt_en: item.alt_en, alt_ar: item.alt_ar })
+        .eq('id', item.id);
+      if (error) notify('Save failed: ' + error.message, 'error'); else notify('Image saved! ✓');
+    } else {
+      // Record does not exist — insert
+      const { data, error } = await supabase.from('cms_page_images_2026_06_01')
+        .insert({ page: item.page, section: item.section, image_key: item.image_key, image_url: item.image_url, alt_en: item.alt_en || '', alt_ar: item.alt_ar || '', sort_order: item.sort_order ?? 0 })
+        .select().single();
+      if (error) { notify('Save failed: ' + error.message, 'error'); }
+      else if (data) {
+        // Update local state with the new id
+        setPageImages(prev => [...prev.filter(p => !(p.page === item.page && p.section === item.section && p.image_key === item.image_key)), data as PageImage]);
+        notify('Image saved! ✓');
+      }
+    }
     setSaving(false);
   };
 
@@ -537,23 +551,24 @@ export default function AdminDashboard() {
               <Divider label="Photos" />
               <div className={`grid gap-4 ${imageKeys.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
                 {imageKeys.map(ik => {
-                  const imgItem = getPI(pageName, sectionName, ik.key);
-                  if (!imgItem) return (
-                    <div key={ik.key}>
-                      <Field label={ik.label}>
-                        <div className="h-32 rounded-xl flex items-center justify-center text-xs" style={{ background: '#0a0e1a', border: '1px dashed #374151', color: '#4b5563' }}>
-                          No image record found in DB
-                        </div>
-                      </Field>
-                    </div>
-                  );
+                  // Use existing DB record OR create a phantom object so the uploader always shows
+                  const imgItem: PageImage = getPI(pageName, sectionName, ik.key) ?? {
+                    id: 0,
+                    page: pageName,
+                    section: sectionName,
+                    image_key: ik.key,
+                    image_url: '',
+                    alt_en: ik.label,
+                    alt_ar: ik.label,
+                    sort_order: 0,
+                  };
                   return (
                     <div key={ik.key}>
                       <Field label={ik.label}>
                         <ImageUploader
                           currentUrl={imgItem.image_url}
                           onUploaded={url => {
-                            updatePI(imgItem.id, url);
+                            if (imgItem.id) updatePI(imgItem.id, url);
                             savePageImage({ ...imgItem, image_url: url });
                           }}
                           folder={`pages/${pageName}`}
