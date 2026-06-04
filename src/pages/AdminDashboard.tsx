@@ -26,6 +26,7 @@ interface Testimonial { id: number; author_name: string; author_role: string; co
 interface MediaItem { id: number; filename: string; url: string; alt_text: string; category: string; uploaded_at: string; }
 interface AboutContent { id: number; section: string; title: string; content: string; image_url: string; }
 interface ContactSubmission { id: number; name: string; email: string; phone: string; company: string; service: string; message: string; status: string; created_at: string; }
+interface QuoteRequest { id: number; company_name: string; email: string; phone: string; exhibition_name: string; exhibition_date: string; exhibition_venue: string; stand_dimension: string; layout: string; flooring: string; platform: string; meeting_room: string; double_deck: string; storage_room: string; required_items: string[]; floor_plan_url: string; brand_guidelines_url: string; message: string; status: string; internal_notes: string; created_at: string; }
 interface PageContent { id: number; page: string; section: string; field: string; value_en: string; value_ar: string; }
 interface PageImage { id: number; page: string; section: string; image_key: string; image_url: string; alt_en: string; alt_ar: string; sort_order: number; }
 
@@ -258,6 +259,7 @@ export default function AdminDashboard() {
   const [saving, setSaving] = useState(false);
   const [selectedMessageId, setSelectedMessageId] = useState<number | null>(null);
   const [inboxNote, setInboxNote] = useState<Record<number, string>>({});
+  const [inboxTabState, setInboxTabState] = useState<'quotes'|'contacts'>('quotes');
 
   const [settings, setSettings] = useState<SiteSetting[]>([]);
   const [socials, setSocials] = useState<SocialLink[]>([]);
@@ -271,6 +273,7 @@ export default function AdminDashboard() {
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [aboutContent, setAboutContent] = useState<AboutContent[]>([]);
   const [inbox, setInbox] = useState<ContactSubmission[]>([]);
+  const [quoteRequests, setQuoteRequests] = useState<QuoteRequest[]>([]);
   const [pageContent, setPageContent] = useState<PageContent[]>([]);
   const [pageImages, setPageImages] = useState<PageImage[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -294,7 +297,7 @@ export default function AdminDashboard() {
   }, []);
 
   const fetchAll = useCallback(async () => {
-    const [s, sl, lg, h, st, sv, pf, tm, ts, md, ab, ib, pc, pi] = await Promise.all([
+    const [s, sl, lg, h, st, sv, pf, tm, ts, md, ab, ib, pc, pi, qr] = await Promise.all([
       supabase.from('cms_site_settings_2026_04_21').select('*').order('group_name').order('id'),
       supabase.from('cms_social_links_2026_04_21').select('*').order('sort_order'),
       supabase.from('cms_logos_2026_04_21').select('*').order('id'),
@@ -309,6 +312,7 @@ export default function AdminDashboard() {
       supabase.from('cms_contact_submissions_2026_04_21').select('*').order('created_at', { ascending: false }),
       supabase.from('cms_page_content_2026_06_01').select('*').order('page').order('section').order('field'),
       supabase.from('cms_page_images_2026_06_01').select('*').order('page').order('sort_order'),
+      supabase.from('quote_requests_2026_06_04').select('*').order('created_at', { ascending: false }),
     ]);
     if (s.data) setSettings(s.data);
     if (sl.data) setSocials(sl.data);
@@ -324,8 +328,9 @@ export default function AdminDashboard() {
     if (ib.data) setInbox(ib.data);
     if (pc.data) setPageContent(pc.data);
     if (pi.data) setPageImages(pi.data);
+    if (qr.data) setQuoteRequests(qr.data);
     setLoaded(true);
-  }, []);
+  }, [];
 
   useEffect(() => { if (authed) fetchAll(); }, [authed, fetchAll]);
 
@@ -441,6 +446,18 @@ export default function AdminDashboard() {
     setInbox(prev => prev.filter(m => m.id !== id));
     if (selectedMessageId === id) setSelectedMessageId(null);
     notify('Message deleted!');
+  };
+
+  const updateQuoteStatus = async (id: number, status: string) => {
+    await supabase.from('quote_requests_2026_06_04').update({ status }).eq('id', id);
+    setQuoteRequests(prev => prev.map(q => q.id === id ? { ...q, status } : q));
+    notify('Status updated!');
+  };
+  const deleteQuoteRequest = async (id: number) => {
+    await supabase.from('quote_requests_2026_06_04').delete().eq('id', id);
+    setQuoteRequests(prev => prev.filter(q => q.id !== id));
+    if (selectedMessageId === id) setSelectedMessageId(null);
+    notify('Quote request deleted!');
   };
 
   const handleMediaUpload = async (file: File) => {
@@ -633,7 +650,7 @@ export default function AdminDashboard() {
     );
   }
 
-  const unreadCount = inbox.filter(m => m.status === 'new').length;
+  const unreadCount = inbox.filter(m => m.status === 'new').length + quoteRequests.filter(q => q.status === 'new').length;
 
   // ── SIDEBAR ──
   const navGroups = [
@@ -1594,6 +1611,7 @@ export default function AdminDashboard() {
 
   // ── INBOX ──
   const renderInbox = () => {
+    const inboxTab = inboxTabState;
     const statusColors: Record<string, { bg: string; text: string; border: string }> = {
       new:        { bg: 'rgba(237,130,20,0.12)',   text: '#ED8214',  border: 'rgba(237,130,20,0.35)' },
       read:       { bg: 'rgba(96,165,250,0.10)',   text: '#60a5fa',  border: 'rgba(96,165,250,0.25)' },
@@ -1607,167 +1625,304 @@ export default function AdminDashboard() {
       in_progress: '⚙ IN PROGRESS', completed: '✅ COMPLETED', archived: '📦 ARCHIVED',
     };
 
+    const StatusActions = ({ id, currentStatus, onUpdate }: { id: number; currentStatus: string; onUpdate: (id: number, st: string) => void }) => (
+      <div className="flex flex-wrap gap-2">
+        {(['read','in_progress','replied','completed','archived'] as const).map(st => (
+          <button key={st} onClick={() => onUpdate(id, st)}
+            className="text-xs font-bold px-3 py-1.5 rounded-lg transition-all hover:scale-105"
+            style={{
+              background: currentStatus === st ? (statusColors[st]?.bg ?? 'rgba(255,255,255,0.05)') : '#0f172a',
+              border: `1px solid ${currentStatus === st ? (statusColors[st]?.border ?? '#374151') : '#374151'}`,
+              color: currentStatus === st ? (statusColors[st]?.text ?? '#9ca3af') : '#9ca3af',
+            }}>{statusLabel[st]}</button>
+        ))}
+      </div>
+    );
+
     return (
       <div>
         <PageHeader
           title={`Inbox${unreadCount > 0 ? ` — ${unreadCount} New` : ''}`}
-          subtitle="Click any message to open it — it stays open until you close it"
+          subtitle="Click any item to expand its full details — stays open until you close it"
           icon={MessageSquare} color="#ED8214"
         />
 
-        {/* Filter bar */}
-        <div className="flex flex-wrap gap-2 mb-5">
-          {['all','new','read','in_progress','replied','completed','archived'].map(f => (
-            <button key={f}
-              onClick={() => setSelectedMessageId(null)}
-              className="text-[11px] font-bold px-3 py-1.5 rounded-full transition-all"
-              style={{ background: '#111827', border: '1px solid #374151', color: '#9ca3af' }}>
-              {f === 'all' ? `All (${inbox.length})` : `${statusLabel[f] ?? f.toUpperCase()} (${inbox.filter(m => m.status === f).length})`}
+        {/* Tab switcher */}
+        <div className="flex gap-3 mb-6">
+          {([['quotes', `📋 Quote Requests (${quoteRequests.length})`, quoteRequests.filter(q => q.status === 'new').length],
+             ['contacts', `📬 Contact Messages (${inbox.length})`, inbox.filter(m => m.status === 'new').length]] as const).map(([tab, label, newCount]) => (
+            <button key={tab} onClick={() => { setInboxTabState(tab as 'quotes'|'contacts'); setSelectedMessageId(null); }}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
+              style={{
+                background: inboxTab === tab ? 'rgba(237,130,20,0.15)' : '#111827',
+                border: `1.5px solid ${inboxTab === tab ? '#ED8214' : '#374151'}`,
+                color: inboxTab === tab ? '#ED8214' : '#6b7280',
+              }}>
+              {label}
+              {(newCount as number) > 0 && <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full" style={{ background: '#ED8214', color: '#000' }}>{newCount as number}</span>}
             </button>
           ))}
         </div>
 
-        <div className="space-y-2">
-          {inbox.map(msg => {
-            const isOpen = selectedMessageId === msg.id;
-            const sc = statusColors[msg.status] ?? statusColors.archived;
-            return (
-              <div key={msg.id}
-                className="rounded-2xl overflow-hidden transition-all duration-300"
-                style={{ border: `1px solid ${isOpen ? sc.border : '#1f2937'}`, background: '#111827' }}>
-
-                {/* ── Row header — always visible, click to toggle ── */}
-                <button
-                  className="w-full flex items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-white/[0.02]"
-                  onClick={() => {
-                    setSelectedMessageId(isOpen ? null : msg.id);
-                    // Auto-mark as read when opened
-                    if (!isOpen && msg.status === 'new') updateInboxStatus(msg.id, 'read');
-                  }}
-                >
-                  {/* Avatar */}
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
-                    style={{ background: sc.bg, color: sc.text }}>
-                    {msg.name?.charAt(0).toUpperCase()}
-                  </div>
-
-                  {/* Name + preview */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <span className="font-bold text-sm text-white">{msg.name}</span>
-                      {msg.company && <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: '#0f172a', color: '#6b7280' }}>🏢 {msg.company}</span>}
+        {/* =================== QUOTE REQUESTS TAB =================== */}
+        {inboxTab === 'quotes' && (
+          <div className="space-y-2">
+            {quoteRequests.map(q => {
+              const isOpen = selectedMessageId === q.id + 100000;
+              const sc = statusColors[q.status] ?? statusColors.archived;
+              return (
+                <div key={q.id} className="rounded-2xl overflow-hidden transition-all duration-300"
+                  style={{ border: `1px solid ${isOpen ? sc.border : '#1f2937'}`, background: '#111827' }}>
+                  {/* Row header */}
+                  <button className="w-full flex items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-white/[0.02]"
+                    onClick={() => {
+                      setSelectedMessageId(isOpen ? null : q.id + 100000);
+                      if (!isOpen && q.status === 'new') updateQuoteStatus(q.id, 'read');
+                    }}>
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
+                      style={{ background: sc.bg, color: sc.text }}>
+                      {q.company_name?.charAt(0).toUpperCase() || 'Q'}
                     </div>
-                    <p className="text-xs truncate" style={{ color: '#6b7280' }}>
-                      {isOpen ? `${msg.email} · ${msg.phone}` : msg.message?.slice(0, 80) + (msg.message?.length > 80 ? '…' : '')}
-                    </p>
-                  </div>
-
-                  {/* Status badge + date + chevron */}
-                  <div className="flex items-center gap-2.5 shrink-0">
-                    <span className="text-[10px] font-black px-2.5 py-1 rounded-full"
-                      style={{ background: sc.bg, color: sc.text, border: `1px solid ${sc.border}` }}>
-                      {statusLabel[msg.status] ?? msg.status.toUpperCase()}
-                    </span>
-                    <span className="text-xs hidden sm:block" style={{ color: '#374151' }}>
-                      {new Date(msg.created_at).toLocaleDateString()}
-                    </span>
-                    <span className="text-xs transition-transform duration-200" style={{ color: '#6b7280', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
-                  </div>
-                </button>
-
-                {/* ── Expanded detail panel — stays open until manually closed ── */}
-                {isOpen && (
-                  <div className="px-5 pb-5" style={{ borderTop: '1px solid #1f2937' }}>
-
-                    {/* Contact info row */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 mb-4">
-                      {[
-                        { icon: '✉️', label: 'Email',   val: msg.email },
-                        { icon: '📞', label: 'Phone',   val: msg.phone },
-                        { icon: '🏢', label: 'Company', val: msg.company || '—' },
-                        { icon: '⚙️', label: 'Service', val: msg.service || '—' },
-                      ].map(({ icon, label, val }) => (
-                        <div key={label} className="p-3 rounded-xl" style={{ background: '#0f172a', border: '1px solid #1f2937' }}>
-                          <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#6b7280' }}>{icon} {label}</p>
-                          <p className="text-xs font-semibold text-white break-all">{val}</p>
-                        </div>
-                      ))}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="font-bold text-sm text-white">{q.company_name}</span>
+                        <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: '#0f172a', color: '#6b7280' }}>🏗 Quote Request</span>
+                      </div>
+                      <p className="text-xs truncate" style={{ color: '#6b7280' }}>
+                        {isOpen ? `${q.email} · ${q.phone}` : (q.exhibition_name ? `🏷 ${q.exhibition_name}` : q.message?.slice(0, 80) || '—')}
+                      </p>
                     </div>
-
-                    {/* Message body */}
-                    <div className="p-4 rounded-xl mb-4" style={{ background: '#0a0e1a', border: '1px solid #1f2937' }}>
-                      <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: '#6b7280' }}>💬 Message</p>
-                      <p className="text-sm leading-relaxed" style={{ color: '#d1d5db' }}>{msg.message}</p>
+                    <div className="flex items-center gap-2.5 shrink-0">
+                      <span className="text-[10px] font-black px-2.5 py-1 rounded-full"
+                        style={{ background: sc.bg, color: sc.text, border: `1px solid ${sc.border}` }}>
+                        {statusLabel[q.status] ?? q.status.toUpperCase()}
+                      </span>
+                      <span className="text-xs hidden sm:block" style={{ color: '#374151' }}>{new Date(q.created_at).toLocaleDateString()}</span>
+                      <span className="text-xs transition-transform duration-200" style={{ color: '#6b7280', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
                     </div>
+                  </button>
 
-                    {/* Internal notes */}
-                    <div className="mb-4">
-                      <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: '#6b7280' }}>📝 Internal Notes (not sent to client)</p>
-                      <textarea
-                        rows={3}
-                        value={inboxNote[msg.id] ?? ''}
-                        onChange={e => setInboxNote(prev => ({ ...prev, [msg.id]: e.target.value }))}
-                        placeholder="Add internal notes, follow-up reminders, quotes discussed…"
-                        className="w-full rounded-xl px-3.5 py-2.5 text-sm resize-none"
-                        style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }}
-                      />
-                    </div>
-
-                    {/* Status changer */}
-                    <div className="mb-4">
-                      <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: '#6b7280' }}>🔄 Update Status</p>
-                      <div className="flex flex-wrap gap-2">
-                        {(['read','in_progress','replied','completed','archived'] as const).map(st => (
-                          <button key={st}
-                            onClick={() => updateInboxStatus(msg.id, st)}
-                            className="text-xs font-bold px-3 py-1.5 rounded-lg transition-all hover:scale-105"
-                            style={{
-                              background: msg.status === st ? (statusColors[st]?.bg ?? 'rgba(255,255,255,0.05)') : '#0f172a',
-                              border: `1px solid ${msg.status === st ? (statusColors[st]?.border ?? '#374151') : '#374151'}`,
-                              color: msg.status === st ? (statusColors[st]?.text ?? '#9ca3af') : '#9ca3af',
-                            }}>
-                            {statusLabel[st]}
-                          </button>
+                  {/* Expanded quote detail */}
+                  {isOpen && (
+                    <div className="px-5 pb-5" style={{ borderTop: '1px solid #1f2937' }}>
+                      {/* Contact info */}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 mb-4">
+                        {[
+                          { icon: '✉️', label: 'Email', val: q.email },
+                          { icon: '📞', label: 'Phone', val: q.phone || '—' },
+                          { icon: '🏢', label: 'Company', val: q.company_name },
+                        ].map(({ icon, label, val }) => (
+                          <div key={label} className="p-3 rounded-xl" style={{ background: '#0f172a', border: '1px solid #1f2937' }}>
+                            <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#6b7280' }}>{icon} {label}</p>
+                            <p className="text-xs font-semibold text-white break-all">{val}</p>
+                          </div>
                         ))}
                       </div>
-                    </div>
 
-                    {/* Action buttons */}
-                    <div className="flex flex-wrap items-center gap-2 pt-3" style={{ borderTop: '1px solid #1f2937' }}>
-                      <a href={`mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.service || 'Your Inquiry')}&body=Dear ${encodeURIComponent(msg.name)},%0D%0A%0D%0A`}
-                        className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-lg transition-colors hover:bg-blue-900/20"
-                        style={{ color: '#60a5fa', border: '1px solid rgba(96,165,250,0.2)' }}>
-                        <Mail className="h-3.5 w-3.5" /> Reply via Email
-                      </a>
-                      <a href={`https://wa.me/${msg.phone?.replace(/\D/g, '')}?text=Hello ${encodeURIComponent(msg.name)}, thank you for contacting MOPi Production!`}
-                        target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-lg transition-colors hover:bg-green-900/20"
-                        style={{ color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' }}>
-                        <Phone className="h-3.5 w-3.5" /> WhatsApp
-                      </a>
-                      <span className="text-xs" style={{ color: '#374151' }}>
-                        Received: {new Date(msg.created_at).toLocaleString()}
-                      </span>
-                      <button
-                        onClick={() => { if (window.confirm('Delete this message?')) deleteInbox(msg.id); }}
-                        className="ml-auto flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-lg hover:bg-red-900/20 transition-colors"
-                        style={{ color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
-                        <Trash2 className="h-3.5 w-3.5" /> Delete
-                      </button>
+                      {/* Exhibition details */}
+                      <div className="p-4 rounded-xl mb-4" style={{ background: '#0a0e1a', border: '1px solid #1f2937' }}>
+                        <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: '#6b7280' }}>🏗 Exhibition Details</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {[
+                            { label: 'Exhibition Name', val: q.exhibition_name || '—' },
+                            { label: 'Date', val: q.exhibition_date || '—' },
+                            { label: 'Venue', val: q.exhibition_venue || '—' },
+                            { label: 'Stand Dimension', val: q.stand_dimension || '—' },
+                            { label: 'Layout', val: q.layout || '—' },
+                            { label: 'Flooring', val: q.flooring || '—' },
+                          ].map(({ label, val }) => (
+                            <div key={label}>
+                              <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#6b7280' }}>{label}: </span>
+                              <span className="text-xs font-semibold text-white">{val}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Options */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                        {[
+                          { label: 'Platform', val: q.platform },
+                          { label: 'Meeting Room', val: q.meeting_room },
+                          { label: 'Double Deck', val: q.double_deck },
+                          { label: 'Storage Room', val: q.storage_room },
+                        ].map(({ label, val }) => (
+                          <div key={label} className="p-3 rounded-xl text-center" style={{ background: '#0f172a', border: `1px solid ${val === 'yes' ? 'rgba(16,185,129,0.25)' : '#1f2937'}` }}>
+                            <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#6b7280' }}>{label}</p>
+                            <p className="text-sm font-bold" style={{ color: val === 'yes' ? '#10b981' : '#6b7280' }}>{val === 'yes' ? '✓ Yes' : '× No'}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Required items */}
+                      {q.required_items && q.required_items.length > 0 && (
+                        <div className="mb-4">
+                          <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: '#6b7280' }}>📋 Required Items</p>
+                          <div className="flex flex-wrap gap-2">
+                            {q.required_items.map((item: string) => (
+                              <span key={item} className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: 'rgba(237,130,20,0.12)', color: '#ED8214', border: '1px solid rgba(237,130,20,0.25)' }}>{item}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Files */}
+                      {(q.floor_plan_url || q.brand_guidelines_url) && (
+                        <div className="flex gap-3 mb-4">
+                          {q.floor_plan_url && (
+                            <a href={q.floor_plan_url} target="_blank" rel="noopener noreferrer"
+                              className="flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-lg"
+                              style={{ background: 'rgba(96,165,250,0.1)', color: '#60a5fa', border: '1px solid rgba(96,165,250,0.2)' }}>
+                              📄 View Floor Plan
+                            </a>
+                          )}
+                          {q.brand_guidelines_url && (
+                            <a href={q.brand_guidelines_url} target="_blank" rel="noopener noreferrer"
+                              className="flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-lg"
+                              style={{ background: 'rgba(167,243,208,0.08)', color: '#6ee7b7', border: '1px solid rgba(110,231,183,0.2)' }}>
+                              🎨 View Brand Guidelines
+                            </a>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Message */}
+                      {q.message && (
+                        <div className="p-4 rounded-xl mb-4" style={{ background: '#0a0e1a', border: '1px solid #1f2937' }}>
+                          <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: '#6b7280' }}>💬 Comment / Message</p>
+                          <p className="text-sm leading-relaxed" style={{ color: '#d1d5db' }}>{q.message}</p>
+                        </div>
+                      )}
+
+                      {/* Notes */}
+                      <div className="mb-4">
+                        <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: '#6b7280' }}>📝 Internal Notes</p>
+                        <textarea rows={3}
+                          value={inboxNote[q.id + 100000] ?? ''}
+                          onChange={e => setInboxNote(prev => ({ ...prev, [q.id + 100000]: e.target.value }))}
+                          placeholder="Notes, quote amount discussed, follow-up…"
+                          className="w-full rounded-xl px-3.5 py-2.5 text-sm resize-none"
+                          style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }} />
+                      </div>
+
+                      {/* Status */}
+                      <div className="mb-4">
+                        <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: '#6b7280' }}>🔄 Update Status</p>
+                        <StatusActions id={q.id} currentStatus={q.status} onUpdate={updateQuoteStatus} />
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex flex-wrap items-center gap-2 pt-3" style={{ borderTop: '1px solid #1f2937' }}>
+                        <a href={`mailto:${q.email}?subject=Re: Exhibition Quote — ${encodeURIComponent(q.exhibition_name || 'Your Project')}&body=Dear ${encodeURIComponent(q.company_name)},%0D%0A%0D%0AThank you for your quote request!%0D%0A%0D%0A`}
+                          className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-lg transition-colors hover:bg-blue-900/20"
+                          style={{ color: '#60a5fa', border: '1px solid rgba(96,165,250,0.2)' }}>
+                          <Mail className="h-3.5 w-3.5" /> Reply via Email
+                        </a>
+                        <a href={`https://wa.me/${q.phone?.replace(/\D/g, '')}?text=Hello ${encodeURIComponent(q.company_name)}, thank you for your quote request to MOPi Production!`}
+                          target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-lg transition-colors hover:bg-green-900/20"
+                          style={{ color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' }}>
+                          <Phone className="h-3.5 w-3.5" /> WhatsApp
+                        </a>
+                        <span className="text-xs" style={{ color: '#374151' }}>Received: {new Date(q.created_at).toLocaleString()}</span>
+                        <button onClick={() => { if (window.confirm('Delete this quote request?')) deleteQuoteRequest(q.id); }}
+                          className="ml-auto flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-lg hover:bg-red-900/20 transition-colors"
+                          style={{ color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
+                          <Trash2 className="h-3.5 w-3.5" /> Delete
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+              );
+            })}
+            {quoteRequests.length === 0 && (
+              <div className="text-center py-20">
+                <MessageSquare className="h-10 w-10 mx-auto mb-3" style={{ color: '#374151' }} />
+                <p className="text-sm" style={{ color: '#4b5563' }}>No quote requests yet.</p>
+                <p className="text-xs mt-1" style={{ color: '#374151' }}>When someone fills the quote form, requests will appear here.</p>
               </div>
-            );
-          })}
-          {inbox.length === 0 && (
-            <div className="text-center py-20">
-              <MessageSquare className="h-10 w-10 mx-auto mb-3" style={{ color: '#374151' }} />
-              <p className="text-sm" style={{ color: '#4b5563' }}>No messages yet.</p>
-              <p className="text-xs mt-1" style={{ color: '#374151' }}>When someone fills the contact form, messages will appear here.</p>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
+
+        {/* =================== CONTACT MESSAGES TAB =================== */}
+        {inboxTab === 'contacts' && (
+          <div className="space-y-2">
+            {inbox.map(msg => {
+              const isOpen = selectedMessageId === msg.id;
+              const sc = statusColors[msg.status] ?? statusColors.archived;
+              return (
+                <div key={msg.id} className="rounded-2xl overflow-hidden transition-all duration-300"
+                  style={{ border: `1px solid ${isOpen ? sc.border : '#1f2937'}`, background: '#111827' }}>
+                  <button className="w-full flex items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-white/[0.02]"
+                    onClick={() => {
+                      setSelectedMessageId(isOpen ? null : msg.id);
+                      if (!isOpen && msg.status === 'new') updateInboxStatus(msg.id, 'read');
+                    }}>
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0" style={{ background: sc.bg, color: sc.text }}>
+                      {msg.name?.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="font-bold text-sm text-white">{msg.name}</span>
+                        {msg.company && <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: '#0f172a', color: '#6b7280' }}>🏢 {msg.company}</span>}
+                      </div>
+                      <p className="text-xs truncate" style={{ color: '#6b7280' }}>
+                        {isOpen ? `${msg.email} · ${msg.phone}` : msg.message?.slice(0, 80) + (msg.message?.length > 80 ? '…' : '')}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2.5 shrink-0">
+                      <span className="text-[10px] font-black px-2.5 py-1 rounded-full" style={{ background: sc.bg, color: sc.text, border: `1px solid ${sc.border}` }}>
+                        {statusLabel[msg.status] ?? msg.status.toUpperCase()}
+                      </span>
+                      <span className="text-xs hidden sm:block" style={{ color: '#374151' }}>{new Date(msg.created_at).toLocaleDateString()}</span>
+                      <span className="text-xs transition-transform duration-200" style={{ color: '#6b7280', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+                    </div>
+                  </button>
+                  {isOpen && (
+                    <div className="px-5 pb-5" style={{ borderTop: '1px solid #1f2937' }}>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 mb-4">
+                        {[{icon:'✉️',label:'Email',val:msg.email},{icon:'📞',label:'Phone',val:msg.phone},{icon:'🏢',label:'Company',val:msg.company||'—'},{icon:'⚙️',label:'Service',val:msg.service||'—'}].map(({icon,label,val})=>(
+                          <div key={label} className="p-3 rounded-xl" style={{background:'#0f172a',border:'1px solid #1f2937'}}>
+                            <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{color:'#6b7280'}}>{icon} {label}</p>
+                            <p className="text-xs font-semibold text-white break-all">{val}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="p-4 rounded-xl mb-4" style={{background:'#0a0e1a',border:'1px solid #1f2937'}}>
+                        <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{color:'#6b7280'}}>💬 Message</p>
+                        <p className="text-sm leading-relaxed" style={{color:'#d1d5db'}}>{msg.message}</p>
+                      </div>
+                      <div className="mb-4">
+                        <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{color:'#6b7280'}}>📝 Internal Notes</p>
+                        <textarea rows={3} value={inboxNote[msg.id]??''} onChange={e=>setInboxNote(prev=>({...prev,[msg.id]:e.target.value}))}
+                          placeholder="Notes, follow-up…" className="w-full rounded-xl px-3.5 py-2.5 text-sm resize-none"
+                          style={{background:'#0f172a',border:'1px solid #374151',color:'#f3f4f6'}} />
+                      </div>
+                      <div className="mb-4">
+                        <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{color:'#6b7280'}}>🔄 Update Status</p>
+                        <StatusActions id={msg.id} currentStatus={msg.status} onUpdate={updateInboxStatus} />
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 pt-3" style={{borderTop:'1px solid #1f2937'}}>
+                        <a href={`mailto:${msg.email}`} className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-lg hover:bg-blue-900/20" style={{color:'#60a5fa',border:'1px solid rgba(96,165,250,0.2)'}}><Mail className="h-3.5 w-3.5"/> Reply</a>
+                        <a href={`https://wa.me/${msg.phone?.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-lg hover:bg-green-900/20" style={{color:'#10b981',border:'1px solid rgba(16,185,129,0.2)'}}><Phone className="h-3.5 w-3.5"/> WhatsApp</a>
+                        <span className="text-xs" style={{color:'#374151'}}>Received: {new Date(msg.created_at).toLocaleString()}</span>
+                        <button onClick={()=>{if(window.confirm('Delete?'))deleteInbox(msg.id);}} className="ml-auto flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-lg hover:bg-red-900/20" style={{color:'#ef4444',border:'1px solid rgba(239,68,68,0.2)'}}><Trash2 className="h-3.5 w-3.5"/> Delete</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            {inbox.length === 0 && (
+              <div className="text-center py-20">
+                <MessageSquare className="h-10 w-10 mx-auto mb-3" style={{ color: '#374151' }} />
+                <p className="text-sm" style={{ color: '#4b5563' }}>No contact messages yet.</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     );
   };

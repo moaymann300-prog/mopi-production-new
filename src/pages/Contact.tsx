@@ -6,7 +6,7 @@ import { useCMS, getLogoUrl, getSocialUrl, getCMSText, getCMSImage } from '@/hoo
 import { useLocalLanguage } from '@/hooks/useLanguage';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
-  Menu, X, ChevronRight, CheckCircle, Clock, Send,
+  Menu, X, ChevronRight, CheckCircle, Clock, Send, Upload,
   Instagram, Facebook, Linkedin,
 } from 'lucide-react';
 
@@ -111,7 +111,16 @@ const Contact = () => {
   const [scrolled, setScrolled] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({ name: '', email: '', phone: '', company: '', service: '', message: '' });
+  const [quoteForm, setQuoteForm] = useState({
+    company_name: '', email: '', phone: '',
+    exhibition_name: '', exhibition_date: '', exhibition_venue: '',
+    stand_dimension: '', layout: '', flooring: '',
+    platform: 'no', meeting_room: 'no', double_deck: 'no', storage_room: 'no',
+    required_items: [] as string[], message: '',
+  });
+  const [floorPlanFile, setFloorPlanFile] = useState<File | null>(null);
+  const [brandGuidelinesFile, setBrandGuidelinesFile] = useState<File | null>(null);
+
   const cms = useCMS();
   const { t: _t, isAr, dir, fontFamily, lang, setLang } = useLocalLanguage();
   const ct = (page: string, section: string, field: string, fallback: string) =>
@@ -134,10 +143,10 @@ const Contact = () => {
     { label: t('nav.contact'), to: '/contact' },
   ];
 
-// CMS data
+  // CMS data
   const companyNameContact = cms.settings.company_name || 'MOPi Production';
   const logoUrlContact = getLogoUrl(cms.headerLogo);
-const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings.whatsapp_number.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
+  const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings.whatsapp_number.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
   const phoneContact = cms.settings.phone_1 || '+20 100 000 0000';
   const phone2Contact = cms.settings.phone_2 || '';
   const emailContact = cms.settings.email || 'info@mopiproduction.com';
@@ -148,21 +157,60 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
   const _youtubeUrl = getSocialUrl(cms.socials, 'youtube');
   const linkedinUrl = getSocialUrl(cms.socials, 'linkedin');
 
+  const uploadFile = async (file: File, folder: string): Promise<string> => {
+    const ext = file.name.split('.').pop();
+    const filename = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error } = await supabase.storage.from('cms-media').upload(filename, file, { upsert: true });
+    if (error) throw error;
+    const { data } = supabase.storage.from('cms-media').getPublicUrl(filename);
+    return data.publicUrl;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.message) return;
+    if (!quoteForm.company_name || !quoteForm.email) return;
     setSubmitting(true);
     try {
-      await supabase.from('contact_submissions_2026_04_20').insert([{
-        name: form.name, email: form.email, phone: form.phone,
-        company: form.company, service: form.service, message: form.message,
-        status: 'new', created_at: new Date().toISOString(),
+      let floorPlanUrl = '';
+      let brandGuidelinesUrl = '';
+      if (floorPlanFile) { try { floorPlanUrl = await uploadFile(floorPlanFile, 'floor-plans'); } catch {} }
+      if (brandGuidelinesFile) { try { brandGuidelinesUrl = await uploadFile(brandGuidelinesFile, 'brand-guidelines'); } catch {} }
+      await supabase.from('quote_requests_2026_06_04').insert([{
+        company_name: quoteForm.company_name,
+        email: quoteForm.email,
+        phone: quoteForm.phone,
+        exhibition_name: quoteForm.exhibition_name,
+        exhibition_date: quoteForm.exhibition_date,
+        exhibition_venue: quoteForm.exhibition_venue,
+        stand_dimension: quoteForm.stand_dimension,
+        layout: quoteForm.layout,
+        flooring: quoteForm.flooring,
+        platform: quoteForm.platform,
+        meeting_room: quoteForm.meeting_room,
+        double_deck: quoteForm.double_deck,
+        storage_room: quoteForm.storage_room,
+        required_items: quoteForm.required_items,
+        floor_plan_url: floorPlanUrl,
+        brand_guidelines_url: brandGuidelinesUrl,
+        message: quoteForm.message,
+        status: 'new',
+        created_at: new Date().toISOString(),
       }]);
     } catch (_) { /* silently continue */ }
     setSubmitting(false);
     setSubmitted(true);
-    setForm({ name: '', email: '', phone: '', company: '', service: '', message: '' });
-    setTimeout(() => setSubmitted(false), 6000);
+    setQuoteForm({ company_name: '', email: '', phone: '', exhibition_name: '', exhibition_date: '', exhibition_venue: '', stand_dimension: '', layout: '', flooring: '', platform: 'no', meeting_room: 'no', double_deck: 'no', storage_room: 'no', required_items: [], message: '' });
+    setFloorPlanFile(null); setBrandGuidelinesFile(null);
+    setTimeout(() => setSubmitted(false), 8000);
+  };
+
+  const toggleRequiredItem = (item: string) => {
+    setQuoteForm(prev => ({
+      ...prev,
+      required_items: prev.required_items.includes(item)
+        ? prev.required_items.filter(i => i !== item)
+        : [...prev.required_items, item],
+    }));
   };
 
   return (
@@ -280,62 +328,226 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
         </div>
       </section>
 
-      {/* ══ § 3 · FORM + DETAILS — WHITE ══ */}
-      <section className="py-28 px-5 relative overflow-hidden" style={{ background: '#FFFFFF' }}>
+      {/* ══ § 3 · PROJECT BRIEF FORM + DETAILS — WHITE ══ */}
+      <section id="quote-form" className="py-20 px-5 relative overflow-hidden" style={{ background: '#FFFFFF' }}>
         <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
         <div className="absolute top-12 right-12 pointer-events-none" style={{ width: 150, height: 150, border: '1.5px solid #ED8214', opacity: 0.06, transform: 'rotate(45deg)' }} />
 
         <div className="max-w-7xl mx-auto grid lg:grid-cols-5 gap-14">
-          {/* Form */}
+          {/* Project Brief Form */}
           <div className="lg:col-span-3">
             <Reveal>
-              <SectionLabel text={isAr ? 'احصل على عرض مجاني' : 'Get a Free Quote'} />
-              <h2 className="font-black mb-3" style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)', color: '#000' }}>{isAr ? 'أرسل لنا رسالة' : 'Send Us a Message'}</h2>
-              <p className="text-base mb-8" style={{ color: '#555', lineHeight: isAr ? '2' : '1.7' }}>{isAr ? 'املأ النموذج أدناه وسيتواصل معك فريقنا خلال 24 ساعة.' : 'Fill out the form below and our team will get back to you within 24 hours.'}</p>
+              <SectionLabel text={isAr ? 'موجز المشروع' : "Let's Talk About Your Project"} />
+              <h2 className="font-black mb-3" style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)', color: '#000' }}>
+                {isAr ? 'اطلب عرض سعر' : 'Request a Quote'}
+              </h2>
+              <p className="text-base mb-8" style={{ color: '#555', lineHeight: isAr ? '2' : '1.7' }}>
+                {isAr
+                  ? 'بعد ما نستلم معلوماتك، هنحدد معك موعد لمناقشة تفاصيل مشروعك.'
+                  : "After we get some information from you, we'll set up a time to discuss your project in further detail."}
+              </p>
 
               {submitted ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center" style={{ background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 16 }}>
                   <CheckCircle className="h-14 w-14 mb-5" style={{ color: '#16a34a' }} />
-                  <h3 className="font-black text-2xl mb-3" style={{ color: '#15803d' }}>{isAr ? 'تم الإرسال!' : 'Message Sent!'}</h3>
-                  <p style={{ color: '#166534' }}>{isAr ? 'شكراً! سيتواصل معك فريقنا خلال 24 ساعة.' : 'Thank you! Our team will contact you within 24 hours.'}</p>
+                  <h3 className="font-black text-2xl mb-3" style={{ color: '#15803d' }}>{isAr ? 'تم الإرسال بنجاح!' : 'Request Submitted!'}</h3>
+                  <p style={{ color: '#166534' }}>{isAr ? 'شكراً! سيتواصل معك فريقنا خلال 24 ساعة لمناقشة تفاصيل مشروعك.' : 'Thank you! Our team will contact you within 24 hours to discuss your project.'}</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
+
+                  {/* Row 1: Company + Email */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    {[
-                      { id: 'name', label: isAr ? 'الاسم الكامل *' : 'Full Name *', type: 'text', placeholder: isAr ? 'اسمك الكامل' : 'Your full name', required: true },
-                      { id: 'email', label: isAr ? 'البريد الإلكتروني *' : 'Email Address *', type: 'email', placeholder: 'your@email.com', required: true },
-                      { id: 'phone', label: isAr ? 'رقم الهاتف' : 'Phone Number', type: 'tel', placeholder: '+20 100 000 0000', required: false },
-                      { id: 'company', label: isAr ? 'اسم الشركة' : 'Company Name', type: 'text', placeholder: isAr ? 'شركتك' : 'Your company', required: false },
-                    ].map(f => (
-                      <div key={f.id}>
-                        <label className="block text-sm font-bold mb-1.5" style={{ color: '#1A1A1A' }}>{f.label}</label>
-                        <input type={f.type} required={f.required} placeholder={f.placeholder}
-                          value={form[f.id as keyof typeof form]}
-                          onChange={e => setForm(p => ({ ...p, [f.id]: e.target.value }))}
-                          className="w-full px-4 py-3 rounded-xl text-sm transition-all"
-                          style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb', color: '#1A1A1A' }} />
-                      </div>
-                    ))}
+                    <div>
+                      <label className="block text-sm font-bold mb-1.5" style={{ color: '#1A1A1A' }}>{isAr ? 'اسم الشركة *' : 'Company Name *'}</label>
+                      <input type="text" required placeholder={isAr ? 'اسم شركتك' : 'Your company name'}
+                        value={quoteForm.company_name} onChange={e => setQuoteForm(p => ({ ...p, company_name: e.target.value }))}
+                        className="w-full px-4 py-3 rounded-xl text-sm transition-all"
+                        style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb', color: '#1A1A1A' }} />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold mb-1.5" style={{ color: '#1A1A1A' }}>{isAr ? 'البريد الإلكتروني *' : 'Email *'}</label>
+                      <input type="email" required placeholder="your@email.com"
+                        value={quoteForm.email} onChange={e => setQuoteForm(p => ({ ...p, email: e.target.value }))}
+                        className="w-full px-4 py-3 rounded-xl text-sm transition-all"
+                        style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb', color: '#1A1A1A' }} />
+                    </div>
                   </div>
 
+                  {/* Phone */}
                   <div>
-                    <label className="block text-sm font-bold mb-1.5" style={{ color: '#1A1A1A' }}>{isAr ? 'الخدمة المطلوبة' : 'Service Interested In'}</label>
-                    <select value={form.service} onChange={e => setForm(p => ({ ...p, service: e.target.value }))}
+                    <label className="block text-sm font-bold mb-1.5" style={{ color: '#1A1A1A' }}>{isAr ? 'رقم الهاتف' : 'Phone'}</label>
+                    <div className="flex">
+                      <span className="flex items-center px-3 rounded-l-xl text-sm font-bold" style={{ background: '#e5e7eb', color: '#555', border: '1.5px solid #e5e7eb', borderRight: 'none' }}>🇪🇬 +20</span>
+                      <input type="tel" placeholder={isAr ? '0100 123 4567' : '0100 123 4567'}
+                        value={quoteForm.phone} onChange={e => setQuoteForm(p => ({ ...p, phone: e.target.value }))}
+                        className="flex-1 px-4 py-3 text-sm transition-all rounded-r-xl"
+                        style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb', borderLeft: 'none', color: '#1A1A1A' }} />
+                    </div>
+                  </div>
+
+                  {/* Exhibition Name */}
+                  <div>
+                    <label className="block text-sm font-bold mb-1.5" style={{ color: '#1A1A1A' }}>{isAr ? 'اسم المعرض / الفعالية' : 'Exhibition / Event Name'}</label>
+                    <input type="text" placeholder={isAr ? 'اسم المعرض أو الفعالية' : 'Exhibition or event name'}
+                      value={quoteForm.exhibition_name} onChange={e => setQuoteForm(p => ({ ...p, exhibition_name: e.target.value }))}
                       className="w-full px-4 py-3 rounded-xl text-sm transition-all"
-                      style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb', color: form.service ? '#1A1A1A' : '#9ca3af' }}>
-                      <option value="">{isAr ? 'اختر خدمة...' : 'Select a service...'}</option>
-                      {(isAr
-                        ? ['تصميم جناح معرض', 'تنفيذ فعاليات', 'براند أكتيفيشن', 'تصنيع مخصص', 'هوية بصرية وجرافيك', 'دعم تقني', 'إدارة مشروع متكاملة']
-                        : ['Exhibition Booth Design', 'Event Production', 'Brand Activations', 'Custom Fabrication', 'Branding & Graphics', 'Technical Support', 'Full Project Management']
-                      ).map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
+                      style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb', color: '#1A1A1A' }} />
                   </div>
 
+                  {/* Exhibition Date */}
                   <div>
-                    <label className="block text-sm font-bold mb-1.5" style={{ color: '#1A1A1A' }}>{isAr ? 'رسالتك *' : 'Your Message *'}</label>
-                    <textarea required rows={5} placeholder={isAr ? 'أخبرنا عن مشروعك — الحجم والموقع والجدول الزمني وأي متطلبات خاصة...' : 'Tell us about your project — size, location, timeline, and any specific requirements...'}
-                      value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
+                    <label className="block text-sm font-bold mb-1.5" style={{ color: '#1A1A1A' }}>{isAr ? 'تاريخ المعرض / الفعالية' : 'Exhibition / Event Date'}</label>
+                    <input type="text" placeholder={isAr ? 'مثال: 15 يناير 2026' : 'e.g. January 15, 2026'}
+                      value={quoteForm.exhibition_date} onChange={e => setQuoteForm(p => ({ ...p, exhibition_date: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-xl text-sm transition-all"
+                      style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb', color: '#1A1A1A' }} />
+                  </div>
+
+                  {/* Exhibition Venue */}
+                  <div>
+                    <label className="block text-sm font-bold mb-1.5" style={{ color: '#1A1A1A' }}>{isAr ? 'مكان المعرض / الفعالية' : 'Exhibition / Event Venue'}</label>
+                    <input type="text" placeholder={isAr ? 'اسم وموقع المكان' : 'Venue name and location'}
+                      value={quoteForm.exhibition_venue} onChange={e => setQuoteForm(p => ({ ...p, exhibition_venue: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-xl text-sm transition-all"
+                      style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb', color: '#1A1A1A' }} />
+                  </div>
+
+                  {/* Stand Dimension */}
+                  <div>
+                    <label className="block text-sm font-bold mb-1.5" style={{ color: '#1A1A1A' }}>{isAr ? 'أبعاد الجناح' : 'Exhibition Stand Dimension'}</label>
+                    <input type="text" placeholder={isAr ? 'مثال: 6م × 4م' : 'e.g. 6m x 4m'}
+                      value={quoteForm.stand_dimension} onChange={e => setQuoteForm(p => ({ ...p, stand_dimension: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-xl text-sm transition-all"
+                      style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb', color: '#1A1A1A' }} />
+                  </div>
+
+                  {/* Layout */}
+                  <div>
+                    <label className="block text-sm font-bold mb-2" style={{ color: '#1A1A1A' }}>{isAr ? 'تصميم الجناح' : 'Layout'}</label>
+                    <div className="flex flex-wrap gap-x-6 gap-y-2">
+                      {[
+                        { val: 'Island', label: isAr ? 'جزيرة' : 'Island' },
+                        { val: 'Closed from 1 Side', label: isAr ? 'مغلق من جهة 1' : 'Closed from 1 Side' },
+                        { val: 'Closed from 2 Sides', label: isAr ? 'مغلق من جهتين' : 'Closed from 2 Sides' },
+                        { val: 'Closed from 3 Sides', label: isAr ? 'مغلق من 3 جهات' : 'Closed from 3 Sides' },
+                      ].map(opt => (
+                        <label key={opt.val} className="flex items-center gap-2 text-sm cursor-pointer">
+                          <input type="radio" name="layout" value={opt.val}
+                            checked={quoteForm.layout === opt.val}
+                            onChange={() => setQuoteForm(p => ({ ...p, layout: opt.val }))}
+                            style={{ accentColor: '#ED8214' }} />
+                          <span style={{ color: '#1A1A1A' }}>{opt.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Flooring */}
+                  <div>
+                    <label className="block text-sm font-bold mb-2" style={{ color: '#1A1A1A' }}>{isAr ? 'نوع الأرضية' : 'Which Flooring You Prefer?'}</label>
+                    <div className="flex flex-wrap gap-x-6 gap-y-2">
+                      {[
+                        { val: 'Carpet', label: isAr ? 'سجادة' : 'Carpet' },
+                        { val: 'Parquet', label: isAr ? 'باركيه' : 'Parquet' },
+                        { val: 'Melamine', label: isAr ? 'ميلامين' : 'Melamine' },
+                        { val: 'Other', label: isAr ? 'أخرى' : 'Other' },
+                      ].map(opt => (
+                        <label key={opt.val} className="flex items-center gap-2 text-sm cursor-pointer">
+                          <input type="radio" name="flooring" value={opt.val}
+                            checked={quoteForm.flooring === opt.val}
+                            onChange={() => setQuoteForm(p => ({ ...p, flooring: opt.val }))}
+                            style={{ accentColor: '#ED8214' }} />
+                          <span style={{ color: '#1A1A1A' }}>{opt.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Platform, Meeting Room, Double Deck, Storage Room — Yes/No */}
+                  {[
+                    { key: 'platform', label: isAr ? 'منصة' : 'Platform' },
+                    { key: 'meeting_room', label: isAr ? 'غرفة اجتماعات / VIP' : 'Meeting Room / VIP area' },
+                    { key: 'double_deck', label: isAr ? 'دور ثاني (Double Deck)' : 'Double Deck' },
+                    { key: 'storage_room', label: isAr ? 'غرفة مخزن' : 'Storage Room' },
+                  ].map(({ key, label }) => (
+                    <div key={key}>
+                      <label className="block text-sm font-bold mb-2" style={{ color: '#1A1A1A' }}>{label}</label>
+                      <div className="flex gap-6">
+                        {['yes', 'no'].map(val => (
+                          <label key={val} className="flex items-center gap-2 text-sm cursor-pointer">
+                            <input type="radio" name={key} value={val}
+                              checked={quoteForm[key as keyof typeof quoteForm] === val}
+                              onChange={() => setQuoteForm(p => ({ ...p, [key]: val }))}
+                              style={{ accentColor: '#ED8214' }} />
+                            <span style={{ color: '#1A1A1A' }}>{val === 'yes' ? (isAr ? 'نعم' : 'Yes') : (isAr ? 'لا' : 'No')}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Required Items — checkboxes */}
+                  <div>
+                    <label className="block text-sm font-bold mb-2" style={{ color: '#1A1A1A' }}>{isAr ? 'العناصر المطلوبة' : 'Required Items'}</label>
+                    <div className="flex flex-wrap gap-x-6 gap-y-2">
+                      {[
+                        { val: 'Led Screen', label: isAr ? 'شاشة LED' : 'Led Screen' },
+                        { val: 'Interactive Screen', label: isAr ? 'شاشة تفاعلية' : 'Interactive Screen' },
+                        { val: 'Catering', label: isAr ? 'كاتيرينج' : 'Catering' },
+                        { val: 'Rigging Signage', label: isAr ? 'لافتات علوية' : 'Rigging Signage' },
+                      ].map(opt => (
+                        <label key={opt.val} className="flex items-center gap-2 text-sm cursor-pointer">
+                          <input type="checkbox" value={opt.val}
+                            checked={quoteForm.required_items.includes(opt.val)}
+                            onChange={() => toggleRequiredItem(opt.val)}
+                            style={{ accentColor: '#ED8214' }} />
+                          <span style={{ color: '#1A1A1A' }}>{opt.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Floor Plan Upload */}
+                  <div>
+                    <label className="block text-sm font-bold mb-1.5" style={{ color: '#1A1A1A' }}>{isAr ? 'مخطط الجناح (Floor Plan)' : 'Floor Plan'}</label>
+                    <div className="flex items-center gap-3">
+                      <label className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all hover:bg-gray-200"
+                        style={{ background: '#e5e7eb', color: '#1A1A1A', border: '1.5px solid #d1d5db' }}>
+                        <Upload className="h-4 w-4" />
+                        {isAr ? 'اختر ملف' : 'Choose File'}
+                        <input type="file" accept=".pdf,.jpg,.jpeg,.png,.dwg" className="hidden"
+                          onChange={e => setFloorPlanFile(e.target.files?.[0] || null)} />
+                      </label>
+                      <span className="text-sm" style={{ color: '#6b7280' }}>
+                        {floorPlanFile ? floorPlanFile.name : (isAr ? 'لم يتم اختيار ملف' : 'No file chosen')}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Brand Guidelines Upload */}
+                  <div>
+                    <label className="block text-sm font-bold mb-1.5" style={{ color: '#1A1A1A' }}>{isAr ? 'الهوية البصرية / Brand Guidelines' : 'Main Visual / Corporate Logo(s) / Packs / Guidelines'}</label>
+                    <div className="flex items-center gap-3">
+                      <label className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all hover:bg-gray-200"
+                        style={{ background: '#e5e7eb', color: '#1A1A1A', border: '1.5px solid #d1d5db' }}>
+                        <Upload className="h-4 w-4" />
+                        {isAr ? 'اختر ملف' : 'Choose File'}
+                        <input type="file" accept=".pdf,.jpg,.jpeg,.png,.zip,.ai,.eps" className="hidden"
+                          onChange={e => setBrandGuidelinesFile(e.target.files?.[0] || null)} />
+                      </label>
+                      <span className="text-sm" style={{ color: '#6b7280' }}>
+                        {brandGuidelinesFile ? brandGuidelinesFile.name : (isAr ? 'لم يتم اختيار ملف' : 'No file chosen')}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Message */}
+                  <div>
+                    <label className="block text-sm font-bold mb-1.5" style={{ color: '#1A1A1A' }}>{isAr ? 'تعليق أو رسالة *' : 'Comment or Message *'}</label>
+                    <textarea required rows={5}
+                      placeholder={isAr ? 'أي تفاصيل إضافية تود مشاركتها...' : 'Any additional details you want to share...'}
+                      value={quoteForm.message} onChange={e => setQuoteForm(p => ({ ...p, message: e.target.value }))}
                       className="w-full px-4 py-3 rounded-xl text-sm transition-all resize-none"
                       style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb', color: '#1A1A1A' }} />
                   </div>
@@ -346,7 +558,7 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
                     {submitting ? (
                       <><span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />{isAr ? 'جاري الإرسال...' : 'Sending...'}</>
                     ) : (
-                      <><Send className="h-5 w-5" />{isAr ? 'إرسال الرسالة' : 'Send Message'} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></>
+                      <><Send className="h-5 w-5" />{isAr ? 'إرسال الطلب' : 'Submit'} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></>
                     )}
                   </button>
                 </form>

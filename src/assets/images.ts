@@ -29,6 +29,7 @@ export const IMAGES = {
   EVENT_7: "https://images.unsplash.com/photo-1772187727917-294cfaff30ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4MTk0NTh8MHwxfHNlYXJjaHw3fHxicmFuZCUyMGFjdGl2YXRpb24lMjBldmVudCUyMHByb2R1Y3Rpb24lMjBzdGFnZXxlbnwwfDB8fHwxNzc2NzcxOTI5fDA&ixlib=rb-4.1.0&q=80&w=1080",
   HERO_MAIN_20260421_114546_27: "/images/hero_main_20260421_114546.png",
   INTRO_BG_20260421_114546_28: "/images/intro_bg_20260421_114546.png",
+  SCREENSHOT2080_29: "/images/Screenshot2080.png",
 } as const;
 
 export type ImageKey = keyof typeof IMAGES;
