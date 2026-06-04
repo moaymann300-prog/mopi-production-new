@@ -570,46 +570,53 @@ const Index = () => {
             </p>
           </Reveal>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {services.map((s, i) => (
               <Reveal key={i} delay={i * 75}>
-                <div className="svc-card group relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-500 hover:-translate-y-2"
+                <div
+                  className="group relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-500 hover:-translate-y-2"
                   style={{
                     background: '#FFFFFF',
                     border: hoveredService === i ? '1.5px solid #ED8214' : '1.5px solid #e9eaec',
                     boxShadow: hoveredService === i
-                      ? '0 20px 48px rgba(244,123,32,0.12), 0 4px 12px rgba(0,0,0,0.06)'
+                      ? '0 20px 48px rgba(237,130,20,0.12), 0 4px 12px rgba(0,0,0,0.06)'
                       : '0 2px 16px rgba(0,0,0,0.06)',
                   }}
                   onMouseEnter={() => setHoveredService(i)}
                   onMouseLeave={() => setHoveredService(null)}>
 
-                  <div className="relative h-48 overflow-hidden">
-                    <img src={s.image} alt={s.title}
-                      className="w-full h-full object-cover svc-img"
-                      style={{ opacity: hoveredService === i ? 0.88 : 0.72 }} />
-                    <div className="absolute inset-0"
-                      style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 60%, transparent 100%)' }} />
-                    <div className="absolute bottom-4 left-4 w-10 h-10 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-300"
+                  <div className="p-7 pb-8 flex flex-col gap-5">
+                    {/* Icon */}
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300"
                       style={{
-                        background: hoveredService === i ? '#ED8214' : 'rgba(244,123,32,0.18)',
-                        border: '1px solid rgba(244,123,32,0.45)',
+                        background: hoveredService === i ? '#ED8214' : 'rgba(237,130,20,0.10)',
+                        border: '1px solid rgba(237,130,20,0.25)',
                       }}>
-                      <s.icon className="h-5 w-5" style={{ color: hoveredService === i ? '#fff' : '#ED8214' }} />
+                      <s.icon className="h-6 w-6" style={{ color: hoveredService === i ? '#fff' : '#ED8214' }} />
                     </div>
-                  </div>
 
-                  <div className="p-6 pb-7">
-                    <h3 className="font-bold text-[1.05rem] mb-2.5 transition-colors duration-300 leading-snug"
+                    {/* Number */}
+                    <span className="text-[11px] font-black tracking-[0.25em] uppercase" style={{ color: '#ED8214' }}>
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+
+                    {/* Title */}
+                    <h3 className="font-bold text-[1.1rem] leading-snug transition-colors duration-300"
                       style={{ color: hoveredService === i ? '#ED8214' : '#111111', fontFamily, lineHeight: isAr ? 1.7 : 1.3 }}>
                       {s.title}
                     </h3>
-                    <p className="text-sm leading-relaxed" style={{ color: '#555555', fontFamily, lineHeight: isAr ? 2 : 1.65 }}>
+
+                    {/* Divider */}
+                    <div className="h-px w-10 transition-all duration-300" style={{ background: hoveredService === i ? '#ED8214' : '#e5e7eb' }} />
+
+                    {/* Description */}
+                    <p className="text-sm" style={{ color: '#555555', fontFamily, lineHeight: isAr ? 2 : 1.7 }}>
                       {s.desc}
                     </p>
                   </div>
 
-                  <div className="absolute bottom-0 left-0 right-0 h-[2px] transition-opacity duration-400"
+                  {/* Bottom accent line */}
+                  <div className="absolute bottom-0 left-0 right-0 h-[2px] transition-opacity duration-300"
                     style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)', opacity: hoveredService === i ? 1 : 0 }} />
                 </div>
               </Reveal>
