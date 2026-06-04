@@ -5,9 +5,9 @@ import { useCMS, getLogoUrl, getCMSText, getCMSImage } from '@/hooks/useCMS';
 import { useLocalLanguage } from '@/hooks/useLanguage';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
-  ChevronDown, CheckCircle, Zap, Clock,
-  Award, Layers, Palette, Wrench,
-  Menu, X, ExternalLink, ChevronRight, MoveRight,
+  ChevronDown, CheckCircle, Clock,
+  Layers,
+  Menu, X, ChevronRight, MoveRight,
   Shield, Users, Globe, Star,
 } from 'lucide-react';
 
@@ -136,10 +136,8 @@ const Index = () => {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeFilter, setActiveFilter] = useState('All');
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', service: '', message: '' });
   const [formSent, setFormSent] = useState(false);
-  const [hoveredService, setHoveredService] = useState<number | null>(null);
   const [hoveredWhy, setHoveredWhy] = useState<number | null>(null);
 
   useEffect(() => {
@@ -171,14 +169,6 @@ const Index = () => {
     { label: t('nav.contact'),   to: '/contact' },
   ];
 
-  const services = [
-    { icon: Layers, title: t('svc.1.title'), desc: t('svc.1.desc'), image: IMAGES.BOOTH_8 },
-    { icon: Zap,    title: t('svc.2.title'), desc: t('svc.2.desc'), image: IMAGES.EVENT_1 },
-    { icon: Award,  title: t('svc.3.title'), desc: t('svc.3.desc'), image: IMAGES.EVENT_3 },
-    { icon: Wrench, title: t('svc.4.title'), desc: t('svc.4.desc'), image: IMAGES.BOOTH_3 },
-    { icon: Palette,title: t('svc.5.title'), desc: t('svc.5.desc'), image: IMAGES.BOOTH_6 },
-  ];
-
   const whyUs = [
     { icon: Star,   title: t('why.1.title'), desc: t('why.1.desc') },
     { icon: Users,  title: t('why.2.title'), desc: t('why.2.desc') },
@@ -194,26 +184,6 @@ const Index = () => {
     { num: '03', title: t('step.3.title'), desc: t('step.3.desc') },
     { num: '04', title: t('step.4.title'), desc: t('step.4.desc') },
   ];
-
-  const portfolioItems = [
-    { title: 'Tech Innovation Expo 2026', cat: isAr ? 'معرض' : 'Exhibition', client: 'TechCorp International', location: 'Dubai, UAE', image: IMAGES.BOOTH_8 },
-    { title: 'Global Healthcare Summit',  cat: isAr ? 'فعالية' : 'Event',    client: 'MedTech Solutions',   location: 'Cairo, Egypt', image: IMAGES.EVENT_1 },
-    { title: 'Automotive Excellence Booth', cat: isAr ? 'جناح' : 'Booth',   client: 'AutoMax Industries',   location: 'Riyadh, KSA',  image: IMAGES.BOOTH_4 },
-    { title: 'Luxury Brand Activation',   cat: isAr ? 'تفعيل' : 'Activation', client: 'Premium Brands Group', location: 'Cairo, Egypt', image: IMAGES.EVENT_3 },
-    { title: 'Corporate Annual Conference', cat: isAr ? 'فعالية' : 'Event',  client: 'Global Finance Corp',  location: 'Alexandria, Egypt', image: IMAGES.CORPORATE_4 },
-    { title: 'Product Launch Experience', cat: isAr ? 'تفعيل' : 'Activation', client: 'Consumer Goods Co.', location: 'Dubai, UAE', image: IMAGES.EVENT_2 },
-    { title: 'Retail Pop-Up Installation', cat: isAr ? 'جناح' : 'Booth',    client: 'Fashion House',        location: 'Cairo, Egypt', image: IMAGES.BOOTH_2 },
-    { title: 'International Trade Show',   cat: isAr ? 'معرض' : 'Exhibition', client: 'Multi-Industry Group', location: 'Abu Dhabi, UAE', image: IMAGES.CORPORATE_2 },
-  ];
-
-  const allCats = isAr
-    ? ['الكل', 'معرض', 'فعالية', 'جناح', 'تفعيل']
-    : ['All', 'Exhibition', 'Event', 'Booth', 'Activation'];
-  const filterAll = allCats[0];
-
-  const filtered = activeFilter === filterAll
-    ? portfolioItems
-    : portfolioItems.filter(p => p.cat === activeFilter);
 
   const inputCls = `w-full border rounded-xl px-4 py-3.5 text-sm transition-all duration-300 focus:outline-none focus:ring-2
     bg-white text-gray-800 placeholder-gray-400 border-gray-200 focus:border-[#ED8214] focus:ring-[#ED8214]/20`;
@@ -553,191 +523,69 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ══ § 4 · SERVICES ══ */}
-      <section id="services" className="py-28 px-5 relative overflow-hidden" style={{ background: '#F2F2F2' }}>
-        <div className="absolute top-0 left-0 right-0 h-[2px]"
-          style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
-
-        <div className="max-w-7xl mx-auto">
-          <Reveal className="text-center mb-16">
-            <SectionLabel text={t('services.label')} />
-            <h2 className="font-black mb-4"
-              style={{ fontSize: 'clamp(2rem,4vw,3.2rem)', color: '#111111', fontFamily }}>
-              {t('services.h1')}
-            </h2>
-            <p className="text-lg max-w-xl mx-auto" style={{ color: '#555555', fontFamily, lineHeight: isAr ? 2 : 1.7 }}>
-              {t('services.sub')}
-            </p>
-          </Reveal>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {services.map((s, i) => (
-              <Reveal key={i} delay={i * 75}>
-                <div
-                  className="group relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-500 hover:-translate-y-2"
-                  style={{
-                    background: '#FFFFFF',
-                    border: hoveredService === i ? '1.5px solid #ED8214' : '1.5px solid #e9eaec',
-                    boxShadow: hoveredService === i
-                      ? '0 20px 48px rgba(237,130,20,0.12), 0 4px 12px rgba(0,0,0,0.06)'
-                      : '0 2px 16px rgba(0,0,0,0.06)',
-                  }}
-                  onMouseEnter={() => setHoveredService(i)}
-                  onMouseLeave={() => setHoveredService(null)}>
-
-                  <div className="p-7 pb-8 flex flex-col gap-5">
-                    {/* Icon */}
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300"
-                      style={{
-                        background: hoveredService === i ? '#ED8214' : 'rgba(237,130,20,0.10)',
-                        border: '1px solid rgba(237,130,20,0.25)',
-                      }}>
-                      <s.icon className="h-6 w-6" style={{ color: hoveredService === i ? '#fff' : '#ED8214' }} />
-                    </div>
-
-                    {/* Number */}
-                    <span className="text-[11px] font-black tracking-[0.25em] uppercase" style={{ color: '#ED8214' }}>
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-
-                    {/* Title */}
-                    <h3 className="font-bold text-[1.1rem] leading-snug transition-colors duration-300"
-                      style={{ color: hoveredService === i ? '#ED8214' : '#111111', fontFamily, lineHeight: isAr ? 1.7 : 1.3 }}>
-                      {s.title}
-                    </h3>
-
-                    {/* Divider */}
-                    <div className="h-px w-10 transition-all duration-300" style={{ background: hoveredService === i ? '#ED8214' : '#e5e7eb' }} />
-
-                    {/* Description */}
-                    <p className="text-sm" style={{ color: '#555555', fontFamily, lineHeight: isAr ? 2 : 1.7 }}>
-                      {s.desc}
-                    </p>
-                  </div>
-
-                  {/* Bottom accent line */}
-                  <div className="absolute bottom-0 left-0 right-0 h-[2px] transition-opacity duration-300"
-                    style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)', opacity: hoveredService === i ? 1 : 0 }} />
+      {/* ══ § 4 · EXPLORE — Services & Portfolio links ══ */}
+      <section className="py-16 px-5 relative overflow-hidden" style={{ background: '#111111' }}>
+        <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
+        <div className="max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-5">
+            {/* Services card */}
+            <Reveal>
+              <Link to="/services"
+                className="group block relative overflow-hidden rounded-2xl p-8 transition-all duration-500 hover:-translate-y-1"
+                style={{ background: '#1A1A1A', border: '1.5px solid rgba(255,255,255,0.06)' }}
+                onMouseEnter={e => { (e.currentTarget.style.borderColor = '#ED8214'); (e.currentTarget.style.boxShadow = '0 16px 40px rgba(237,130,20,0.14)'); }}
+                onMouseLeave={e => { (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'); (e.currentTarget.style.boxShadow = 'none'); }}>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
+                  style={{ background: 'rgba(237,130,20,0.12)', border: '1px solid rgba(237,130,20,0.3)' }}>
+                  <Layers className="h-6 w-6" style={{ color: '#ED8214' }} />
                 </div>
-              </Reveal>
-            ))}
-
-            {/* CTA tile */}
-            <Reveal delay={services.length * 75}>
-              <button
-                onClick={() => scrollTo('contact')}
-                className="group w-full min-h-[320px] rounded-2xl flex flex-col items-center justify-center text-center p-8 cursor-pointer transition-all duration-500 hover:-translate-y-2"
-                style={{ background: '#111111', border: '1.5px solid #1E1E1E', boxShadow: '0 2px 16px rgba(0,0,0,0.15)' }}
-                onMouseEnter={e => { (e.currentTarget.style.border = '1.5px solid #ED8214'); (e.currentTarget.style.boxShadow = '0 20px 48px rgba(244,123,32,0.15)'); }}
-                onMouseLeave={e => { (e.currentTarget.style.border = '1.5px solid #1E1E1E'); (e.currentTarget.style.boxShadow = '0 2px 16px rgba(0,0,0,0.15)'); }}>
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110"
-                  style={{ background: 'rgba(244,123,32,0.14)', border: '1.5px solid rgba(244,123,32,0.3)' }}>
-                  <MoveRight className={`h-7 w-7 ${isAr ? 'rotate-180' : ''}`} style={{ color: '#ED8214' }} />
-                </div>
-                <h3 className="font-bold text-lg mb-2 text-white" style={{ fontFamily }}>
-                  {isAr ? 'متطلبات خاصة؟' : 'Custom Requirements?'}
+                <span className="text-[11px] font-black tracking-[0.25em] uppercase" style={{ color: '#ED8214' }}>
+                  {isAr ? 'خدماتنا' : 'Our Services'}
+                </span>
+                <h3 className="font-black text-white text-xl mt-3 mb-3 group-hover:text-[#ED8214] transition-colors" style={{ fontFamily }}>
+                  {isAr ? 'اكتشف كل خدماتنا' : 'Explore All Services'}
                 </h3>
-                <p className="text-sm" style={{ color: '#9ca3af', fontFamily }}>
-                  {isAr ? 'شاركنا فكرتك وسننفذها بأعلى مستوى.' : "Tell us your vision and we'll make it happen."}
+                <p className="text-sm" style={{ color: '#9ca3af', lineHeight: isAr ? 2 : 1.7 }}>
+                  {isAr ? 'تصميم وتنفيذ أجنحة المعارض، إدارة الفعاليات، براند أكتيفيشن والمزيد.' : 'Exhibition booths, event production, brand activations, custom fabrication and more.'}
                 </p>
-              </button>
+                <div className="mt-5 inline-flex items-center gap-2 text-sm font-bold" style={{ color: '#ED8214' }}>
+                  {isAr ? 'شاهد الخدمات' : 'View Services'}
+                  {isAr ? <ChevronRight className="h-4 w-4 rotate-180 group-hover:-translate-x-1 transition-transform" /> : <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />}
+                </div>
+              </Link>
+            </Reveal>
+
+            {/* Portfolio card */}
+            <Reveal delay={80}>
+              <Link to="/portfolio"
+                className="group block relative overflow-hidden rounded-2xl p-8 transition-all duration-500 hover:-translate-y-1"
+                style={{ background: '#1A1A1A', border: '1.5px solid rgba(255,255,255,0.06)' }}
+                onMouseEnter={e => { (e.currentTarget.style.borderColor = '#ED8214'); (e.currentTarget.style.boxShadow = '0 16px 40px rgba(237,130,20,0.14)'); }}
+                onMouseLeave={e => { (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'); (e.currentTarget.style.boxShadow = 'none'); }}>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
+                  style={{ background: 'rgba(237,130,20,0.12)', border: '1px solid rgba(237,130,20,0.3)' }}>
+                  <Star className="h-6 w-6" style={{ color: '#ED8214' }} />
+                </div>
+                <span className="text-[11px] font-black tracking-[0.25em] uppercase" style={{ color: '#ED8214' }}>
+                  {isAr ? 'أعمالنا' : 'Our Work'}
+                </span>
+                <h3 className="font-black text-white text-xl mt-3 mb-3 group-hover:text-[#ED8214] transition-colors" style={{ fontFamily }}>
+                  {isAr ? 'شاهد مشاريعنا' : 'Browse Our Portfolio'}
+                </h3>
+                <p className="text-sm" style={{ color: '#9ca3af', lineHeight: isAr ? 2 : 1.7 }}>
+                  {isAr ? 'مجموعة من أفضل أعمالنا في مصر ومنطقة الشرق الأوسط وشمال أفريقيا.' : 'A curated selection of our finest projects across Egypt and the MENA region.'}
+                </p>
+                <div className="mt-5 inline-flex items-center gap-2 text-sm font-bold" style={{ color: '#ED8214' }}>
+                  {isAr ? 'شاهد الأعمال' : 'View Portfolio'}
+                  {isAr ? <ChevronRight className="h-4 w-4 rotate-180 group-hover:-translate-x-1 transition-transform" /> : <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />}
+                </div>
+              </Link>
             </Reveal>
           </div>
         </div>
       </section>
 
-      {/* ══ § 5 · PORTFOLIO ══ */}
-      <section id="portfolio" className="py-28 px-5 relative overflow-hidden" style={{ background: '#111111' }}>
-        <div className="absolute top-0 left-0 right-0 h-[2px]"
-          style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
-        <div className="absolute top-20 right-16 pointer-events-none"
-          style={{ width: 130, height: 130, border: '1px solid #ED8214', opacity: 0.055, transform: 'rotate(45deg)' }} />
-
-        <div className="max-w-7xl mx-auto">
-          <Reveal className="text-center mb-12">
-            <SectionLabel text={t('portfolio.label')} />
-            <h2 className="font-black mb-4 text-white"
-              style={{ fontSize: 'clamp(2rem,4vw,3.2rem)', fontFamily }}>
-              {t('portfolio.h1')}
-            </h2>
-            <p className="text-lg max-w-xl mx-auto" style={{ color: '#9ca3af', fontFamily, lineHeight: isAr ? 2 : 1.7 }}>
-              {t('portfolio.sub')}
-            </p>
-          </Reveal>
-
-          {/* Filter */}
-          <Reveal delay={80}>
-            <div className="flex flex-wrap gap-3 justify-center mb-10">
-              {allCats.map(c => (
-                <button key={c} onClick={() => setActiveFilter(c)}
-                  className="px-5 py-2 rounded-full text-sm font-bold tracking-wide transition-all duration-300 hover:scale-105"
-                  style={{
-                    ...(activeFilter === c
-                      ? { background: '#ED8214', color: '#fff', boxShadow: '0 6px 20px rgba(244,123,32,0.35)' }
-                      : { background: 'rgba(255,255,255,0.04)', color: '#9ca3af', border: '1.5px solid rgba(255,255,255,0.1)' }),
-                    fontFamily,
-                  }}
-                  onMouseEnter={e => { if (activeFilter !== c) { (e.currentTarget.style.borderColor = '#ED8214'); (e.currentTarget.style.color = '#ED8214'); } }}
-                  onMouseLeave={e => { if (activeFilter !== c) { (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'); (e.currentTarget.style.color = '#9ca3af'); } }}>
-                  {c}
-                </button>
-              ))}
-            </div>
-          </Reveal>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {filtered.map((p, i) => (
-              <Link key={`${p.title}-${i}`} to="/portfolio"
-                className={`port-card group relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-500
-                  ${i === 0 || i === 5 ? 'sm:col-span-2 h-72' : 'h-60'}`}
-                style={{ animation: `fadeUp 0.5s ease ${i * 55}ms both`, boxShadow: '0 4px 20px rgba(0,0,0,0.4)', textDecoration: 'none' }}>
-
-                <img src={p.image} alt={p.title} className="w-full h-full object-cover port-img" />
-                <div className="absolute inset-0"
-                  style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.15) 60%, transparent 100%)' }} />
-                <div className="absolute inset-0 transition-colors duration-400 group-hover:bg-[rgba(244,123,32,0.05)]" />
-
-                <div className="absolute bottom-0 left-0 right-0 p-5 transition-transform duration-300">
-                  <span className="inline-block text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded tracking-wide uppercase"
-                    style={{ background: '#ED8214' }}>{p.cat}</span>
-                  <h3 className="text-white font-bold mt-1.5 text-sm transition-colors group-hover:text-[#ED8214]"
-                    style={{ fontFamily }}>
-                    {p.title}
-                  </h3>
-                  <p className="text-xs mt-1 flex items-center gap-1 transition-opacity duration-400 opacity-0 group-hover:opacity-100"
-                    style={{ color: '#9ca3af' }}>
-                    <MapPin className="h-3 w-3" style={{ color: '#ED8214' }} />{p.location}
-                  </p>
-                </div>
-
-                <div className="absolute top-4 right-4 w-9 h-9 rounded-full backdrop-blur-md flex items-center justify-center
-                    opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300"
-                  style={{ background: 'rgba(244,123,32,0.2)', border: '1px solid rgba(244,123,32,0.4)' }}>
-                  <ExternalLink className="h-4 w-4 text-white" />
-                </div>
-
-                <div className="absolute bottom-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-400"
-                  style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
-              </Link>
-            ))}
-          </div>
-
-          <Reveal delay={200}>
-            <div className="text-center mt-14">
-              <Link to="/portfolio"
-                className="group inline-flex items-center gap-2.5 font-bold text-sm tracking-wide transition-all duration-300 px-8 py-3.5 rounded-full"
-                style={{ border: '1.5px solid rgba(244,123,32,0.4)', color: '#ED8214', fontFamily }}
-                onMouseEnter={e => { (e.currentTarget.style.background = '#ED8214'); (e.currentTarget.style.color = '#fff'); (e.currentTarget.style.borderColor = '#ED8214'); }}
-                onMouseLeave={e => { (e.currentTarget.style.background = 'transparent'); (e.currentTarget.style.color = '#ED8214'); (e.currentTarget.style.borderColor = 'rgba(244,123,32,0.4)'); }}>
-                {t('portfolio.viewAll')}
-                {isAr ? <ChevronRight className="h-4 w-4 rotate-180 group-hover:-translate-x-1 transition-transform duration-300" /> : <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />}
-              </Link>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ══ § 6 · WHY CHOOSE US ══ */}
+      {/* ══ § 5 · WHY CHOOSE US ══ */}
       <section id="why" className="py-28 px-5 relative overflow-hidden" style={{ background: '#FFFFFF' }}>
         <div className="absolute top-0 left-0 right-0 h-[2px]"
           style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
