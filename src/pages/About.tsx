@@ -148,16 +148,6 @@ const About = () => {
     { icon: Users,    title: ct('about','values','val3_title','Collaboration'), desc: ct('about','values','val3_desc','We work closely with clients as partners, bringing their vision to life seamlessly.') },
     { icon: Globe,    title: ct('about','values','val4_title','Regional Reach'), desc: ct('about','values','val4_desc','With projects across Egypt and the MENA region, we deliver world-class expertise.') },
   ];
-
-  const milestones = [
-    { year: ct('about','timeline','year1','2016'), event: ct('about','timeline','event1','MOPi Production Founded in Cairo') },
-    { year: ct('about','timeline','year2','2018'), event: ct('about','timeline','event2','First International Exhibition Project') },
-    { year: ct('about','timeline','year3','2020'), event: ct('about','timeline','event3','100+ Projects Milestone Reached') },
-    { year: ct('about','timeline','year4','2022'), event: ct('about','timeline','event4','Expanded to Saudi Arabia & UAE Markets') },
-    { year: ct('about','timeline','year5','2024'), event: ct('about','timeline','event5','400+ Projects Completed') },
-    { year: ct('about','timeline','year6','2026'), event: ct('about','timeline','event6','500+ Projects & Growing') },
-  ];
-
   const achievements = [
     { year: ct('about','awards','award1_year','2025'), title: ct('about','awards','award1_title','Best Exhibition Design'),    org: ct('about','awards','award1_org','MENA Trade Show Association'), desc: ct('about','awards','award1_desc','Recognized for innovative booth design at Cairo Tech Expo 2025.') },
     { year: ct('about','awards','award2_year','2024'), title: ct('about','awards','award2_title','Client Choice Award'),       org: ct('about','awards','award2_org','Exhibition Industry Alliance'),  desc: ct('about','awards','award2_desc','Highest client satisfaction rating for two consecutive years.') },
@@ -355,51 +345,7 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
         </div>
       </section>
 
-      {/* ══ § 4 · JOURNEY TIMELINE — BLACK ══ */}
-      <section className="py-28 px-5 relative overflow-hidden" style={{ background: '#000000' }}>
-        <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
-        <div className="absolute top-20 right-16 pointer-events-none" style={{ width: 120, height: 120, border: '1px solid #ED8214', opacity: 0.06, transform: 'rotate(45deg)' }} />
-
-        <div className="max-w-4xl mx-auto">
-          <Reveal className="text-center mb-16">
-            <SectionLabel text={ct('about','timeline','label','Our Journey')} />
-            <h2 className="font-black mb-4 text-white" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>
-              {ct('about','timeline','heading','Milestones That Shaped Us')}
-            </h2>
-            <p className="text-lg max-w-xl mx-auto" style={{ color: '#9ca3af' }}>{ct('about','timeline','subtitle','From humble beginnings to regional leadership')}</p>
-          </Reveal>
-
-          <div className="relative">
-            {/* Center line */}
-            <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-px" style={{ background: 'linear-gradient(to bottom, transparent, rgba(244,163,0,0.4), transparent)' }} />
-
-            <div className="space-y-10">
-              {milestones.map((m, i) => (
-                <Reveal key={i} delay={i * 60}>
-                  <div className={`flex items-center gap-6 ${i % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
-                    <div className={`w-[calc(50%-2rem)] ${i % 2 === 0 ? 'text-right' : 'text-left'}`}>
-                      <div className="inline-block p-5 rounded-2xl transition-all duration-300 hover:-translate-y-1"
-                        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
-                        onMouseEnter={e => { (e.currentTarget.style.borderColor = 'rgba(244,163,0,0.4)'); (e.currentTarget.style.background = 'rgba(244,163,0,0.05)'); }}
-                        onMouseLeave={e => { (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'); (e.currentTarget.style.background = 'rgba(255,255,255,0.04)'); }}>
-                        <div className="text-xl font-black mb-1" style={{ color: '#ED8214', fontFamily: "'Poppins', sans-serif" }}>{m.year}</div>
-                        <div className="text-sm font-semibold text-white" style={{ direction: isAr ? 'rtl' : 'ltr' }}>{m.event}</div>
-                      </div>
-                    </div>
-                    {/* Dot */}
-                    <div className="relative z-10 shrink-0">
-                      <div className="w-4 h-4 rounded-full border-4" style={{ background: '#ED8214', borderColor: '#000' }} />
-                    </div>
-                    <div className="w-[calc(50%-2rem)]" />
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══ § 5 · AWARDS — WHITE ══ */}
+      {/* ══ § 4 · AWARDS — WHITE ══ */
       <section className="py-28 px-5 relative overflow-hidden" style={{ background: '#FFFFFF' }}>
         <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
         <div className="absolute bottom-20 right-20 pointer-events-none" style={{ width: 140, height: 140, border: '1.5px solid #ED8214', opacity: 0.07, transform: 'rotate(45deg)' }} />
