@@ -256,6 +256,8 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const [saving, setSaving] = useState(false);
+  const [selectedMessageId, setSelectedMessageId] = useState<number | null>(null);
+  const [inboxNote, setInboxNote] = useState<Record<number, string>>({});
 
   const [settings, setSettings] = useState<SiteSetting[]>([]);
   const [socials, setSocials] = useState<SocialLink[]>([]);
@@ -427,13 +429,18 @@ export default function AdminDashboard() {
   };
 
   const updateInboxStatus = async (id: number, status: string) => {
+    // Update in DB
     await supabase.from('cms_contact_submissions_2026_04_21').update({ status, updated_at: new Date().toISOString() }).eq('id', id);
-    notify('Updated!'); fetchAll();
+    // Update locally only — NO fetchAll() so the open message stays open
+    setInbox(prev => prev.map(m => m.id === id ? { ...m, status } : m));
+    notify('Status updated!');
   };
   const deleteInbox = async (id: number) => {
-    if (!confirm('Delete this message?')) return;
     await supabase.from('cms_contact_submissions_2026_04_21').delete().eq('id', id);
-    notify('Deleted!'); fetchAll();
+    // Update locally only — NO fetchAll()
+    setInbox(prev => prev.filter(m => m.id !== id));
+    if (selectedMessageId === id) setSelectedMessageId(null);
+    notify('Message deleted!');
   };
 
   const handleMediaUpload = async (file: File) => {
@@ -1571,58 +1578,184 @@ export default function AdminDashboard() {
   };
 
   // ── INBOX ──
-  const renderInbox = () => (
-    <div>
-      <PageHeader title={`Inbox${unreadCount > 0 ? ` — ${unreadCount} New` : ''}`} subtitle="Messages submitted through the contact form" icon={MessageSquare} color="#ED8214" />
-      <div className="space-y-3">
-        {inbox.map(msg => (
-          <div key={msg.id} className="p-5 rounded-2xl" style={{ background: '#111827', border: `1px solid ${msg.status === 'new' ? 'rgba(237,130,20,0.3)' : '#1f2937'}` }}>
-            <div className="flex items-start justify-between gap-4 mb-3">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm" style={{ background: 'rgba(237,130,20,0.15)', color: '#ED8214' }}>
-                  {msg.name?.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <p className="font-bold text-sm text-white">{msg.name}</p>
-                  <p className="text-xs" style={{ color: '#6b7280' }}>{msg.email} · {msg.phone}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="text-[10px] font-black px-2 py-1 rounded-full" style={{ background: msg.status === 'new' ? 'rgba(237,130,20,0.15)' : 'rgba(255,255,255,0.05)', color: msg.status === 'new' ? '#ED8214' : '#6b7280' }}>
-                  {msg.status === 'new' ? '● NEW' : msg.status.toUpperCase()}
-                </span>
-                <span className="text-xs" style={{ color: '#374151' }}>{new Date(msg.created_at).toLocaleDateString()}</span>
-              </div>
-            </div>
-            {(msg.company || msg.service) && (
-              <div className="flex gap-3 mb-3">
-                {msg.company && <span className="text-xs px-2 py-1 rounded-lg" style={{ background: '#0f172a', color: '#9ca3af' }}>🏢 {msg.company}</span>}
-                {msg.service && <span className="text-xs px-2 py-1 rounded-lg" style={{ background: '#0f172a', color: '#9ca3af' }}>⚙️ {msg.service}</span>}
-              </div>
-            )}
-            <p className="text-sm mb-4 leading-relaxed" style={{ color: '#d1d5db' }}>{msg.message}</p>
-            <div className="flex items-center gap-2 pt-3" style={{ borderTop: '1px solid #1f2937' }}>
-              <a href={`mailto:${msg.email}`} className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors hover:bg-blue-900/20" style={{ color: '#60a5fa', border: '1px solid rgba(96,165,250,0.2)' }}>
-                <Mail className="h-3 w-3" />Reply via Email
-              </a>
-              <a href={`https://wa.me/${msg.phone?.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors hover:bg-green-900/20" style={{ color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' }}>
-                <Phone className="h-3 w-3" />WhatsApp
-              </a>
-              {msg.status === 'new' && (
-                <button onClick={() => updateInboxStatus(msg.id, 'read')} className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors" style={{ color: '#9ca3af', border: '1px solid #374151' }}>
-                  <Check className="h-3 w-3" />Mark Read
+  const renderInbox = () => {
+    const statusColors: Record<string, { bg: string; text: string; border: string }> = {
+      new:        { bg: 'rgba(237,130,20,0.12)',   text: '#ED8214',  border: 'rgba(237,130,20,0.35)' },
+      read:       { bg: 'rgba(96,165,250,0.10)',   text: '#60a5fa',  border: 'rgba(96,165,250,0.25)' },
+      replied:    { bg: 'rgba(16,185,129,0.10)',   text: '#10b981',  border: 'rgba(16,185,129,0.25)' },
+      in_progress:{ bg: 'rgba(251,191,36,0.10)',   text: '#fbbf24',  border: 'rgba(251,191,36,0.25)' },
+      completed:  { bg: 'rgba(167,243,208,0.08)',  text: '#6ee7b7',  border: 'rgba(110,231,183,0.2)'  },
+      archived:   { bg: 'rgba(255,255,255,0.04)',  text: '#6b7280',  border: '#1f2937'                },
+    };
+    const statusLabel: Record<string, string> = {
+      new: '● NEW', read: '✓ READ', replied: '↩ REPLIED',
+      in_progress: '⚙ IN PROGRESS', completed: '✅ COMPLETED', archived: '📦 ARCHIVED',
+    };
+
+    return (
+      <div>
+        <PageHeader
+          title={`Inbox${unreadCount > 0 ? ` — ${unreadCount} New` : ''}`}
+          subtitle="Click any message to open it — it stays open until you close it"
+          icon={MessageSquare} color="#ED8214"
+        />
+
+        {/* Filter bar */}
+        <div className="flex flex-wrap gap-2 mb-5">
+          {['all','new','read','in_progress','replied','completed','archived'].map(f => (
+            <button key={f}
+              onClick={() => setSelectedMessageId(null)}
+              className="text-[11px] font-bold px-3 py-1.5 rounded-full transition-all"
+              style={{ background: '#111827', border: '1px solid #374151', color: '#9ca3af' }}>
+              {f === 'all' ? `All (${inbox.length})` : `${statusLabel[f] ?? f.toUpperCase()} (${inbox.filter(m => m.status === f).length})`}
+            </button>
+          ))}
+        </div>
+
+        <div className="space-y-2">
+          {inbox.map(msg => {
+            const isOpen = selectedMessageId === msg.id;
+            const sc = statusColors[msg.status] ?? statusColors.archived;
+            return (
+              <div key={msg.id}
+                className="rounded-2xl overflow-hidden transition-all duration-300"
+                style={{ border: `1px solid ${isOpen ? sc.border : '#1f2937'}`, background: '#111827' }}>
+
+                {/* ── Row header — always visible, click to toggle ── */}
+                <button
+                  className="w-full flex items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-white/[0.02]"
+                  onClick={() => {
+                    setSelectedMessageId(isOpen ? null : msg.id);
+                    // Auto-mark as read when opened
+                    if (!isOpen && msg.status === 'new') updateInboxStatus(msg.id, 'read');
+                  }}
+                >
+                  {/* Avatar */}
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
+                    style={{ background: sc.bg, color: sc.text }}>
+                    {msg.name?.charAt(0).toUpperCase()}
+                  </div>
+
+                  {/* Name + preview */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="font-bold text-sm text-white">{msg.name}</span>
+                      {msg.company && <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: '#0f172a', color: '#6b7280' }}>🏢 {msg.company}</span>}
+                    </div>
+                    <p className="text-xs truncate" style={{ color: '#6b7280' }}>
+                      {isOpen ? `${msg.email} · ${msg.phone}` : msg.message?.slice(0, 80) + (msg.message?.length > 80 ? '…' : '')}
+                    </p>
+                  </div>
+
+                  {/* Status badge + date + chevron */}
+                  <div className="flex items-center gap-2.5 shrink-0">
+                    <span className="text-[10px] font-black px-2.5 py-1 rounded-full"
+                      style={{ background: sc.bg, color: sc.text, border: `1px solid ${sc.border}` }}>
+                      {statusLabel[msg.status] ?? msg.status.toUpperCase()}
+                    </span>
+                    <span className="text-xs hidden sm:block" style={{ color: '#374151' }}>
+                      {new Date(msg.created_at).toLocaleDateString()}
+                    </span>
+                    <span className="text-xs transition-transform duration-200" style={{ color: '#6b7280', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+                  </div>
                 </button>
-              )}
-              <button onClick={() => deleteInbox(msg.id)} className="ml-auto flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg" style={{ color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
-                <Trash2 className="h-3 w-3" />Delete
-              </button>
+
+                {/* ── Expanded detail panel — stays open until manually closed ── */}
+                {isOpen && (
+                  <div className="px-5 pb-5" style={{ borderTop: '1px solid #1f2937' }}>
+
+                    {/* Contact info row */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 mb-4">
+                      {[
+                        { icon: '✉️', label: 'Email',   val: msg.email },
+                        { icon: '📞', label: 'Phone',   val: msg.phone },
+                        { icon: '🏢', label: 'Company', val: msg.company || '—' },
+                        { icon: '⚙️', label: 'Service', val: msg.service || '—' },
+                      ].map(({ icon, label, val }) => (
+                        <div key={label} className="p-3 rounded-xl" style={{ background: '#0f172a', border: '1px solid #1f2937' }}>
+                          <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#6b7280' }}>{icon} {label}</p>
+                          <p className="text-xs font-semibold text-white break-all">{val}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Message body */}
+                    <div className="p-4 rounded-xl mb-4" style={{ background: '#0a0e1a', border: '1px solid #1f2937' }}>
+                      <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: '#6b7280' }}>💬 Message</p>
+                      <p className="text-sm leading-relaxed" style={{ color: '#d1d5db' }}>{msg.message}</p>
+                    </div>
+
+                    {/* Internal notes */}
+                    <div className="mb-4">
+                      <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: '#6b7280' }}>📝 Internal Notes (not sent to client)</p>
+                      <textarea
+                        rows={3}
+                        value={inboxNote[msg.id] ?? ''}
+                        onChange={e => setInboxNote(prev => ({ ...prev, [msg.id]: e.target.value }))}
+                        placeholder="Add internal notes, follow-up reminders, quotes discussed…"
+                        className="w-full rounded-xl px-3.5 py-2.5 text-sm resize-none"
+                        style={{ background: '#0f172a', border: '1px solid #374151', color: '#f3f4f6' }}
+                      />
+                    </div>
+
+                    {/* Status changer */}
+                    <div className="mb-4">
+                      <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: '#6b7280' }}>🔄 Update Status</p>
+                      <div className="flex flex-wrap gap-2">
+                        {(['read','in_progress','replied','completed','archived'] as const).map(st => (
+                          <button key={st}
+                            onClick={() => updateInboxStatus(msg.id, st)}
+                            className="text-xs font-bold px-3 py-1.5 rounded-lg transition-all hover:scale-105"
+                            style={{
+                              background: msg.status === st ? (statusColors[st]?.bg ?? 'rgba(255,255,255,0.05)') : '#0f172a',
+                              border: `1px solid ${msg.status === st ? (statusColors[st]?.border ?? '#374151') : '#374151'}`,
+                              color: msg.status === st ? (statusColors[st]?.text ?? '#9ca3af') : '#9ca3af',
+                            }}>
+                            {statusLabel[st]}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="flex flex-wrap items-center gap-2 pt-3" style={{ borderTop: '1px solid #1f2937' }}>
+                      <a href={`mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.service || 'Your Inquiry')}&body=Dear ${encodeURIComponent(msg.name)},%0D%0A%0D%0A`}
+                        className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-lg transition-colors hover:bg-blue-900/20"
+                        style={{ color: '#60a5fa', border: '1px solid rgba(96,165,250,0.2)' }}>
+                        <Mail className="h-3.5 w-3.5" /> Reply via Email
+                      </a>
+                      <a href={`https://wa.me/${msg.phone?.replace(/\D/g, '')}?text=Hello ${encodeURIComponent(msg.name)}, thank you for contacting MOPi Production!`}
+                        target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-lg transition-colors hover:bg-green-900/20"
+                        style={{ color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' }}>
+                        <Phone className="h-3.5 w-3.5" /> WhatsApp
+                      </a>
+                      <span className="text-xs" style={{ color: '#374151' }}>
+                        Received: {new Date(msg.created_at).toLocaleString()}
+                      </span>
+                      <button
+                        onClick={() => { if (window.confirm('Delete this message?')) deleteInbox(msg.id); }}
+                        className="ml-auto flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-lg hover:bg-red-900/20 transition-colors"
+                        style={{ color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
+                        <Trash2 className="h-3.5 w-3.5" /> Delete
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          {inbox.length === 0 && (
+            <div className="text-center py-20">
+              <MessageSquare className="h-10 w-10 mx-auto mb-3" style={{ color: '#374151' }} />
+              <p className="text-sm" style={{ color: '#4b5563' }}>No messages yet.</p>
+              <p className="text-xs mt-1" style={{ color: '#374151' }}>When someone fills the contact form, messages will appear here.</p>
             </div>
-          </div>
-        ))}
-        {inbox.length === 0 && <p className="text-center py-16 text-sm" style={{ color: '#4b5563' }}>No messages yet. When someone fills the contact form, they'll appear here.</p>}
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const sectionRenderer: Record<Section, () => React.ReactNode> = {
     'dashboard': renderDashboard,
