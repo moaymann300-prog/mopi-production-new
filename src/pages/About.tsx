@@ -7,7 +7,6 @@ import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
   Menu, X, ChevronRight, MoveRight, CheckCircle,
   Target, Star, Lightbulb, Shield, Users, Globe,
-  Award,
 } from 'lucide-react';
 
 /* ── Shared helpers (same as homepage) ── */
@@ -148,13 +147,6 @@ const About = () => {
     { icon: Users,    title: ct('about','values','val3_title','Collaboration'), desc: ct('about','values','val3_desc','We work closely with clients as partners, bringing their vision to life seamlessly.') },
     { icon: Globe,    title: ct('about','values','val4_title','Regional Reach'), desc: ct('about','values','val4_desc','With projects across Egypt and the MENA region, we deliver world-class expertise.') },
   ];
-  const achievements = [
-    { year: ct('about','awards','award1_year','2025'), title: ct('about','awards','award1_title','Best Exhibition Design'),    org: ct('about','awards','award1_org','MENA Trade Show Association'), desc: ct('about','awards','award1_desc','Recognized for innovative booth design at Cairo Tech Expo 2025.') },
-    { year: ct('about','awards','award2_year','2024'), title: ct('about','awards','award2_title','Client Choice Award'),       org: ct('about','awards','award2_org','Exhibition Industry Alliance'),  desc: ct('about','awards','award2_desc','Highest client satisfaction rating for two consecutive years.') },
-    { year: ct('about','awards','award3_year','2023'), title: ct('about','awards','award3_title','Innovation in Design'),       org: ct('about','awards','award3_org','Gulf Exhibition Awards'),          desc: ct('about','awards','award3_desc','Revolutionary custom modular booth system design.') },
-    { year: ct('about','awards','award4_year','2022'), title: ct('about','awards','award4_title','Top Production Company'),     org: ct('about','awards','award4_org','Egypt Events Council'),             desc: ct('about','awards','award4_desc','Leading event production company in the Egyptian market.') },
-  ];
-
   // CMS-driven data with fallbacks
   const companyName = cms.settings.company_name || 'MOPi Production';
   const _email = cms.settings.email || 'info@mopiproduction.com';
@@ -338,46 +330,6 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
                   </div>
                   <h3 className="font-bold text-base mb-3 transition-colors group-hover:text-[#ED8214]" style={{ color: '#000' }}>{v.title}</h3>
                   <p className="text-sm leading-relaxed" style={{ color: '#555', lineHeight: isAr ? '2' : '1.7' }}>{v.desc}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══ § 4 · AWARDS — WHITE ══ */}
-      <section className="py-28 px-5 relative overflow-hidden" style={{ background: '#FFFFFF' }}>
-        <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
-        <div className="absolute bottom-20 right-20 pointer-events-none" style={{ width: 140, height: 140, border: '1.5px solid #ED8214', opacity: 0.07, transform: 'rotate(45deg)' }} />
-
-        <div className="max-w-7xl mx-auto">
-          <Reveal className="text-center mb-16">
-            <SectionLabel text={ct('about','awards','label','Recognition')} />
-            <h2 className="font-black mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
-              {ct('about','awards','heading','Awards & Achievements')}
-            </h2>
-            <p className="text-lg max-w-xl mx-auto" style={{ color: '#555' }}>{ct('about','awards','subtitle','Our commitment to excellence recognized by industry leaders')}</p>
-          </Reveal>
-
-          <div className="grid md:grid-cols-2 gap-5">
-            {achievements.map((a, i) => (
-              <Reveal key={i} delay={i * 70}>
-                <div className="group flex items-start gap-5 p-7 rounded-2xl transition-all duration-400 hover:-translate-y-1"
-                  style={{ background: '#FFFFFF', border: '1.5px solid #e5e7eb', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}
-                  onMouseEnter={e => { (e.currentTarget.style.borderColor = '#ED8214'); (e.currentTarget.style.boxShadow = '0 16px 36px rgba(244,163,0,0.1)'); }}
-                  onMouseLeave={e => { (e.currentTarget.style.borderColor = '#e5e7eb'); (e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.06)'); }}>
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110"
-                    style={{ background: 'rgba(244,163,0,0.1)', border: '1.5px solid rgba(244,163,0,0.25)' }}>
-                    <Award className="h-5 w-5" style={{ color: '#ED8214' }} />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-xl font-black" style={{ color: '#ED8214', fontFamily: "'Poppins', sans-serif" }}>{a.year}</span>
-                      <h3 className="font-bold text-base transition-colors group-hover:text-[#ED8214]" style={{ color: '#000' }}>{a.title}</h3>
-                    </div>
-                    <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: '#9ca3af' }}>{a.org}</p>
-                    <p className="text-sm leading-relaxed" style={{ color: '#555', lineHeight: isAr ? '2' : '1.7' }}>{a.desc}</p>
-                  </div>
                 </div>
               </Reveal>
             ))}
