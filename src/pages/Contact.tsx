@@ -232,14 +232,21 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
         <div className="relative z-10 text-center px-5 max-w-4xl mx-auto py-20">
           <div className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase px-4 py-2 rounded-full mb-8"
             style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#ED8214', animation: 'fadeDown 0.8s ease 0.2s both' }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#ED8214' }} />{heroContact?.badge_text || (isAr ? 'دائماً في خدمتك' : 'Always Ready to Help')}
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#ED8214' }} />
+            {isAr ? 'دائماً في خدمتك' : (heroContact?.badge_text || 'Always Ready to Help')}
           </div>
           <h1 className="font-black leading-tight text-white mb-6"
             style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both' }}>
-            {heroContact?.heading ? <span dangerouslySetInnerHTML={{ __html: heroContact.heading }} /> : isAr ? <>دعنا نبني<br /><span style={{ color: '#ED8214' }}>شيئاً استثنائياً</span></> : <>Let's Build<br /><span style={{ color: '#ED8214' }}>Something Amazing</span></>}
+            {isAr
+              ? <>دعنا نبني<br /><span style={{ color: '#ED8214' }}>شيئاً استثنائياً</span></>
+              : (heroContact?.heading ? <span dangerouslySetInnerHTML={{ __html: heroContact.heading }} /> : <>Let's Build<br /><span style={{ color: '#ED8214' }}>Something Amazing</span></>)
+            }
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both', lineHeight: isAr ? '2' : '1.7' }}>
-            {heroContact?.subheading || (isAr ? 'تواصل مع فريقنا للحصول على استشارة مجانية. سنناقش مشروعك ونقدم لك عرضاً مخصصاً خلال 24 ساعة.' : "Get in touch with our team for a free consultation. We'll discuss your project and create a custom proposal within 24 hours.")}
+            {isAr
+              ? 'تواصل مع فريقنا للحصول على استشارة مجانية. سنناقش مشروعك ونقدم لك عرضاً مخصصاً خلال 24 ساعة.'
+              : (heroContact?.subheading || "Get in touch with our team for a free consultation. We'll discuss your project and create a custom proposal within 24 hours.")
+            }
           </p>
         </div>
       </section>

@@ -242,14 +242,17 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
           <div className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase px-4 py-2 rounded-full mb-8"
             style={{ background: 'rgba(244,163,0,0.12)', border: '1px solid rgba(244,163,0,0.3)', color: '#ED8214', animation: 'fadeDown 0.8s ease 0.2s both' }}>
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#ED8214' }} />
-            {ct('about','hero','badge', 'Our Story')}
+            {isAr ? ct('about','hero','badge_ar','قصتنا') : ct('about','hero','badge','Our Story')}
           </div>
           <h1 className="font-black leading-tight text-white mb-6"
             style={{ fontSize: 'clamp(2.8rem, 7vw, 5rem)', animation: 'fadeDown 0.9s ease 0.35s both' }}>
-            {ct('about','hero','heading','Crafting Excellence Since 2016')}
+            {isAr ? ct('about','hero','heading_ar','نصنع التميز منذ 2016') : ct('about','hero','heading','Crafting Excellence Since 2016')}
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed" style={{ color: '#d1d5db', animation: 'fadeDown 0.9s ease 0.5s both', lineHeight: isAr ? '2' : '1.7' }}>
-            {ct('about','hero','subtitle','Passionate creators, innovative designers, and meticulous builders dedicated to transforming your brand vision into extraordinary experiences.')}
+            {isAr
+              ? ct('about','hero','subtitle_ar','مبدعون شغوفون ومصممون مبتكرون ومنفذون متقنون — نحوّل رؤيتك إلى تجارب استثنائية تبقى في الذاكرة.')
+              : ct('about','hero','subtitle','Passionate creators, innovative designers, and meticulous builders dedicated to transforming your brand vision into extraordinary experiences.')
+            }
           </p>
         </div>
       </section>
