@@ -8,7 +8,7 @@ import {
   ChevronDown, CheckCircle, Clock,
   Layers,
   Menu, X, ChevronRight, MoveRight,
-  Shield, Users, Globe, Star,
+  Shield, Users, Star,
 } from 'lucide-react';
 
 /* ─── Counter ─────────────────────────────────────── */
@@ -170,11 +170,9 @@ const Index = () => {
   ];
 
   const whyUs = [
-    { icon: Star,   title: t('why.1.title'), desc: t('why.1.desc') },
     { icon: Users,  title: t('why.2.title'), desc: t('why.2.desc') },
     { icon: Clock,  title: t('why.3.title'), desc: t('why.3.desc') },
     { icon: Shield, title: t('why.4.title'), desc: t('why.4.desc') },
-    { icon: Globe,  title: t('why.5.title'), desc: t('why.5.desc') },
     { icon: Layers, title: t('why.6.title'), desc: t('why.6.desc') },
   ];
 
