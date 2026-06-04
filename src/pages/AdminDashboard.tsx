@@ -330,7 +330,7 @@ export default function AdminDashboard() {
     if (pi.data) setPageImages(pi.data);
     if (qr.data) setQuoteRequests(qr.data);
     setLoaded(true);
-  }, [];
+  }, []);
 
   useEffect(() => { if (authed) fetchAll(); }, [authed, fetchAll]);
 
