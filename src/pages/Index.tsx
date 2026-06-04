@@ -83,11 +83,11 @@ const Particles = () => {
 
 /* ─── SectionLabel ────────────────────────────────── */
 const SectionLabel = ({ text, dark = false }: { text: string; dark?: boolean }) => (
-  <div className="inline-flex items-center gap-3 text-[10px] font-bold tracking-[0.3em] uppercase mb-5"
+  <div className="inline-flex items-center gap-6 text-[20px] font-bold tracking-[0.3em] uppercase mb-5"
     style={{ color: '#ED8214' }}>
-    <span className="w-10 h-px block" style={{ background: '#ED8214' }} />
+    <span className="w-20 h-0.5 block" style={{ background: '#ED8214' }} />
     {text}
-    <span className="w-10 h-px block" style={{ background: '#ED8214' }} />
+    <span className="w-20 h-0.5 block" style={{ background: '#ED8214' }} />
   </div>
 );
 
