@@ -345,7 +345,7 @@ const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings
         </div>
       </section>
 
-      {/* ══ § 4 · AWARDS — WHITE ══ */
+      {/* ══ § 4 · AWARDS — WHITE ══ */}
       <section className="py-28 px-5 relative overflow-hidden" style={{ background: '#FFFFFF' }}>
         <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
         <div className="absolute bottom-20 right-20 pointer-events-none" style={{ width: 140, height: 140, border: '1.5px solid #ED8214', opacity: 0.07, transform: 'rotate(45deg)' }} />
