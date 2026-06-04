@@ -135,6 +135,14 @@ const Contact = () => {
     return () => window.removeEventListener('scroll', fn);
   }, []);
 
+  // Auto-scroll to quote form on page load (since all quote buttons link here)
+  useEffect(() => {
+    const el = document.getElementById('quote-form');
+    if (el) {
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 400);
+    }
+  }, []);
+
   const navLinks = [
     { label: t('nav.home'), to: '/' },
     { label: t('nav.about'), to: '/about' },

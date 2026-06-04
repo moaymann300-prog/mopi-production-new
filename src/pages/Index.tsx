@@ -261,13 +261,13 @@ const Index = () => {
               onMouseLeave={e => (e.currentTarget.style.background = '#16a34a')}>
               <MessageCircle className="h-4 w-4" /> {t('nav.whatsapp')}
             </a>
-            <button onClick={() => scrollTo('contact')}
+<Link to="/contact"
               className="flex items-center gap-2 text-white text-[13px] font-bold px-5 py-2 rounded-full transition-all duration-300 hover:scale-105"
-              style={{ background: '#ED8214' }}
+              style={{ background: '#ED8214', textDecoration: 'none' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#d96b18'); (e.currentTarget.style.boxShadow = '0 6px 20px rgba(244,123,32,0.4)'); }}
               onMouseLeave={e => { (e.currentTarget.style.background = '#ED8214'); (e.currentTarget.style.boxShadow = 'none'); }}>
               {t('nav.quote')} <ArrowRight className="h-3.5 w-3.5" />
-            </button>
+            </Link>
           </div>
 
           <button onClick={() => setMenuOpen(p => !p)} className="md:hidden p-2 text-white"
@@ -300,9 +300,9 @@ const Index = () => {
               <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
                 className="flex-1 text-center text-white text-sm font-bold px-4 py-3 rounded-full"
                 style={{ background: '#16a34a' }}>{t('nav.whatsapp')}</a>
-              <button onClick={() => scrollTo('contact')}
+<Link to="/contact"
                 className="flex-1 text-center text-white text-sm font-bold px-4 py-3 rounded-full"
-                style={{ background: '#ED8214' }}>{t('nav.quote')}</button>
+                style={{ background: '#ED8214', textDecoration: 'none' }}>{t('nav.quote')}</Link>
             </div>
           </div>
         </div>
@@ -394,14 +394,14 @@ const Index = () => {
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20"
             style={{ animation: 'fadeDown 0.9s ease 0.7s both' }}>
-            <button onClick={() => scrollTo('contact')}
-              className="group flex items-center gap-3 text-white font-bold text-base px-10 py-4.5 rounded-full transition-all duration-300 hover:scale-105"
-              style={{ background: '#ED8214', boxShadow: '0 10px 30px rgba(244,123,32,0.3)', paddingTop: '1.1rem', paddingBottom: '1.1rem', fontFamily }}
+<Link to="/contact"
+              className="group flex items-center gap-3 text-white font-bold text-base px-10 rounded-full transition-all duration-300 hover:scale-105"
+              style={{ background: '#ED8214', boxShadow: '0 10px 30px rgba(244,123,32,0.3)', paddingTop: '1.1rem', paddingBottom: '1.1rem', fontFamily, textDecoration: 'none' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#d96b18'); (e.currentTarget.style.boxShadow = '0 14px 40px rgba(244,123,32,0.5)'); }}
               onMouseLeave={e => { (e.currentTarget.style.background = '#ED8214'); (e.currentTarget.style.boxShadow = '0 10px 30px rgba(244,123,32,0.3)'); }}>
               {t('hero.cta1')}
               {isAr ? <ArrowRight className="h-5 w-5 rotate-180 transition-transform group-hover:-translate-x-1.5" /> : <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1.5" />}
-            </button>
+            </Link>
             <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
               className="group flex items-center gap-3 text-white font-bold text-base px-10 rounded-full transition-all duration-300 hover:scale-105"
               style={{ background: 'rgba(255,255,255,0.06)', border: '1.5px solid rgba(255,255,255,0.18)', paddingTop: '1.1rem', paddingBottom: '1.1rem', fontFamily }}
@@ -484,14 +484,14 @@ const Index = () => {
               ))}
             </div>
 
-            <button onClick={() => scrollTo('contact')}
+<Link to="/contact"
               className="group inline-flex items-center gap-2.5 text-white font-bold px-8 py-3.5 rounded-full transition-all duration-300 hover:scale-105"
-              style={{ background: '#ED8214', boxShadow: '0 8px 24px rgba(244,123,32,0.25)', fontFamily }}
+              style={{ background: '#ED8214', boxShadow: '0 8px 24px rgba(244,123,32,0.25)', fontFamily, textDecoration: 'none' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#d96b18'); (e.currentTarget.style.boxShadow = '0 12px 32px rgba(244,123,32,0.4)'); }}
               onMouseLeave={e => { (e.currentTarget.style.background = '#ED8214'); (e.currentTarget.style.boxShadow = '0 8px 24px rgba(244,123,32,0.25)'); }}>
               {ct('home','about','cta','Work With Us')}
               {isAr ? <MoveRight className="h-4 w-4 rotate-180 transition-transform group-hover:-translate-x-1" /> : <MoveRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />}
-            </button>
+            </Link>
           </Reveal>
 
           <Reveal delay={150}>
@@ -740,14 +740,14 @@ const Index = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button onClick={() => scrollTo('contact')}
+<Link to="/contact"
               className="group flex items-center justify-center gap-3 text-white font-bold text-lg px-11 rounded-full transition-all duration-300 hover:scale-105"
-              style={{ background: '#ED8214', boxShadow: '0 12px 32px rgba(244,123,32,0.3)', paddingTop: '1.15rem', paddingBottom: '1.15rem', fontFamily }}
+              style={{ background: '#ED8214', boxShadow: '0 12px 32px rgba(244,123,32,0.3)', paddingTop: '1.15rem', paddingBottom: '1.15rem', fontFamily, textDecoration: 'none' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#d96b18'); (e.currentTarget.style.boxShadow = '0 16px 44px rgba(244,123,32,0.5)'); }}
               onMouseLeave={e => { (e.currentTarget.style.background = '#ED8214'); (e.currentTarget.style.boxShadow = '0 12px 32px rgba(244,123,32,0.3)'); }}>
               {t('cta.btn1')}
               {isAr ? <ArrowRight className="h-5 w-5 rotate-180 transition-transform group-hover:-translate-x-1.5" /> : <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1.5" />}
-            </button>
+            </Link>
             <Link to="/portfolio"
               className="group flex items-center justify-center gap-3 text-white font-bold text-lg px-11 rounded-full transition-all duration-300 hover:scale-105"
               style={{ background: 'rgba(255,255,255,0.06)', border: '1.5px solid rgba(255,255,255,0.15)', paddingTop: '1.15rem', paddingBottom: '1.15rem', fontFamily, textDecoration: 'none' }}
