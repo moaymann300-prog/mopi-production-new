@@ -354,13 +354,15 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
               <h2 className="font-black mb-6" style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', color: '#000' }}>{isAr ? 'تواصل معنا من أي مكان' : 'Find Us Anywhere'}</h2>
 
               {[
-                { icon: MapPin, label: isAr ? 'عنوان المكتب' : 'Office Address', lines: [cmsAddress, isAr ? 'عمليات منطقة الشرق الأوسط' : 'MENA Region Operations'] },
-                { icon: Phone, label: isAr ? 'أرقام الهاتف' : 'Phone Numbers', lines: phone2Contact ? [phoneContact, phone2Contact] : [phoneContact] },
-                { icon: Mail, label: isAr ? 'البريد الإلكتروني' : 'Email Addresses', lines: [emailContact] },
-                { icon: Clock, label: isAr ? 'ساعات العمل' : 'Business Hours', lines: isAr ? ['الأحد – الجمعة: 9 ص – 6 م', 'توقيت القاهرة (EET)'] : ['Mon–Sat: 9:00 AM – 6:00 PM', 'EET (Egypt Standard Time)'] },
+                { icon: MapPin, label: isAr ? 'عنوان المكتب' : 'Office Address', lines: [cmsAddress, isAr ? 'عمليات منطقة الشرق الأوسط' : 'MENA Region Operations'], href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cmsAddress)}` },
+                { icon: Phone, label: isAr ? 'أرقام الهاتف' : 'Phone Numbers', lines: phone2Contact ? [phoneContact, phone2Contact] : [phoneContact], href: `tel:${phoneContact.replace(/\s/g, '')}` },
+                { icon: Mail, label: isAr ? 'البريد الإلكتروني' : 'Email Addresses', lines: [emailContact], href: `mailto:${emailContact}` },
+                { icon: Clock, label: isAr ? 'ساعات العمل' : 'Business Hours', lines: isAr ? ['الأحد – الجمعة: 9 ص – 6 م', 'توقيت القاهرة (EET)'] : ['Mon–Sat: 9:00 AM – 6:00 PM', 'EET (Egypt Standard Time)'], href: null },
               ].map((c, i) => (
-                <div key={i} className="group flex items-start gap-4 p-5 rounded-xl transition-all duration-300 hover:-translate-y-0.5"
-                  style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb' }}
+                c.href ? (
+                <a key={i} href={c.href} target={c.href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer"
+                  className="group flex items-start gap-4 p-5 rounded-xl transition-all duration-300 hover:-translate-y-0.5"
+                  style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb', textDecoration: 'none' }}
                   onMouseEnter={e => { (e.currentTarget.style.borderColor = '#ED8214'); (e.currentTarget.style.background = '#fffef9'); }}
                   onMouseLeave={e => { (e.currentTarget.style.borderColor = '#e5e7eb'); (e.currentTarget.style.background = '#f9fafb'); }}>
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-all group-hover:scale-110"
@@ -371,7 +373,20 @@ const whatsappUrlContact = cms.settings.whatsapp_number ? `https://wa.me/${cms.s
                     <div className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: '#9ca3af' }}>{c.label}</div>
                     {c.lines.map((l, li) => <p key={li} className="text-sm font-semibold" style={{ color: '#1A1A1A' }}>{l}</p>)}
                   </div>
+                </a>
+                ) : (
+                <div key={i} className="group flex items-start gap-4 p-5 rounded-xl transition-all duration-300"
+                  style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb' }}>
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ background: 'rgba(244,163,0,0.1)', border: '1.5px solid rgba(244,163,0,0.25)' }}>
+                    <c.icon className="h-4.5 w-4.5" style={{ color: '#ED8214' }} />
+                  </div>
+                  <div>
+                    <div className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: '#9ca3af' }}>{c.label}</div>
+                    {c.lines.map((l, li) => <p key={li} className="text-sm font-semibold" style={{ color: '#1A1A1A' }}>{l}</p>)}
+                  </div>
                 </div>
+                )
               ))}
             </Reveal>
 

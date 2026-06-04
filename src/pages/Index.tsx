@@ -784,11 +784,11 @@ const Index = () => {
               {[
                 { icon: Phone, label: isAr ? 'الهاتف' : 'Phone', value: cmsPhone2 ? `${cmsPhone} / ${cmsPhone2}` : cmsPhone, href: phoneHref },
                 { icon: Mail, label: isAr ? 'البريد الإلكتروني' : 'Email', value: cmsEmail, href: emailHref },
-                { icon: MapPin, label: isAr ? 'الموقع' : 'Location', value: cmsAddress, href: '#' },
+                { icon: MapPin, label: isAr ? 'الموقع' : 'Location', value: cmsAddress, href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cmsAddress)}` },
                 { icon: MessageCircle, label: 'WhatsApp', value: isAr ? 'تواصل معنا مباشرةً' : 'Chat directly with us', href: whatsappUrl },
               ].map(c => (
                 <a key={c.label} href={c.href}
-                  target={c.href.startsWith('http') ? '_blank' : undefined}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="group flex items-center gap-4 p-4 rounded-xl transition-all duration-300"
                   style={{ background: '#FFFFFF', border: '1.5px solid #e9eaec', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', textDecoration: 'none' }}
