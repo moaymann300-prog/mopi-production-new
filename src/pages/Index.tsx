@@ -215,8 +215,10 @@ const Index = () => {
         @keyframes marqueeLeft  { from{transform:translateX(0)} to{transform:translateX(-50%)} }
         .marquee-track { display:flex; width:max-content; animation:marqueeLeft 30s linear infinite; }
         .marquee-track:hover { animation-play-state:paused; }
-        .marquee-logo { filter:grayscale(1) brightness(0) invert(1); opacity:0.45; transition:filter 0.45s ease, opacity 0.45s ease, transform 0.35s ease; }
-        .marquee-logo:hover { filter:none; opacity:1; transform:scale(1.08); }
+        .marquee-logo { filter:grayscale(0.15); opacity:0.9; transition:filter 0.4s ease, opacity 0.4s ease, transform 0.35s ease; }
+        .marquee-logo:hover { filter:none; opacity:1; transform:scale(1.06); }
+        .marquee-logo-wrap { background:#FFFFFF; border-radius:14px; padding:14px 22px; display:flex; align-items:center; justify-content:center; transition:box-shadow 0.35s ease, transform 0.35s ease; box-shadow:0 2px 12px rgba(0,0,0,0.08); }
+        .marquee-logo-wrap:hover { box-shadow:0 6px 28px rgba(237,130,20,0.22); transform:translateY(-3px); }
         .marquee-fade-l { background:linear-gradient(to right, #111111 0%, transparent 100%); }
         .marquee-fade-r { background:linear-gradient(to left,  #111111 0%, transparent 100%); }
         @keyframes fadeDown   { from{opacity:0;transform:translateY(-22px)} to{opacity:1;transform:translateY(0)} }
@@ -699,26 +701,26 @@ const Index = () => {
             {[...clientLogos, ...clientLogos].map((cl, i) => (
               <div
                 key={`${cl.domain}-${i}`}
-                className="flex-shrink-0 mx-10 flex items-center justify-center"
-                style={{ width: '130px', height: '64px' }}
+                className="flex-shrink-0 mx-5"
               >
+                <div className="marquee-logo-wrap" style={{ width: '150px', height: '72px' }}>
                 <img
                   src={`https://img.logo.dev/${cl.domain}?token=pk_freetoken&size=120`}
                   alt={cl.name}
                   className="marquee-logo"
-                  style={{ maxHeight: '44px', maxWidth: '120px', objectFit: 'contain' }}
+                  style={{ maxHeight: '42px', maxWidth: '110px', objectFit: 'contain' }}
                   onError={e => {
-                    // fallback: render text if logo fails to load
                     const parent = (e.currentTarget as HTMLImageElement).parentElement;
                     if (parent) {
                       (e.currentTarget as HTMLImageElement).style.display = 'none';
                       const span = document.createElement('span');
                       span.textContent = cl.name;
-                      span.style.cssText = 'color:#4b5563;font-size:13px;font-weight:700;letter-spacing:0.08em;font-family:Montserrat,sans-serif;white-space:nowrap;';
+                      span.style.cssText = 'color:#374151;font-size:12px;font-weight:800;letter-spacing:0.08em;font-family:Montserrat,sans-serif;white-space:nowrap;';
                       parent.appendChild(span);
                     }
                   }}
                 />
+                </div>
               </div>
             ))}
           </div>
