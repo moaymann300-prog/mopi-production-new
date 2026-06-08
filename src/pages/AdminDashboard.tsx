@@ -2065,17 +2065,17 @@ export default function AdminDashboard() {
           <div className="py-8 px-4">
             {activeCount > 0 ? (
               <div style={{ overflow: 'hidden', position: 'relative' }}>
-                <div style={{ display: 'flex', gap: '40px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
                   {sorted.filter(c => c.is_active).map(cl => (
                     <div key={cl.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                      {cl.logo_url ? (
-                        <img src={cl.logo_url} alt={cl.name}
-                          style={{ height: '48px', maxWidth: '120px', objectFit: 'contain', filter: 'grayscale(0.8) brightness(0.8)', opacity: 0.7 }} />
-                      ) : (
-                        <div style={{ height: '48px', width: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px dashed #374151', borderRadius: '8px' }}>
-                          <span style={{ fontSize: '10px', color: '#4b5563' }}>No logo</span>
-                        </div>
-                      )}
+                      <div style={{ background: '#FFFFFF', borderRadius: '12px', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '120px', height: '76px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)' }}>
+                        {cl.logo_url ? (
+                          <img src={cl.logo_url} alt={cl.name}
+                            style={{ height: '52px', maxWidth: '110px', objectFit: 'contain', filter: 'none', opacity: 1 }} />
+                        ) : (
+                          <span style={{ fontSize: '10px', color: '#6b7280', fontWeight: 700 }}>{cl.name}</span>
+                        )}
+                      </div>
                       <span style={{ fontSize: '9px', color: '#4b5563', letterSpacing: '0.1em', fontWeight: 700 }}>{cl.name}</span>
                     </div>
                   ))}
@@ -2119,18 +2119,18 @@ export default function AdminDashboard() {
               </div>
               <div className="flex flex-col justify-between">
                 {/* Preview of what it'll look like */}
-                <div className="rounded-xl p-5 flex flex-col items-center justify-center gap-4 h-40"
-                  style={{ background: '#0B0B0B', border: '1px solid #1f2937' }}>
+                <div className="rounded-xl p-5 flex flex-col items-center justify-center gap-4"
+                  style={{ background: '#0B0B0B', border: '1px solid #1f2937', minHeight: '160px' }}>
                   <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#374151' }}>Preview on Website</p>
-                  {clientLogoPreview ? (
-                    <img src={clientLogoPreview} alt="preview"
-                      style={{ maxHeight: '54px', maxWidth: '140px', objectFit: 'contain', filter: 'grayscale(1) brightness(0.7)', opacity: 0.65 }} />
-                  ) : (
-                    <div style={{ height: '54px', width: '140px', border: '1px dashed #374151', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span style={{ fontSize: '10px', color: '#4b5563' }}>Logo preview</span>
-                    </div>
-                  )}
-                  <p className="text-[9px]" style={{ color: '#374151' }}>Grayscale by default, color on hover</p>
+                  <div style={{ background: '#FFFFFF', borderRadius: '12px', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '130px', height: '80px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)' }}>
+                    {clientLogoPreview ? (
+                      <img src={clientLogoPreview} alt="preview"
+                        style={{ maxHeight: '60px', maxWidth: '120px', objectFit: 'contain', filter: 'none', opacity: 1 }} />
+                    ) : (
+                      <span style={{ fontSize: '10px', color: '#9ca3af' }}>Logo preview</span>
+                    )}
+                  </div>
+                  <p className="text-[9px]" style={{ color: '#374151' }}>Full color on white background</p>
                 </div>
                 <button onClick={addClientLogo} disabled={saving || !newClientName.trim()}
                   className="w-full flex items-center justify-center gap-2 text-sm font-bold py-3 rounded-xl text-black transition-all hover:scale-[1.02] disabled:opacity-50 mt-4"

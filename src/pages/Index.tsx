@@ -222,20 +222,37 @@ const Index = () => {
         @keyframes marqueeLeft  { from{transform:translateX(0)} to{transform:translateX(-50%)} }
         .marquee-track { display:flex; width:max-content; animation:marqueeLeft 35s linear infinite; align-items:center; }
         .marquee-track:hover { animation-play-state:paused; }
-        .marquee-logo-item { display:flex; align-items:center; justify-content:center; flex-shrink:0; margin:0 40px; cursor:default; }
-        .marquee-logo {
-          height:54px; max-width:140px; width:auto; object-fit:contain;
-          filter:grayscale(1) brightness(0.7);
-          opacity:0.65;
-          transition:filter 0.45s ease, opacity 0.45s ease, transform 0.4s ease;
+        .marquee-logo-item {
+          display:flex; align-items:center; justify-content:center;
+          flex-shrink:0; margin:0 28px; cursor:default;
         }
-        .marquee-logo:hover {
+        .marquee-logo-card {
+          background:#FFFFFF;
+          border-radius:16px;
+          padding:18px 32px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          box-shadow:0 2px 16px rgba(0,0,0,0.12);
+          transition:transform 0.35s ease, box-shadow 0.35s ease;
+          min-width:160px;
+          height:100px;
+        }
+        .marquee-logo-card:hover {
+          transform:translateY(-4px) scale(1.04);
+          box-shadow:0 8px 32px rgba(237,130,20,0.22);
+        }
+        .marquee-logo {
+          height:70px;
+          max-width:150px;
+          width:auto;
+          object-fit:contain;
           filter:none;
           opacity:1;
-          transform:scale(1.1);
+          transition:transform 0.35s ease;
         }
         .marquee-logo-name {
-          color:#4b5563; font-size:11px; font-weight:800; letter-spacing:0.12em;
+          color:#374151; font-size:13px; font-weight:800; letter-spacing:0.1em;
           font-family:'Montserrat',sans-serif; white-space:nowrap; text-transform:uppercase;
         }
         .marquee-fade-l { background:linear-gradient(to right, #0B0B0B 0%, transparent 100%); }
@@ -714,22 +731,24 @@ const Index = () => {
             <div className="marquee-track">
               {[...clientLogos, ...clientLogos].map((cl, i) => (
                 <div key={`${cl.id}-${i}`} className="marquee-logo-item">
-                  {cl.logo_url ? (
-                    <img
-                      src={cl.logo_url}
-                      alt={cl.name}
-                      className="marquee-logo"
-                      onError={e => {
-                        (e.currentTarget as HTMLImageElement).style.display = 'none';
-                        const span = document.createElement('span');
-                        span.textContent = cl.name;
-                        span.className = 'marquee-logo-name';
-                        (e.currentTarget as HTMLImageElement).parentElement?.appendChild(span);
-                      }}
-                    />
-                  ) : (
-                    <span className="marquee-logo-name">{cl.name}</span>
-                  )}
+                  <div className="marquee-logo-card">
+                    {cl.logo_url ? (
+                      <img
+                        src={cl.logo_url}
+                        alt={cl.name}
+                        className="marquee-logo"
+                        onError={e => {
+                          (e.currentTarget as HTMLImageElement).style.display = 'none';
+                          const span = document.createElement('span');
+                          span.textContent = cl.name;
+                          span.className = 'marquee-logo-name';
+                          (e.currentTarget as HTMLImageElement).parentElement?.appendChild(span);
+                        }}
+                      />
+                    ) : (
+                      <span className="marquee-logo-name">{cl.name}</span>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
