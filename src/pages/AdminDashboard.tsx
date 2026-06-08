@@ -901,6 +901,17 @@ export default function AdminDashboard() {
         ]}
       />
 
+      {/* Clients / Marquee Section */}
+      <PageSection
+        pageName="home" sectionName="clients" sectionLabel="🎯 Our Clients / Trusted Brands Section"
+        icon={Users} color="#ED8214"
+        fields={[
+          { field: 'label', label: 'Section Label (small badge above heading)', hint: 'e.g. "Our Clients" or "عملاؤنا"' },
+          { field: 'heading', label: 'Main Heading', hint: 'e.g. "TRUSTED BY LEADING BRANDS"' },
+          { field: 'subtitle', label: 'Subtitle / Description', hint: 'Short description below the heading', multiline: true, rows: 2 },
+        ]}
+      />
+
       {/* Process */}
       <PageSection
         pageName="home" sectionName="process" sectionLabel="📋 Our Process Section"
@@ -927,8 +938,9 @@ export default function AdminDashboard() {
         pageName="home" sectionName="cta" sectionLabel="🎯 CTA Band — Call to Action"
         icon={MousePointerClick} color="#f43f5e"
         fields={[
+          { field: 'label', label: 'Section Label (above heading)', hint: 'e.g. "Let\'s Work Together"' },
           { field: 'heading', label: 'Heading Line 1' },
-          { field: 'heading2', label: 'Heading Line 2' },
+          { field: 'heading2', label: 'Heading Line 2 (in orange)' },
           { field: 'subtitle', label: 'Subtitle' },
           { field: 'cta_primary', label: 'Primary Button Text' },
           { field: 'cta_secondary', label: 'Secondary Button Text' },

@@ -170,17 +170,17 @@ const Index = () => {
   ];
 
   const whyUs = [
-    { icon: Users,  title: t('why.2.title'), desc: t('why.2.desc') },
-    { icon: Clock,  title: t('why.3.title'), desc: t('why.3.desc') },
-    { icon: Shield, title: t('why.4.title'), desc: t('why.4.desc') },
-    { icon: Layers, title: t('why.6.title'), desc: t('why.6.desc') },
+    { icon: Users,  title: ct('home','why','item2_title', t('why.2.title')), desc: ct('home','why','item2_desc', t('why.2.desc')) },
+    { icon: Clock,  title: ct('home','why','item3_title', t('why.3.title')), desc: ct('home','why','item3_desc', t('why.3.desc')) },
+    { icon: Shield, title: ct('home','why','item4_title', t('why.4.title')), desc: ct('home','why','item4_desc', t('why.4.desc')) },
+    { icon: Layers, title: ct('home','why','item6_title', t('why.6.title')), desc: ct('home','why','item6_desc', t('why.6.desc')) },
   ];
 
   const process = [
-    { num: '01', title: t('step.1.title'), desc: t('step.1.desc') },
-    { num: '02', title: t('step.2.title'), desc: t('step.2.desc') },
-    { num: '03', title: t('step.3.title'), desc: t('step.3.desc') },
-    { num: '04', title: t('step.4.title'), desc: t('step.4.desc') },
+    { num: '01', title: ct('home','process','step1_title', t('step.1.title')), desc: ct('home','process','step1_desc', t('step.1.desc')) },
+    { num: '02', title: ct('home','process','step2_title', t('step.2.title')), desc: ct('home','process','step2_desc', t('step.2.desc')) },
+    { num: '03', title: ct('home','process','step3_title', t('step.3.title')), desc: ct('home','process','step3_desc', t('step.3.desc')) },
+    { num: '04', title: ct('home','process','step4_title', t('step.4.title')), desc: ct('home','process','step4_desc', t('step.4.desc')) },
   ];
 
   const inputCls = `w-full border rounded-xl px-4 py-3.5 text-sm transition-all duration-300 focus:outline-none focus:ring-2
@@ -614,14 +614,14 @@ const Index = () => {
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-16">
-            <SectionLabel text={t('why.label')} />
+            <SectionLabel text={ct('home','why','label', t('why.label'))} />
             <h2 className="font-black mb-4"
               style={{ fontSize: 'clamp(2rem,4vw,3.2rem)', color: '#111111', fontFamily }}>
-              {t('why.h1')}{' '}
-              <span style={{ color: '#ED8214' }}>{t('why.h2')}</span>
+              {ct('home','why','heading1', t('why.h1'))}{' '}
+              <span style={{ color: '#ED8214' }}>{ct('home','why','heading2', t('why.h2'))}</span>
             </h2>
             <p className="text-lg max-w-xl mx-auto" style={{ color: '#555555', fontFamily, lineHeight: isAr ? 2 : 1.7 }}>
-              {t('why.sub')}
+              {ct('home','why','subtitle', t('why.sub'))}
             </p>
           </Reveal>
 
@@ -671,22 +671,16 @@ const Index = () => {
 
         {/* ── Header ── */}
         <Reveal className="text-center mb-14 px-5">
-          <div className="inline-flex items-center gap-2 mb-5">
-            <div className="h-px w-10" style={{ background: '#ED8214', opacity: 0.6 }} />
-            <span className="text-[10px] font-black tracking-[0.32em] uppercase" style={{ color: '#ED8214', fontFamily }}>
-              {isAr ? 'عملاؤنا' : 'Our Clients'}
-            </span>
-            <div className="h-px w-10" style={{ background: '#ED8214', opacity: 0.6 }} />
-          </div>
+          <SectionLabel text={ct('home', 'clients', 'label', isAr ? 'عملاؤنا' : 'Our Clients')} />
           <h2 className="font-black text-white mb-4"
             style={{ fontSize: 'clamp(1.7rem,3.8vw,2.9rem)', fontFamily, letterSpacing: isAr ? '0.02em' : '0.06em' }}>
-            {isAr ? 'يثق بنا كبار البراندات' : 'TRUSTED BY LEADING BRANDS'}
+            {ct('home', 'clients', 'heading', isAr ? 'يثق بنا كبار البراندات' : 'TRUSTED BY LEADING BRANDS')}
           </h2>
           <p className="text-base max-w-xl mx-auto"
             style={{ color: '#6b7280', fontFamily, lineHeight: isAr ? 2 : 1.7 }}>
-            {isAr
+            {ct('home', 'clients', 'subtitle', isAr
               ? 'براندات اختارت MOPI Production لتحويل رؤيتها إلى واقع'
-              : 'Brands that trusted MOPI Production to bring their vision to reality.'}
+              : 'Brands that trusted MOPI Production to bring their vision to reality.')}
           </p>
         </Reveal>
 
@@ -743,13 +737,13 @@ const Index = () => {
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-16">
-            <SectionLabel text={t('process.label')} />
+            <SectionLabel text={ct('home','process','label', t('process.label'))} />
             <h2 className="font-black mb-4"
               style={{ fontSize: 'clamp(2rem,4vw,3.2rem)', color: '#111111', fontFamily }}>
-              {t('process.h1')}
+              {ct('home','process','heading', t('process.h1'))}
             </h2>
             <p className="text-lg max-w-xl mx-auto" style={{ color: '#555555', fontFamily, lineHeight: isAr ? 2 : 1.7 }}>
-              {t('process.sub')}
+              {ct('home','process','subtitle', t('process.sub'))}
             </p>
           </Reveal>
 
@@ -796,14 +790,14 @@ const Index = () => {
           style={{ width: 160, height: 160, border: '1px solid #ED8214', opacity: 0.07, transform: 'translateY(-50%) rotate(45deg)' }} />
 
         <Reveal className="relative max-w-4xl mx-auto text-center">
-          <SectionLabel text={isAr ? 'لنبدأ معاً' : "Let's Work Together"} />
+          <SectionLabel text={ct('home','cta','label', isAr ? 'لنبدأ معاً' : "Let's Work Together")} />
           <h2 className="font-black text-white leading-tight mb-6"
             style={{ fontSize: 'clamp(2.2rem,5vw,4rem)', fontFamily }}>
-            {t('cta.h1')}{' '}
-            <span style={{ color: '#ED8214' }}>{t('cta.h2')}</span>
+            {ct('home','cta','heading', t('cta.h1'))}{' '}
+            <span style={{ color: '#ED8214' }}>{ct('home','cta','heading2', t('cta.h2'))}</span>
           </h2>
           <p className="text-lg mb-12" style={{ color: '#9ca3af', fontFamily, lineHeight: isAr ? 2 : 1.7 }}>
-            {t('cta.sub')}
+            {ct('home','cta','subtitle', t('cta.sub'))}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -812,7 +806,7 @@ const Index = () => {
               style={{ background: '#ED8214', boxShadow: '0 12px 32px rgba(244,123,32,0.3)', paddingTop: '1.15rem', paddingBottom: '1.15rem', fontFamily, textDecoration: 'none' }}
               onMouseEnter={e => { (e.currentTarget.style.background = '#d96b18'); (e.currentTarget.style.boxShadow = '0 16px 44px rgba(244,123,32,0.5)'); }}
               onMouseLeave={e => { (e.currentTarget.style.background = '#ED8214'); (e.currentTarget.style.boxShadow = '0 12px 32px rgba(244,123,32,0.3)'); }}>
-              {t('cta.btn1')}
+              {ct('home','cta','cta_primary', t('cta.btn1'))}
               {isAr ? <ArrowRight className="h-5 w-5 rotate-180 transition-transform group-hover:-translate-x-1.5" /> : <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1.5" />}
             </Link>
             <Link to="/portfolio"
@@ -820,7 +814,7 @@ const Index = () => {
               style={{ background: 'rgba(255,255,255,0.06)', border: '1.5px solid rgba(255,255,255,0.15)', paddingTop: '1.15rem', paddingBottom: '1.15rem', fontFamily, textDecoration: 'none' }}
               onMouseEnter={e => { (e.currentTarget.style.borderColor = '#ED8214'); (e.currentTarget.style.color = '#ED8214'); }}
               onMouseLeave={e => { (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'); (e.currentTarget.style.color = '#fff'); }}>
-              {t('cta.btn2')}
+              {ct('home','cta','cta_secondary', t('cta.btn2'))}
             </Link>
           </div>
         </Reveal>
@@ -837,14 +831,14 @@ const Index = () => {
 
           {/* Info */}
           <Reveal>
-            <SectionLabel text={t('contact.label')} />
+            <SectionLabel text={ct('home','contact','label', t('contact.label'))} />
             <h2 className="font-black leading-tight mb-6"
               style={{ fontSize: 'clamp(2rem,4vw,3.2rem)', color: '#111111', fontFamily }}>
-              {t('contact.h1')}<br />
-              <span style={{ color: '#ED8214' }}>{t('contact.h2')}</span>
+              {ct('home','contact','heading', t('contact.h1'))}<br />
+              <span style={{ color: '#ED8214' }}>{ct('home','contact','heading2', t('contact.h2'))}</span>
             </h2>
             <p className="text-lg mb-10 leading-relaxed" style={{ color: '#555555', fontFamily, lineHeight: isAr ? 2 : 1.7 }}>
-              {t('contact.sub')}
+              {ct('home','contact','subtitle', t('contact.sub'))}
             </p>
 
             <div className="space-y-4">
