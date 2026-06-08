@@ -186,9 +186,24 @@ const Index = () => {
   const inputCls = `w-full border rounded-xl px-4 py-3.5 text-sm transition-all duration-300 focus:outline-none focus:ring-2
     bg-white text-gray-800 placeholder-gray-400 border-gray-200 focus:border-[#ED8214] focus:ring-[#ED8214]/20`;
 
-  const clients = [
-    'Samsung', 'Huawei', 'L\'Oréal', 'Nestlé', 'BMW', 'Pfizer',
-    'KPMG', 'Siemens', 'Oracle', 'Unilever', 'ABB', 'Mastercard',
+  // client logos via logo.dev CDN (publicly accessible, no auth needed)
+  const clientLogos = [
+    { name: 'Samsung',    domain: 'samsung.com' },
+    { name: 'Huawei',     domain: 'huawei.com' },
+    { name: "L'Oréal",   domain: 'loreal.com' },
+    { name: 'Nestlé',     domain: 'nestle.com' },
+    { name: 'BMW',        domain: 'bmw.com' },
+    { name: 'Pfizer',     domain: 'pfizer.com' },
+    { name: 'KPMG',       domain: 'kpmg.com' },
+    { name: 'Siemens',    domain: 'siemens.com' },
+    { name: 'Oracle',     domain: 'oracle.com' },
+    { name: 'Unilever',   domain: 'unilever.com' },
+    { name: 'Mastercard', domain: 'mastercard.com' },
+    { name: 'Henkel',     domain: 'henkel.com' },
+    { name: 'Vodafone',   domain: 'vodafone.com' },
+    { name: 'Shell',      domain: 'shell.com' },
+    { name: 'Bosch',      domain: 'bosch.com' },
+    { name: 'Microsoft',  domain: 'microsoft.com' },
   ];
 
   return (
@@ -197,6 +212,13 @@ const Index = () => {
       {/* ══ KEYFRAMES ══ */}
       <style>{`
         @keyframes slowZoom   { from{transform:scale(1.04)} to{transform:scale(1.12)} }
+        @keyframes marqueeLeft  { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+        .marquee-track { display:flex; width:max-content; animation:marqueeLeft 30s linear infinite; }
+        .marquee-track:hover { animation-play-state:paused; }
+        .marquee-logo { filter:grayscale(1) brightness(0) invert(1); opacity:0.45; transition:filter 0.45s ease, opacity 0.45s ease, transform 0.35s ease; }
+        .marquee-logo:hover { filter:none; opacity:1; transform:scale(1.08); }
+        .marquee-fade-l { background:linear-gradient(to right, #111111 0%, transparent 100%); }
+        .marquee-fade-r { background:linear-gradient(to left,  #111111 0%, transparent 100%); }
         @keyframes fadeDown   { from{opacity:0;transform:translateY(-22px)} to{opacity:1;transform:translateY(0)} }
         @keyframes fadeUp     { from{opacity:0;transform:translateY(22px)}  to{opacity:1;transform:translateY(0)} }
         @keyframes lineGrow   { from{width:0} to{width:100%} }
@@ -636,36 +658,79 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ══ § 7 · CLIENTS ══ */}
-      <section id="clients" className="py-20 px-5 relative overflow-hidden" style={{ background: '#111111' }}>
+      {/* ══ § 7 · CLIENTS MARQUEE ══ */}
+      <section id="clients" className="py-20 relative overflow-hidden" style={{ background: '#111111' }}>
+        {/* top orange line */}
         <div className="absolute top-0 left-0 right-0 h-[2px]"
           style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
+        {/* bottom orange line */}
+        <div className="absolute bottom-0 left-0 right-0 h-px"
+          style={{ background: 'linear-gradient(to right, transparent, rgba(237,130,20,0.35), transparent)' }} />
 
-        <div className="max-w-7xl mx-auto">
-          <Reveal className="text-center mb-12">
-            <SectionLabel text={t('clients.label')} />
-            <h2 className="font-black mb-3 text-white"
-              style={{ fontSize: 'clamp(1.8rem,3.5vw,2.8rem)', fontFamily }}>
-              {t('clients.h1')}
-            </h2>
-            <p className="text-base" style={{ color: '#6b7280', fontFamily }}>{t('clients.sub')}</p>
-          </Reveal>
+        {/* ── Header ── */}
+        <Reveal className="text-center mb-14 px-5">
+          <div className="inline-flex items-center gap-2 mb-5">
+            <div className="h-px w-10" style={{ background: '#ED8214', opacity: 0.6 }} />
+            <span className="text-[10px] font-black tracking-[0.32em] uppercase" style={{ color: '#ED8214', fontFamily }}>
+              {isAr ? 'عملاؤنا' : 'Our Clients'}
+            </span>
+            <div className="h-px w-10" style={{ background: '#ED8214', opacity: 0.6 }} />
+          </div>
+          <h2 className="font-black text-white mb-4"
+            style={{ fontSize: 'clamp(1.7rem,3.8vw,2.9rem)', fontFamily, letterSpacing: isAr ? '0.02em' : '0.06em' }}>
+            {isAr ? 'يثق بنا كبار البراندات' : 'TRUSTED BY LEADING BRANDS'}
+          </h2>
+          <p className="text-base max-w-xl mx-auto"
+            style={{ color: '#6b7280', fontFamily, lineHeight: isAr ? 2 : 1.7 }}>
+            {isAr
+              ? 'براندات اختارت MOPI Production لتحويل رؤيتها إلى واقع'
+              : 'Brands that trusted MOPI Production to bring their vision to reality.'}
+          </p>
+        </Reveal>
 
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {clients.map((c, i) => (
-              <Reveal key={c} delay={i * 40}>
-                <div className="group flex items-center justify-center rounded-xl py-5 px-4 transition-all duration-300 cursor-default"
-                  style={{ border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}
-                  onMouseEnter={e => { (e.currentTarget.style.borderColor = 'rgba(244,123,32,0.3)'); (e.currentTarget.style.background = 'rgba(244,123,32,0.04)'); }}
-                  onMouseLeave={e => { (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'); (e.currentTarget.style.background = 'rgba(255,255,255,0.02)'); }}>
-                  <span className="text-sm font-bold tracking-wide transition-colors duration-300"
-                    style={{ color: '#6b7280', fontFamily }}>
-                    {c}
-                  </span>
-                </div>
-              </Reveal>
+        {/* ── Marquee track ── */}
+        <div className="relative overflow-hidden">
+          {/* Fade edges */}
+          <div className="absolute left-0 top-0 bottom-0 w-24 z-10 pointer-events-none marquee-fade-l" />
+          <div className="absolute right-0 top-0 bottom-0 w-24 z-10 pointer-events-none marquee-fade-r" />
+
+          <div className="marquee-track py-3">
+            {/* Duplicate the list twice for seamless infinite loop */}
+            {[...clientLogos, ...clientLogos].map((cl, i) => (
+              <div
+                key={`${cl.domain}-${i}`}
+                className="flex-shrink-0 mx-10 flex items-center justify-center"
+                style={{ width: '130px', height: '64px' }}
+              >
+                <img
+                  src={`https://img.logo.dev/${cl.domain}?token=pk_freetoken&size=120`}
+                  alt={cl.name}
+                  className="marquee-logo"
+                  style={{ maxHeight: '44px', maxWidth: '120px', objectFit: 'contain' }}
+                  onError={e => {
+                    // fallback: render text if logo fails to load
+                    const parent = (e.currentTarget as HTMLImageElement).parentElement;
+                    if (parent) {
+                      (e.currentTarget as HTMLImageElement).style.display = 'none';
+                      const span = document.createElement('span');
+                      span.textContent = cl.name;
+                      span.style.cssText = 'color:#4b5563;font-size:13px;font-weight:700;letter-spacing:0.08em;font-family:Montserrat,sans-serif;white-space:nowrap;';
+                      parent.appendChild(span);
+                    }
+                  }}
+                />
+              </div>
             ))}
           </div>
+        </div>
+
+        {/* ── Subtle divider ornament ── */}
+        <div className="flex items-center justify-center gap-4 mt-12 px-5 opacity-25">
+          <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.2))' }} />
+          <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#ED8214' }} />
+          <div className="w-1 h-1 rounded-full" style={{ background: '#ED8214', opacity: 0.5 }} />
+          <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#ED8214' }} />
+          <div className="flex-1 h-px" style={{ background: 'linear-gradient(to left, transparent, rgba(255,255,255,0.2))' }} />
         </div>
       </section>
 
