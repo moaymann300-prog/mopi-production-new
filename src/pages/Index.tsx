@@ -760,13 +760,13 @@ const Index = () => {
       </section>
 
       {/* ══ § 10 · CONTACT ══ */}
-      <section id="contact" className="py-28 px-5 relative overflow-hidden" style={{ background: '#F2F2F2' }}>
+      <section id="contact" className="py-16 sm:py-28 px-4 sm:px-5 relative overflow-hidden" style={{ background: '#F2F2F2' }}>
         <div className="absolute top-0 left-0 right-0 h-[2px]"
           style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
         <div className="absolute top-12 right-12 pointer-events-none"
           style={{ width: 150, height: 150, border: '1px solid #ED8214', opacity: 0.055, transform: 'rotate(45deg)' }} />
 
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
 
           {/* Info */}
           <Reveal>
@@ -810,7 +810,7 @@ const Index = () => {
 
           {/* Form */}
           <Reveal delay={150}>
-            <div className="rounded-2xl p-8"
+            <div className="rounded-2xl p-5 sm:p-8"
               style={{ background: '#FFFFFF', border: '1.5px solid #e9eaec', boxShadow: '0 4px 24px rgba(0,0,0,0.07)' }}>
               {formSent ? (
                 <div className="text-center py-16">
@@ -836,7 +836,7 @@ const Index = () => {
                     {isAr ? 'أرسل لنا رسالة' : 'Send Us a Message'}
                   </h3>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-[10px] font-bold uppercase tracking-widest mb-2 block" style={{ color: '#9ca3af', fontFamily }}>{t('contact.name')} *</label>
                       <input required value={formData.name} onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
