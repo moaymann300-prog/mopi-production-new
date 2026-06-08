@@ -30,11 +30,21 @@ interface QuoteRequest { id: number; company_name: string; email: string; phone:
 interface PageContent { id: number; page: string; section: string; field: string; value_en: string; value_ar: string; }
 interface PageImage { id: number; page: string; section: string; image_key: string; image_url: string; alt_en: string; alt_ar: string; sort_order: number; }
 
+interface ClientLogoItem {
+  id: number;
+  name: string;
+  logo_url: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at?: string;
+}
+
 type Section =
   | 'dashboard'
   | 'page-home' | 'page-about' | 'page-services' | 'page-portfolio' | 'page-contact'
   | 'site-settings' | 'social-links' | 'logos' | 'hero-sections'
-  | 'stats' | 'services' | 'portfolio' | 'team' | 'testimonials' | 'media' | 'about' | 'inbox';
+  | 'stats' | 'services' | 'portfolio' | 'team' | 'testimonials' | 'media' | 'about' | 'inbox'
+  | 'clients-management';
 
 // ─── Micro Components ─────────────────────────────────────────────────────────
 
@@ -260,6 +270,10 @@ export default function AdminDashboard() {
   const [selectedMessageId, setSelectedMessageId] = useState<number | null>(null);
   const [inboxNote, setInboxNote] = useState<Record<number, string>>({});
   const [inboxTabState, setInboxTabState] = useState<'quotes'|'contacts'>('quotes');
+  const [clientLogosDB, setClientLogosDB] = useState<ClientLogoItem[]>([]);
+  const [newClientName, setNewClientName] = useState('');
+  const [newClientUrl, setNewClientUrl] = useState('');
+  const [clientLogoPreview, setClientLogoPreview] = useState('');
 
   const [settings, setSettings] = useState<SiteSetting[]>([]);
   const [socials, setSocials] = useState<SocialLink[]>([]);
@@ -297,7 +311,7 @@ export default function AdminDashboard() {
   }, []);
 
   const fetchAll = useCallback(async () => {
-    const [s, sl, lg, h, st, sv, pf, tm, ts, md, ab, ib, pc, pi, qr] = await Promise.all([
+    const [s, sl, lg, h, st, sv, pf, tm, ts, md, ab, ib, pc, pi, qr, cl] = await Promise.all([
       supabase.from('cms_site_settings_2026_04_21').select('*').order('group_name').order('id'),
       supabase.from('cms_social_links_2026_04_21').select('*').order('sort_order'),
       supabase.from('cms_logos_2026_04_21').select('*').order('id'),
@@ -313,6 +327,7 @@ export default function AdminDashboard() {
       supabase.from('cms_page_content_2026_06_01').select('*').order('page').order('section').order('field'),
       supabase.from('cms_page_images_2026_06_01').select('*').order('page').order('sort_order'),
       supabase.from('quote_requests_2026_06_04').select('*').order('created_at', { ascending: false }),
+      supabase.from('cms_client_logos_2026_06_08').select('*').order('sort_order'),
     ]);
     if (s.data) setSettings(s.data);
     if (sl.data) setSocials(sl.data);
@@ -329,6 +344,7 @@ export default function AdminDashboard() {
     if (pc.data) setPageContent(pc.data);
     if (pi.data) setPageImages(pi.data);
     if (qr.data) setQuoteRequests(qr.data);
+    if (cl.data) setClientLogosDB(cl.data);
     setLoaded(true);
   }, []);
 
@@ -459,6 +475,65 @@ export default function AdminDashboard() {
     if (selectedMessageId === id) setSelectedMessageId(null);
     notify('Quote request deleted!');
   };
+
+  // ─── Client Logos CRUD ───────────────────────────────────────────────────
+  const addClientLogo = async () => {
+    if (!newClientName.trim()) { notify('Please enter a client name', 'error'); return; }
+    setSaving(true);
+    const nextOrder = clientLogosDB.length > 0 ? Math.max(...clientLogosDB.map(c => c.sort_order)) + 1 : 1;
+    const { data, error } = await supabase
+      .from('cms_client_logos_2026_06_08')
+      .insert([{ name: newClientName.trim(), logo_url: newClientUrl, sort_order: nextOrder, is_active: true }])
+      .select()
+      .single();
+    if (error) { notify('Failed to add client: ' + error.message, 'error'); }
+    else {
+      setClientLogosDB(prev => [...prev, data]);
+      setNewClientName('');
+      setNewClientUrl('');
+      setClientLogoPreview('');
+      notify('✅ Client logo added!');
+    }
+    setSaving(false);
+  };
+
+  const updateClientLogo = async (item: ClientLogoItem) => {
+    const { error } = await supabase
+      .from('cms_client_logos_2026_06_08')
+      .update({ name: item.name, logo_url: item.logo_url, sort_order: item.sort_order, is_active: item.is_active, updated_at: new Date().toISOString() })
+      .eq('id', item.id);
+    if (error) notify('Save failed: ' + error.message, 'error');
+    else notify('✅ Logo saved!');
+  };
+
+  const deleteClientLogo = async (id: number) => {
+    if (!confirm('Delete this client logo?')) return;
+    const { error } = await supabase.from('cms_client_logos_2026_06_08').delete().eq('id', id);
+    if (error) { notify('Delete failed: ' + error.message, 'error'); return; }
+    setClientLogosDB(prev => prev.filter(c => c.id !== id));
+    notify('✔ Logo deleted!');
+  };
+
+  const moveClientLogo = async (id: number, dir: 'up' | 'down') => {
+    const sorted = [...clientLogosDB].sort((a, b) => a.sort_order - b.sort_order);
+    const idx = sorted.findIndex(c => c.id === id);
+    const swapIdx = dir === 'up' ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= sorted.length) return;
+    const current = sorted[idx];
+    const swapWith = sorted[swapIdx];
+    const newOrder1 = swapWith.sort_order;
+    const newOrder2 = current.sort_order;
+    await Promise.all([
+      supabase.from('cms_client_logos_2026_06_08').update({ sort_order: newOrder1 }).eq('id', current.id),
+      supabase.from('cms_client_logos_2026_06_08').update({ sort_order: newOrder2 }).eq('id', swapWith.id),
+    ]);
+    setClientLogosDB(prev => prev.map(c => {
+      if (c.id === current.id) return { ...c, sort_order: newOrder1 };
+      if (c.id === swapWith.id) return { ...c, sort_order: newOrder2 };
+      return c;
+    }));
+  };
+  // ────────────────────────────────────────────────────────────────────
 
   const handleMediaUpload = async (file: File) => {
     try {
@@ -671,6 +746,7 @@ export default function AdminDashboard() {
     {
       label: 'Content',
       items: [
+        { id: 'clients-management' as Section, icon: Users, label: 'Client Logos ✨', color: '#ED8214' },
         { id: 'services' as Section, icon: Wrench, label: 'Services Cards' },
         { id: 'portfolio' as Section, icon: Palette, label: 'Portfolio Projects' },
         { id: 'team' as Section, icon: Users, label: 'Team Members' },
@@ -743,6 +819,24 @@ export default function AdminDashboard() {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Client Logos Quick Access */}
+      <div className="mb-6">
+        <button onClick={() => setSection('clients-management')}
+          className="w-full p-5 rounded-2xl text-left transition-all hover:scale-[1.01] group flex items-center justify-between"
+          style={{ background: 'rgba(237,130,20,0.05)', border: '1px solid rgba(237,130,20,0.2)' }}>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(237,130,20,0.1)' }}>
+              <Users className="h-6 w-6" style={{ color: '#ED8214' }} />
+            </div>
+            <div>
+              <p className="font-black text-white group-hover:text-[#ED8214] transition-colors">✨ Client Logos Management</p>
+              <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>{clientLogosDB.filter(c => c.is_active).length} active • {clientLogosDB.length} total — Upload, reorder, enable/disable logos in the homepage marquee</p>
+            </div>
+          </div>
+          <svg className="h-5 w-5 group-hover:translate-x-1 transition-transform" style={{ color: '#ED8214' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+        </button>
       </div>
 
       {/* Recent Messages + Quick Links */}
@@ -1939,6 +2033,253 @@ export default function AdminDashboard() {
     );
   };
 
+  // ─── CLIENTS MANAGEMENT ───────────────────────────────────────────────────
+  const renderClientsManagement = () => {
+    const sorted = [...clientLogosDB].sort((a, b) => a.sort_order - b.sort_order);
+    const activeCount = sorted.filter(c => c.is_active).length;
+
+    return (
+      <div>
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(237,130,20,0.1)' }}>
+              <Users className="h-5 w-5" style={{ color: '#ED8214' }} />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black text-white">Client Logos Management</h1>
+              <p className="text-sm" style={{ color: '#6b7280' }}>{activeCount} active logos • {sorted.length} total — logos appear in the marquee on the homepage</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Live Preview */}
+        <div className="rounded-2xl overflow-hidden mb-8" style={{ background: '#0B0B0B', border: '1px solid #ED821430' }}>
+          <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: '1px solid #1a1a1a' }}>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full" style={{ background: '#ED8214' }} />
+              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#ED8214' }}>Live Preview — Homepage Marquee</span>
+            </div>
+            <span className="text-xs" style={{ color: '#374151' }}>{activeCount} logos shown</span>
+          </div>
+          <div className="py-8 px-4">
+            {activeCount > 0 ? (
+              <div style={{ overflow: 'hidden', position: 'relative' }}>
+                <div style={{ display: 'flex', gap: '40px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+                  {sorted.filter(c => c.is_active).map(cl => (
+                    <div key={cl.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                      {cl.logo_url ? (
+                        <img src={cl.logo_url} alt={cl.name}
+                          style={{ height: '48px', maxWidth: '120px', objectFit: 'contain', filter: 'grayscale(0.8) brightness(0.8)', opacity: 0.7 }} />
+                      ) : (
+                        <div style={{ height: '48px', width: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px dashed #374151', borderRadius: '8px' }}>
+                          <span style={{ fontSize: '10px', color: '#4b5563' }}>No logo</span>
+                        </div>
+                      )}
+                      <span style={{ fontSize: '9px', color: '#4b5563', letterSpacing: '0.1em', fontWeight: 700 }}>{cl.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-sm" style={{ color: '#374151' }}>No active logos yet. Add logos below to see the preview.</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Add New Logo */}
+        <div className="rounded-2xl mb-6 overflow-hidden" style={{ background: '#111827', border: '1px solid #1f2937' }}>
+          <div className="px-5 py-4" style={{ borderBottom: '1px solid #1f2937' }}>
+            <div className="flex items-center gap-2">
+              <Plus className="h-4 w-4" style={{ color: '#10b981' }} />
+              <span className="font-bold text-sm text-white">Add New Client Logo</span>
+            </div>
+          </div>
+          <div className="p-5">
+            <div className="grid md:grid-cols-2 gap-5">
+              <div className="space-y-4">
+                <Field label="Client Name *" required>
+                  <Input
+                    value={newClientName}
+                    onChange={e => setNewClientName(e.target.value)}
+                    placeholder="e.g. Samsung, BMW, KPMG..."
+                  />
+                </Field>
+                <Field label="Logo Image" hint="Upload PNG, SVG, JPG, or WebP. Recommended: transparent or white background. Min 200px width.">
+                  <ImageUploader
+                    currentUrl={clientLogoPreview}
+                    onUploaded={url => { setNewClientUrl(url); setClientLogoPreview(url); }}
+                    label="Click to upload logo (PNG, SVG, JPG, WebP)"
+                    folder="client-logos"
+                    size="md"
+                  />
+                </Field>
+              </div>
+              <div className="flex flex-col justify-between">
+                {/* Preview of what it'll look like */}
+                <div className="rounded-xl p-5 flex flex-col items-center justify-center gap-4 h-40"
+                  style={{ background: '#0B0B0B', border: '1px solid #1f2937' }}>
+                  <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#374151' }}>Preview on Website</p>
+                  {clientLogoPreview ? (
+                    <img src={clientLogoPreview} alt="preview"
+                      style={{ maxHeight: '54px', maxWidth: '140px', objectFit: 'contain', filter: 'grayscale(1) brightness(0.7)', opacity: 0.65 }} />
+                  ) : (
+                    <div style={{ height: '54px', width: '140px', border: '1px dashed #374151', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: '10px', color: '#4b5563' }}>Logo preview</span>
+                    </div>
+                  )}
+                  <p className="text-[9px]" style={{ color: '#374151' }}>Grayscale by default, color on hover</p>
+                </div>
+                <button onClick={addClientLogo} disabled={saving || !newClientName.trim()}
+                  className="w-full flex items-center justify-center gap-2 text-sm font-bold py-3 rounded-xl text-black transition-all hover:scale-[1.02] disabled:opacity-50 mt-4"
+                  style={{ background: '#ED8214', boxShadow: '0 4px 14px rgba(237,130,20,0.25)' }}>
+                  {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                  Add to Marquee
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Existing Logos Grid */}
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-black uppercase tracking-widest" style={{ color: '#374151' }}>All Logos ({sorted.length})</h2>
+          <span className="text-xs" style={{ color: '#4b5563' }}>Drag up/down arrows to reorder</span>
+        </div>
+
+        {sorted.length === 0 && (
+          <div className="text-center py-16 rounded-2xl" style={{ background: '#111827', border: '1px dashed #1f2937' }}>
+            <Users className="h-10 w-10 mx-auto mb-3" style={{ color: '#374151' }} />
+            <p className="text-sm" style={{ color: '#4b5563' }}>No logos yet. Add your first client logo above.</p>
+          </div>
+        )}
+
+        <div className="space-y-3">
+          {sorted.map((cl, idx) => (
+            <div key={cl.id}
+              className="rounded-2xl overflow-hidden transition-all duration-200"
+              style={{ background: '#111827', border: `1px solid ${cl.is_active ? '#1f2937' : '#0f172a'}`, opacity: cl.is_active ? 1 : 0.55 }}>
+              <div className="flex items-center gap-4 px-5 py-4">
+
+                {/* Reorder arrows */}
+                <div className="flex flex-col gap-0.5 shrink-0">
+                  <button onClick={() => moveClientLogo(cl.id, 'up')} disabled={idx === 0}
+                    className="w-6 h-5 flex items-center justify-center rounded transition-colors hover:bg-white/5 disabled:opacity-20"
+                    style={{ color: '#6b7280' }}>
+                    <svg width="10" height="7" viewBox="0 0 10 7" fill="currentColor"><path d="M5 0L10 7H0L5 0Z"/></svg>
+                  </button>
+                  <button onClick={() => moveClientLogo(cl.id, 'down')} disabled={idx === sorted.length - 1}
+                    className="w-6 h-5 flex items-center justify-center rounded transition-colors hover:bg-white/5 disabled:opacity-20"
+                    style={{ color: '#6b7280' }}>
+                    <svg width="10" height="7" viewBox="0 0 10 7" fill="currentColor"><path d="M5 7L0 0H10L5 7Z"/></svg>
+                  </button>
+                </div>
+
+                {/* Logo preview */}
+                <div className="shrink-0 w-20 h-12 rounded-lg flex items-center justify-center overflow-hidden"
+                  style={{ background: '#0B0B0B', border: '1px solid #1f2937' }}>
+                  {cl.logo_url ? (
+                    <img src={cl.logo_url} alt={cl.name}
+                      style={{ maxHeight: '40px', maxWidth: '70px', objectFit: 'contain', filter: 'grayscale(0.6)', opacity: 0.8 }} />
+                  ) : (
+                    <span style={{ fontSize: '9px', color: '#374151', textAlign: 'center' }}>No logo</span>
+                  )}
+                </div>
+
+                {/* Name input */}
+                <div className="flex-1 min-w-0">
+                  <input
+                    value={cl.name}
+                    onChange={e => setClientLogosDB(prev => prev.map(c => c.id === cl.id ? { ...c, name: e.target.value } : c))}
+                    className="w-full bg-transparent text-white font-bold text-sm outline-none border-b transition-colors"
+                    style={{ borderColor: '#374151', paddingBottom: '2px' }}
+                    onFocus={e => e.currentTarget.style.borderColor = '#ED8214'}
+                    onBlur={e => e.currentTarget.style.borderColor = '#374151'}
+                    placeholder="Client name"
+                  />
+                  <p className="text-[10px] mt-1 truncate" style={{ color: '#4b5563' }}>
+                    {cl.logo_url ? `✓ Logo uploaded` : '⚠ No logo uploaded yet'}
+                  </p>
+                </div>
+
+                {/* Active toggle */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#4b5563' }}>Show</span>
+                  <Toggle
+                    checked={cl.is_active}
+                    onChange={v => {
+                      const updated = { ...cl, is_active: v };
+                      setClientLogosDB(prev => prev.map(c => c.id === cl.id ? updated : c));
+                      updateClientLogo(updated);
+                    }}
+                  />
+                </div>
+
+                {/* Upload logo */}
+                <button
+                  onClick={() => document.getElementById(`logo-upload-${cl.id}`)?.click()}
+                  className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg transition-colors hover:bg-white/5 shrink-0"
+                  style={{ color: '#ED8214', border: '1px solid rgba(237,130,20,0.2)' }}>
+                  <Upload className="h-3.5 w-3.5" /> Upload
+                </button>
+                <input id={`logo-upload-${cl.id}`} type="file" accept="image/*" className="hidden"
+                  onChange={async e => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const ext = file.name.split('.').pop();
+                    const filename = `client-logos/${Date.now()}_${cl.id}.${ext}`;
+                    const { error } = await supabase.storage.from('cms-media').upload(filename, file, { upsert: true });
+                    if (error) { notify('Upload failed', 'error'); return; }
+                    const { data: urlData } = supabase.storage.from('cms-media').getPublicUrl(filename);
+                    const updated = { ...cl, logo_url: urlData.publicUrl };
+                    setClientLogosDB(prev => prev.map(c => c.id === cl.id ? updated : c));
+                    await updateClientLogo(updated);
+                    notify('✅ Logo uploaded and saved!');
+                    e.target.value = '';
+                  }} />
+
+                {/* Save */}
+                <button onClick={() => updateClientLogo(cl)}
+                  className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg transition-colors shrink-0"
+                  style={{ background: 'rgba(16,185,129,0.1)', color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' }}>
+                  <Save className="h-3.5 w-3.5" /> Save
+                </button>
+
+                {/* Delete */}
+                <button onClick={() => deleteClientLogo(cl.id)}
+                  className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg transition-colors hover:bg-red-900/20 shrink-0"
+                  style={{ color: '#ef4444', border: '1px solid rgba(239,68,68,0.15)' }}>
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
+              {/* Logo upload area (expand on demand) */}
+              {cl.logo_url === '' && (
+                <div className="px-5 pb-4">
+                  <ImageUploader
+                    currentUrl={cl.logo_url}
+                    onUploaded={async url => {
+                      const updated = { ...cl, logo_url: url };
+                      setClientLogosDB(prev => prev.map(c => c.id === cl.id ? updated : c));
+                      await updateClientLogo(updated);
+                      notify('✅ Logo saved!');
+                    }}
+                    label="Upload logo (PNG, SVG, JPG, WebP)"
+                    folder="client-logos"
+                    size="sm"
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+  // ──────────────────────────────────────────────────────────────
+
   const sectionRenderer: Record<Section, () => React.ReactNode> = {
     'dashboard': renderDashboard,
     'site-settings': renderSiteSettings,
@@ -1958,6 +2299,7 @@ export default function AdminDashboard() {
     'page-services': renderPageServices,
     'page-portfolio': renderPagePortfolio,
     'page-contact': renderPageContact,
+    'clients-management': renderClientsManagement,
   };
 
   const sectionTitles: Record<Section, string> = {
@@ -1967,6 +2309,7 @@ export default function AdminDashboard() {
     'hero-sections': 'Hero Sections', 'stats': 'Stats & Numbers', 'services': 'Service Cards',
     'portfolio': 'Portfolio Projects', 'team': 'Team Members', 'testimonials': 'Testimonials',
     'media': 'Media Library', 'about': 'About Content', 'inbox': 'Inbox',
+    'clients-management': '✨ Client Logos Management',
   };
 
   return (
@@ -2005,9 +2348,9 @@ export default function AdminDashboard() {
                 return (
                   <button key={item.id} onClick={() => setSection(item.id)}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl mb-0.5 transition-all text-left"
-                    style={{ background: active ? 'rgba(237,130,20,0.1)' : 'transparent', color: active ? '#ED8214' : '#4b5563', border: active ? '1px solid rgba(237,130,20,0.15)' : '1px solid transparent' }}
-                    onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.color = '#9ca3af'; } }}
-                    onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#4b5563'; } }}>
+                    style={{ background: active ? 'rgba(237,130,20,0.1)' : 'transparent', color: active ? '#ED8214' : (('color' in item && item.color) ? item.color + 'aa' : '#4b5563'), border: active ? '1px solid rgba(237,130,20,0.15)' : '1px solid transparent' }}
+                    onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.color = ('color' in item && item.color) ? (item.color as string) : '#9ca3af'; } }}
+                    onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = ('color' in item && item.color) ? (item.color as string) + 'aa' : '#4b5563'; } }}>
                     <item.icon className="h-4 w-4 shrink-0" />
                     {sidebarOpen && <span className="text-sm font-medium truncate">{item.label}</span>}
                   </button>

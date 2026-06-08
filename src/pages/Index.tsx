@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 import { Link } from 'react-router-dom';
 import { IMAGES } from '@/assets/images';
 import { useCMS, getLogoUrl, getCMSText, getCMSImage } from '@/hooks/useCMS';
+import { supabase } from '@/integrations/supabase/client';
 import { useLocalLanguage } from '@/hooks/useLanguage';
 import {
   ArrowRight, Phone, Mail, MapPin, MessageCircle,
@@ -108,6 +110,9 @@ const LangToggle = ({ lang, setLang }: { lang: string; setLang: (l: 'en' | 'ar')
   </div>
 );
 
+/* ─── ClientLogo type ─────────────────────────────── */
+interface ClientLogo { id: number; name: string; logo_url: string; sort_order: number; is_active: boolean; }
+
 /* ═══════════════════════════════════════════════════
    MAIN PAGE
 ═══════════════════════════════════════════════════ */
@@ -186,25 +191,27 @@ const Index = () => {
   const inputCls = `w-full border rounded-xl px-4 py-3.5 text-sm transition-all duration-300 focus:outline-none focus:ring-2
     bg-white text-gray-800 placeholder-gray-400 border-gray-200 focus:border-[#ED8214] focus:ring-[#ED8214]/20`;
 
-  // client logos via logo.dev CDN (publicly accessible, no auth needed)
-  const clientLogos = [
-    { name: 'Samsung',    domain: 'samsung.com' },
-    { name: 'Huawei',     domain: 'huawei.com' },
-    { name: "L'Oréal",   domain: 'loreal.com' },
-    { name: 'Nestlé',     domain: 'nestle.com' },
-    { name: 'BMW',        domain: 'bmw.com' },
-    { name: 'Pfizer',     domain: 'pfizer.com' },
-    { name: 'KPMG',       domain: 'kpmg.com' },
-    { name: 'Siemens',    domain: 'siemens.com' },
-    { name: 'Oracle',     domain: 'oracle.com' },
-    { name: 'Unilever',   domain: 'unilever.com' },
-    { name: 'Mastercard', domain: 'mastercard.com' },
-    { name: 'Henkel',     domain: 'henkel.com' },
-    { name: 'Vodafone',   domain: 'vodafone.com' },
-    { name: 'Shell',      domain: 'shell.com' },
-    { name: 'Bosch',      domain: 'bosch.com' },
-    { name: 'Microsoft',  domain: 'microsoft.com' },
-  ];
+  // ─── Client logos: fetched live from Supabase ─────────────────────────────
+  const [clientLogos, setClientLogos] = useState<ClientLogo[]>([])
+
+  useEffect(() => {
+    let channel: RealtimeChannel | null = null;
+    const loadLogos = async () => {
+      const { data } = await supabase
+        .from('cms_client_logos_2026_06_08')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+      if (data) setClientLogos(data);
+    };
+    loadLogos();
+    // Realtime subscription so adding/editing logos in dashboard reflects immediately
+    channel = supabase
+      .channel('client-logos-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'cms_client_logos_2026_06_08' }, loadLogos)
+      .subscribe();
+    return () => { if (channel) supabase.removeChannel(channel); };
+  }, []);
 
   return (
     <div className="overflow-x-hidden" style={{ fontFamily, direction: dir }}>
@@ -213,14 +220,26 @@ const Index = () => {
       <style>{`
         @keyframes slowZoom   { from{transform:scale(1.04)} to{transform:scale(1.12)} }
         @keyframes marqueeLeft  { from{transform:translateX(0)} to{transform:translateX(-50%)} }
-        .marquee-track { display:flex; width:max-content; animation:marqueeLeft 30s linear infinite; }
+        .marquee-track { display:flex; width:max-content; animation:marqueeLeft 35s linear infinite; align-items:center; }
         .marquee-track:hover { animation-play-state:paused; }
-        .marquee-logo { filter:grayscale(0.15); opacity:0.9; transition:filter 0.4s ease, opacity 0.4s ease, transform 0.35s ease; }
-        .marquee-logo:hover { filter:none; opacity:1; transform:scale(1.06); }
-        .marquee-logo-wrap { background:#FFFFFF; border-radius:14px; padding:14px 22px; display:flex; align-items:center; justify-content:center; transition:box-shadow 0.35s ease, transform 0.35s ease; box-shadow:0 2px 12px rgba(0,0,0,0.08); }
-        .marquee-logo-wrap:hover { box-shadow:0 6px 28px rgba(237,130,20,0.22); transform:translateY(-3px); }
-        .marquee-fade-l { background:linear-gradient(to right, #111111 0%, transparent 100%); }
-        .marquee-fade-r { background:linear-gradient(to left,  #111111 0%, transparent 100%); }
+        .marquee-logo-item { display:flex; align-items:center; justify-content:center; flex-shrink:0; margin:0 40px; cursor:default; }
+        .marquee-logo {
+          height:54px; max-width:140px; width:auto; object-fit:contain;
+          filter:grayscale(1) brightness(0.7);
+          opacity:0.65;
+          transition:filter 0.45s ease, opacity 0.45s ease, transform 0.4s ease;
+        }
+        .marquee-logo:hover {
+          filter:none;
+          opacity:1;
+          transform:scale(1.1);
+        }
+        .marquee-logo-name {
+          color:#4b5563; font-size:11px; font-weight:800; letter-spacing:0.12em;
+          font-family:'Montserrat',sans-serif; white-space:nowrap; text-transform:uppercase;
+        }
+        .marquee-fade-l { background:linear-gradient(to right, #0B0B0B 0%, transparent 100%); }
+        .marquee-fade-r { background:linear-gradient(to left,  #0B0B0B 0%, transparent 100%); }
         @keyframes fadeDown   { from{opacity:0;transform:translateY(-22px)} to{opacity:1;transform:translateY(0)} }
         @keyframes fadeUp     { from{opacity:0;transform:translateY(22px)}  to{opacity:1;transform:translateY(0)} }
         @keyframes lineGrow   { from{width:0} to{width:100%} }
@@ -661,15 +680,15 @@ const Index = () => {
       </section>
 
       {/* ══ § 7 · CLIENTS MARQUEE ══ */}
-      <section id="clients" className="py-20 relative overflow-hidden" style={{ background: '#111111' }}>
-        {/* top orange line */}
+      <section id="clients" className="py-20 relative overflow-hidden" style={{ background: '#0B0B0B' }}>
+        {/* top accent line */}
         <div className="absolute top-0 left-0 right-0 h-[2px]"
           style={{ background: 'linear-gradient(to right, transparent, #ED8214, transparent)' }} />
-        {/* bottom orange line */}
+        {/* bottom accent line */}
         <div className="absolute bottom-0 left-0 right-0 h-px"
-          style={{ background: 'linear-gradient(to right, transparent, rgba(237,130,20,0.35), transparent)' }} />
+          style={{ background: 'linear-gradient(to right, transparent, rgba(237,130,20,0.3), transparent)' }} />
 
-        {/* ── Header ── */}
+        {/* ── Section Header ── */}
         <Reveal className="text-center mb-14 px-5">
           <SectionLabel text={ct('home', 'clients', 'label', isAr ? 'عملاؤنا' : 'Our Clients')} />
           <h2 className="font-black text-white mb-4"
@@ -684,49 +703,51 @@ const Index = () => {
           </p>
         </Reveal>
 
-        {/* ── Marquee track ── */}
-        <div className="relative overflow-hidden">
-          {/* Fade edges */}
-          <div className="absolute left-0 top-0 bottom-0 w-24 z-10 pointer-events-none marquee-fade-l" />
-          <div className="absolute right-0 top-0 bottom-0 w-24 z-10 pointer-events-none marquee-fade-r" />
+        {/* ── Marquee Track ── */}
+        {clientLogos.length > 0 ? (
+          <div className="relative overflow-hidden py-4">
+            {/* Edge fade masks */}
+            <div className="absolute left-0 top-0 bottom-0 w-32 z-10 pointer-events-none marquee-fade-l" />
+            <div className="absolute right-0 top-0 bottom-0 w-32 z-10 pointer-events-none marquee-fade-r" />
 
-          <div className="marquee-track py-3">
-            {/* Duplicate the list twice for seamless infinite loop */}
-            {[...clientLogos, ...clientLogos].map((cl, i) => (
-              <div
-                key={`${cl.domain}-${i}`}
-                className="flex-shrink-0 mx-5"
-              >
-                <div className="marquee-logo-wrap" style={{ width: '150px', height: '72px' }}>
-                <img
-                  src={`https://img.logo.dev/${cl.domain}?token=pk_freetoken&size=120`}
-                  alt={cl.name}
-                  className="marquee-logo"
-                  style={{ maxHeight: '42px', maxWidth: '110px', objectFit: 'contain' }}
-                  onError={e => {
-                    const parent = (e.currentTarget as HTMLImageElement).parentElement;
-                    if (parent) {
-                      (e.currentTarget as HTMLImageElement).style.display = 'none';
-                      const span = document.createElement('span');
-                      span.textContent = cl.name;
-                      span.style.cssText = 'color:#374151;font-size:12px;font-weight:800;letter-spacing:0.08em;font-family:Montserrat,sans-serif;white-space:nowrap;';
-                      parent.appendChild(span);
-                    }
-                  }}
-                />
+            {/* Duplicate logos for seamless infinite loop */}
+            <div className="marquee-track">
+              {[...clientLogos, ...clientLogos].map((cl, i) => (
+                <div key={`${cl.id}-${i}`} className="marquee-logo-item">
+                  {cl.logo_url ? (
+                    <img
+                      src={cl.logo_url}
+                      alt={cl.name}
+                      className="marquee-logo"
+                      onError={e => {
+                        (e.currentTarget as HTMLImageElement).style.display = 'none';
+                        const span = document.createElement('span');
+                        span.textContent = cl.name;
+                        span.className = 'marquee-logo-name';
+                        (e.currentTarget as HTMLImageElement).parentElement?.appendChild(span);
+                      }}
+                    />
+                  ) : (
+                    <span className="marquee-logo-name">{cl.name}</span>
+                  )}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          /* Empty state — shown while loading or when no logos are uploaded */
+          <div className="text-center py-8 opacity-40">
+            <p className="text-sm" style={{ color: '#6b7280', fontFamily }}>Client logos will appear here once added from the dashboard.</p>
+          </div>
+        )}
 
-        {/* ── Subtle divider ornament ── */}
-        <div className="flex items-center justify-center gap-4 mt-12 px-5 opacity-25">
-          <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.2))' }} />
+        {/* Ornament divider */}
+        <div className="flex items-center justify-center gap-4 mt-12 px-5 opacity-20">
+          <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(237,130,20,0.5))' }} />
           <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#ED8214' }} />
           <div className="w-1 h-1 rounded-full" style={{ background: '#ED8214', opacity: 0.5 }} />
           <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#ED8214' }} />
-          <div className="flex-1 h-px" style={{ background: 'linear-gradient(to left, transparent, rgba(255,255,255,0.2))' }} />
+          <div className="flex-1 h-px" style={{ background: 'linear-gradient(to left, transparent, rgba(237,130,20,0.5))' }} />
         </div>
       </section>
 
