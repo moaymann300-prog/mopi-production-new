@@ -220,7 +220,8 @@ const Index = () => {
       <style>{`
         @keyframes slowZoom   { from{transform:scale(1.04)} to{transform:scale(1.12)} }
         @keyframes marqueeLeft  { from{transform:translateX(0)} to{transform:translateX(-50%)} }
-        .marquee-track { display:flex; width:max-content; animation:marqueeLeft 35s linear infinite; align-items:center; }
+        .marquee-wrap { direction:ltr !important; }
+        .marquee-track { display:flex; width:max-content; animation:marqueeLeft 35s linear infinite; align-items:center; direction:ltr !important; }
         .marquee-track:hover { animation-play-state:paused; }
         .marquee-logo-item {
           display:flex; align-items:center; justify-content:center;
@@ -722,13 +723,13 @@ const Index = () => {
 
         {/* ── Marquee Track ── */}
         {clientLogos.length > 0 ? (
-          <div className="relative overflow-hidden py-4">
+          <div className="relative overflow-hidden py-4 marquee-wrap" dir="ltr">
             {/* Edge fade masks */}
             <div className="absolute left-0 top-0 bottom-0 w-32 z-10 pointer-events-none marquee-fade-l" />
             <div className="absolute right-0 top-0 bottom-0 w-32 z-10 pointer-events-none marquee-fade-r" />
 
             {/* Duplicate logos for seamless infinite loop */}
-            <div className="marquee-track">
+            <div className="marquee-track" dir="ltr">
               {[...clientLogos, ...clientLogos].map((cl, i) => (
                 <div key={`${cl.id}-${i}`} className="marquee-logo-item">
                   <div className="marquee-logo-card">
