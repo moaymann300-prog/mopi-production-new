@@ -10,7 +10,7 @@ import {
   Hash, Link2, Layers, Zap, Award, Wrench, Palette, Package,
   Home, Info, Server, RefreshCw, ExternalLink, Type, PenLine,
   BookOpen, Megaphone, MessageCircle, ImageIcon, ToggleLeft, ToggleRight,
-  MousePointerClick, AlignLeft, Heading, Layout, Camera,
+  MousePointerClick, AlignLeft, Heading, Layout, Camera, Shield,
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -1184,35 +1184,137 @@ export default function AdminDashboard() {
   // ── SERVICES PAGE ──
   const renderPageServices = () => (
     <div>
-      <PageHeader title="Services Page" subtitle="Edit all content on the Services page" icon={Briefcase} color="#8b5cf6" page="services" liveUrl="/services" />
+      <PageHeader title="Services Page" subtitle="Edit every section on the Services page" icon={Briefcase} color="#8b5cf6" page="services" liveUrl="/services" />
 
+      {/* ── Hero ── */}
       <PageSection pageName="services" sectionName="hero" sectionLabel="🚀 Hero Banner" icon={Megaphone} color="#ED8214" defaultOpen={true}
         fields={[
-          { field: 'badge', label: 'Badge Text' },
-          { field: 'heading', label: 'Main Heading' },
-          { field: 'subtitle', label: 'Subtitle' },
+          { field: 'badge', label: 'Badge Text', hint: 'Small label above heading' },
+          { field: 'heading', label: 'Main Heading (EN)' },
+          { field: 'subline', label: 'Heading Line 2 (EN)', hint: 'Shown in orange' },
+          { field: 'heading_ar', label: 'Main Heading (AR)' },
+          { field: 'subline_ar', label: 'Heading Line 2 (AR)', hint: 'Shown in orange' },
+          { field: 'subheading', label: 'Subtitle / Paragraph' },
+          { field: 'cta', label: 'CTA Button Text' },
         ]}
         imageKeys={[{ key: 'background', label: 'Hero Background Photo', size: 'lg' }]}
       />
 
-      <PageSection pageName="services" sectionName="cta" sectionLabel="🎯 CTA Section" icon={MousePointerClick} color="#f43f5e"
+      {/* ── Service Card 1 ── */}
+      <PageSection pageName="services" sectionName="card1" sectionLabel="📦 Service Card 1 — Exhibition Booth" icon={Layers} color="#3b82f6"
         fields={[
-          { field: 'heading', label: 'CTA Heading' },
-          { field: 'subtitle', label: 'CTA Subtitle' },
-          { field: 'cta_primary', label: 'CTA Button Text' },
+          { field: 'title', label: 'Card Title' },
+          { field: 'subtitle', label: 'Card Subtitle' },
+          { field: 'desc', label: 'Description' },
+          { field: 'f1', label: 'Feature 1' }, { field: 'f2', label: 'Feature 2' },
+          { field: 'f3', label: 'Feature 3' }, { field: 'f4', label: 'Feature 4' },
+          { field: 'f5', label: 'Feature 5' }, { field: 'f6', label: 'Feature 6' },
+          { field: 'p1', label: 'Process Step 1' }, { field: 'p2', label: 'Process Step 2' },
+          { field: 'p3', label: 'Process Step 3' }, { field: 'p4', label: 'Process Step 4' },
+          { field: 'p5', label: 'Process Step 5' }, { field: 'p6', label: 'Process Step 6' },
+        ]}
+        imageKeys={[{ key: 'image', label: 'Card Image', size: 'md' }]}
+      />
+
+      {/* ── Service Card 2 ── */}
+      <PageSection pageName="services" sectionName="card2" sectionLabel="⚡ Service Card 2 — Event Production" icon={Zap} color="#f59e0b"
+        fields={[
+          { field: 'title', label: 'Card Title' },
+          { field: 'subtitle', label: 'Card Subtitle' },
+          { field: 'desc', label: 'Description' },
+          { field: 'f1', label: 'Feature 1' }, { field: 'f2', label: 'Feature 2' },
+          { field: 'f3', label: 'Feature 3' }, { field: 'f4', label: 'Feature 4' },
+          { field: 'f5', label: 'Feature 5' }, { field: 'f6', label: 'Feature 6' },
+          { field: 'p1', label: 'Process Step 1' }, { field: 'p2', label: 'Process Step 2' },
+          { field: 'p3', label: 'Process Step 3' }, { field: 'p4', label: 'Process Step 4' },
+          { field: 'p5', label: 'Process Step 5' }, { field: 'p6', label: 'Process Step 6' },
+        ]}
+        imageKeys={[{ key: 'image', label: 'Card Image', size: 'md' }]}
+      />
+
+      {/* ── Service Card 3 ── */}
+      <PageSection pageName="services" sectionName="card3" sectionLabel="🏆 Service Card 3 — Brand Activations" icon={Award} color="#8b5cf6"
+        fields={[
+          { field: 'title', label: 'Card Title' },
+          { field: 'subtitle', label: 'Card Subtitle' },
+          { field: 'desc', label: 'Description' },
+          { field: 'f1', label: 'Feature 1' }, { field: 'f2', label: 'Feature 2' },
+          { field: 'f3', label: 'Feature 3' }, { field: 'f4', label: 'Feature 4' },
+          { field: 'f5', label: 'Feature 5' }, { field: 'f6', label: 'Feature 6' },
+          { field: 'p1', label: 'Process Step 1' }, { field: 'p2', label: 'Process Step 2' },
+          { field: 'p3', label: 'Process Step 3' }, { field: 'p4', label: 'Process Step 4' },
+          { field: 'p5', label: 'Process Step 5' }, { field: 'p6', label: 'Process Step 6' },
+        ]}
+        imageKeys={[{ key: 'image', label: 'Card Image', size: 'md' }]}
+      />
+
+      {/* ── Service Card 4 ── */}
+      <PageSection pageName="services" sectionName="card4" sectionLabel="🔧 Service Card 4 — Custom Fabrication" icon={Wrench} color="#10b981"
+        fields={[
+          { field: 'title', label: 'Card Title' },
+          { field: 'subtitle', label: 'Card Subtitle' },
+          { field: 'desc', label: 'Description' },
+          { field: 'f1', label: 'Feature 1' }, { field: 'f2', label: 'Feature 2' },
+          { field: 'f3', label: 'Feature 3' }, { field: 'f4', label: 'Feature 4' },
+          { field: 'f5', label: 'Feature 5' }, { field: 'f6', label: 'Feature 6' },
+          { field: 'p1', label: 'Process Step 1' }, { field: 'p2', label: 'Process Step 2' },
+          { field: 'p3', label: 'Process Step 3' }, { field: 'p4', label: 'Process Step 4' },
+          { field: 'p5', label: 'Process Step 5' }, { field: 'p6', label: 'Process Step 6' },
+        ]}
+        imageKeys={[{ key: 'image', label: 'Card Image', size: 'md' }]}
+      />
+
+      {/* ── Additional Services ── */}
+      <PageSection pageName="services" sectionName="additional" sectionLabel="🛠️ Additional Services Section" icon={Settings} color="#06b6d4"
+        fields={[
+          { field: 'label', label: 'Section Label' },
+          { field: 'heading', label: 'Heading Word 1' },
+          { field: 'heading2', label: 'Heading Word 2 (in orange)' },
+          { field: 'subtitle', label: 'Subtitle' },
+          { field: 's1_title', label: 'Service 1 Title' }, { field: 's1_desc', label: 'Service 1 Description' },
+          { field: 's2_title', label: 'Service 2 Title' }, { field: 's2_desc', label: 'Service 2 Description' },
+          { field: 's3_title', label: 'Service 3 Title' }, { field: 's3_desc', label: 'Service 3 Description' },
+          { field: 's4_title', label: 'Service 4 Title' }, { field: 's4_desc', label: 'Service 4 Description' },
         ]}
       />
 
-      <div className="mb-4 px-4 py-3.5 rounded-xl flex items-center gap-3" style={{ background: '#0f172a', border: '1px dashed #374151' }}>
-        <Wrench className="h-4 w-4 shrink-0" style={{ color: '#8b5cf6' }} />
-        <div>
-          <p className="text-sm font-semibold text-white">Individual Service Cards</p>
-          <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>
-            Edit titles, descriptions and photos per service in{' '}
-            <button onClick={() => setSection('services')} className="underline" style={{ color: '#ED8214' }}>Services Cards →</button>
-          </p>
-        </div>
-      </div>
+      {/* ── Industries ── */}
+      <PageSection pageName="services" sectionName="industries" sectionLabel="🏭 Industries We Serve" icon={Globe} color="#f59e0b"
+        fields={[
+          { field: 'label', label: 'Section Label' },
+          { field: 'heading', label: 'Section Heading' },
+          { field: 'subtitle', label: 'Subtitle' },
+          { field: 'i1', label: 'Industry 1' }, { field: 'i2', label: 'Industry 2' },
+          { field: 'i3', label: 'Industry 3' }, { field: 'i4', label: 'Industry 4' },
+          { field: 'i5', label: 'Industry 5' }, { field: 'i6', label: 'Industry 6' },
+          { field: 'i7', label: 'Industry 7' }, { field: 'i8', label: 'Industry 8' },
+        ]}
+      />
+
+      {/* ── Why Choose Us ── */}
+      <PageSection pageName="services" sectionName="why" sectionLabel="⭐ Why Choose MOPi Section" icon={Shield} color="#f43f5e"
+        fields={[
+          { field: 'label', label: 'Section Label' },
+          { field: 'heading', label: 'Section Heading' },
+          { field: 'w1_title', label: 'Point 1 Title' }, { field: 'w1_desc', label: 'Point 1 Description' },
+          { field: 'w2_title', label: 'Point 2 Title' }, { field: 'w2_desc', label: 'Point 2 Description' },
+          { field: 'w3_title', label: 'Point 3 Title' }, { field: 'w3_desc', label: 'Point 3 Description' },
+          { field: 'w4_title', label: 'Point 4 Title' }, { field: 'w4_desc', label: 'Point 4 Description' },
+          { field: 'w5_title', label: 'Point 5 Title' }, { field: 'w5_desc', label: 'Point 5 Description' },
+          { field: 'w6_title', label: 'Point 6 Title' }, { field: 'w6_desc', label: 'Point 6 Description' },
+        ]}
+      />
+
+      {/* ── CTA ── */}
+      <PageSection pageName="services" sectionName="cta" sectionLabel="🎯 CTA Section" icon={MousePointerClick} color="#ED8214"
+        fields={[
+          { field: 'label', label: 'Section Label' },
+          { field: 'heading', label: 'Heading Part 1' },
+          { field: 'heading2', label: 'Heading Part 2 (orange)' },
+          { field: 'subtitle', label: 'Subtitle Paragraph' },
+          { field: 'cta_primary', label: 'CTA Button Text' },
+        ]}
+      />
     </div>
   );
 

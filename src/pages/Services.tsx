@@ -133,66 +133,71 @@ const Services = () => {
     { label: t('nav.contact'), to: '/contact' },
   ];
 
+  // ── CMS-driven service cards data ─────────────────────────────
   const mainServices = [
     {
       icon: Layers,
-      title: isAr ? 'تصميم وتنفيذ أجنحة المعارض' : 'Exhibition Booth Design & Build',
-      subtitle: isAr ? 'أجنحة مصممة خصيصاً تستقطب الأنظار وتحقق النتائج' : 'Custom-designed booths that captivate and convert',
-      desc: isAr ? 'من الفكرة للتنفيذ، نصمم أجنحة معارض احترافية تعكس هوية براندك وتحقق تفاعلاً حقيقياً مع جمهورك المستهدف.' : 'From concept to completion, we create stunning exhibition booths that tell your brand story and drive meaningful engagement with your target audience.',
-      image: IMAGES.BOOTH_8,
-      features: isAr ? ['تصميم ثلاثي الأبعاد وتصور واقعي', 'دمج هوية البراند بالكامل', 'عناصر تفاعلية وتقنية', 'خامات ممتازة عالية الجودة', 'أنظمة معيارية قابلة للتوسيع', 'تركيب ودعم في الموقع'] : ['3D Design & Visualization', 'Custom Branding Integration', 'Interactive Elements', 'Premium Materials', 'Modular Systems', 'On-site Installation'],
-      process: isAr ? ['استشارة أولية وتحليل المتطلبات', 'تطوير التصميم ثلاثي الأبعاد', 'موافقة العميل والتعديلات', 'التصنيع والإنتاج', 'التركيب والإعداد', 'الدعم بعد الفعالية'] : ['Initial Consultation & Brief', '3D Design Development', 'Client Approval & Refinement', 'Production & Fabrication', 'Installation & Setup', 'Post-Event Support'],
+      title: ct('services','card1','title','Exhibition Booth Design & Build'),
+      subtitle: ct('services','card1','subtitle','Custom-designed booths that captivate and convert'),
+      desc: ct('services','card1','desc','From concept to completion, we create stunning exhibition booths that tell your brand story and drive meaningful engagement with your target audience.'),
+      image: ci('services','card1','image', IMAGES.BOOTH_8),
+      features: [ct('services','card1','f1','3D Design & Visualization'),ct('services','card1','f2','Custom Branding Integration'),ct('services','card1','f3','Interactive Elements'),ct('services','card1','f4','Premium Materials'),ct('services','card1','f5','Modular Systems'),ct('services','card1','f6','On-site Installation')],
+      process: [ct('services','card1','p1','Initial Consultation & Brief'),ct('services','card1','p2','3D Design Development'),ct('services','card1','p3','Client Approval & Refinement'),ct('services','card1','p4','Production & Fabrication'),ct('services','card1','p5','Installation & Setup'),ct('services','card1','p6','Post-Event Support')],
     },
     {
       icon: Zap,
-      title: isAr ? 'تنفيذ وإدارة الفعاليات' : 'Event Production & Management',
-      subtitle: isAr ? 'إدارة متكاملة للفعاليات من الفكرة حتى التنفيذ' : 'Complete event management from concept to execution',
-      desc: isAr ? 'خدمة متكاملة في إنتاج الفعاليات تشمل تصميم المسرح والإضاءة وأنظمة الصوت والصورة والإدارة الميدانية للفعاليات المؤسسية.' : 'Full-service event production including stage design, lighting, audio-visual systems, and on-the-ground management for corporate events and product launches.',
-      image: IMAGES.EVENT_1,
-      features: isAr ? ['تصميم وإنشاء المسرح', 'أنظمة إضاءة احترافية', 'تكامل الصوت والصورة', 'فريق دعم تقني متخصص', 'إدارة مشروع متكاملة', 'تنسيق الفعالية مباشرة'] : ['Stage Design & Construction', 'Professional Lighting Systems', 'Audio-Visual Integration', 'Technical Support Team', 'Project Management', 'Live Event Coordination'],
-      process: isAr ? ['تخطيط الفعالية والاستراتيجية', 'تحليل المتطلبات التقنية', 'التصميم وتخطيط الإعداد', 'تركيب المعدات', 'إدارة الفعالية المباشرة', 'التفكيك بعد الفعالية'] : ['Event Planning & Strategy', 'Technical Requirements Analysis', 'Design & Setup Planning', 'Equipment Installation', 'Live Event Management', 'Post-Event Breakdown'],
+      title: ct('services','card2','title','Event Production & Management'),
+      subtitle: ct('services','card2','subtitle','Complete event management from concept to execution'),
+      desc: ct('services','card2','desc','Full-service event production including stage design, lighting, audio-visual systems, and on-the-ground management for corporate events and product launches.'),
+      image: ci('services','card2','image', IMAGES.EVENT_1),
+      features: [ct('services','card2','f1','Stage Design & Construction'),ct('services','card2','f2','Professional Lighting Systems'),ct('services','card2','f3','Audio-Visual Integration'),ct('services','card2','f4','Technical Support Team'),ct('services','card2','f5','Project Management'),ct('services','card2','f6','Live Event Coordination')],
+      process: [ct('services','card2','p1','Event Planning & Strategy'),ct('services','card2','p2','Technical Requirements Analysis'),ct('services','card2','p3','Design & Setup Planning'),ct('services','card2','p4','Equipment Installation'),ct('services','card2','p5','Live Event Management'),ct('services','card2','p6','Post-Event Breakdown')],
     },
     {
       icon: Award,
-      title: isAr ? 'براند أكتيفيشن' : 'Brand Activations',
-      subtitle: isAr ? 'تجارب تفاعلية تترك أثراً حقيقياً في ذاكرة جمهورك' : 'Immersive experiences that deeply engage audiences',
-      desc: isAr ? 'تفعيلات براند إبداعية ومنشآت تصنع تفاعلاً حقيقياً بين براندك وجمهورك، تُحدث أثراً وتُعزز التذكّر.' : 'Creative brand activations and installations that create memorable interactions between your brand and your audience, driving real engagement and recall.',
-      image: IMAGES.EVENT_3,
-      features: isAr ? ['الفكرة والاستراتيجية', 'منشآت مخصصة', 'تجارب تفاعلية', 'سرد قصة البراند', 'تفاعل الجمهور', 'تقارير ما بعد التفعيل'] : ['Concept & Strategy', 'Custom Installations', 'Interactive Experiences', 'Brand Storytelling', 'Audience Engagement', 'Post-Activation Reports'],
-      process: isAr ? ['تحليل البراند والاستراتيجية', 'تطوير المفهوم الإبداعي', 'التصميم والإنتاج', 'التركيب والاختبار', 'إدارة التفعيل المباشر', 'تحليل الأداء'] : ['Brand Analysis & Strategy', 'Creative Concept Development', 'Design & Production', 'Installation & Testing', 'Live Activation Management', 'Performance Analysis'],
+      title: ct('services','card3','title','Brand Activations'),
+      subtitle: ct('services','card3','subtitle','Immersive experiences that deeply engage audiences'),
+      desc: ct('services','card3','desc','Creative brand activations and installations that create memorable interactions between your brand and your audience, driving real engagement and recall.'),
+      image: ci('services','card3','image', IMAGES.EVENT_3),
+      features: [ct('services','card3','f1','Concept & Strategy'),ct('services','card3','f2','Custom Installations'),ct('services','card3','f3','Interactive Experiences'),ct('services','card3','f4','Brand Storytelling'),ct('services','card3','f5','Audience Engagement'),ct('services','card3','f6','Post-Activation Reports')],
+      process: [ct('services','card3','p1','Brand Analysis & Strategy'),ct('services','card3','p2','Creative Concept Development'),ct('services','card3','p3','Design & Production'),ct('services','card3','p4','Installation & Testing'),ct('services','card3','p5','Live Activation Management'),ct('services','card3','p6','Performance Analysis')],
     },
     {
       icon: Wrench,
-      title: isAr ? 'تصنيع مخصص' : 'Custom Fabrication',
-      subtitle: isAr ? 'هياكل مصنوعة وفق مواصفاتك لأي مكان وغرض' : 'Tailored structures for any space and purpose',
-      desc: isAr ? 'هياكل معيارية ومخصصة مصممة وفق مواصفاتك الدقيقة — من المنشآت المؤقتة إلى العروض الدائمة والكيوسكات والعناصر المعمارية.' : 'Modular and custom structures designed to your exact specifications — from temporary installations to permanent displays, kiosks, and architectural elements.',
-      image: IMAGES.BOOTH_3,
-      features: isAr ? ['أنظمة تصميم معيارية', 'تصنيع مخصص', 'هندسة هيكلية', 'خامات ممتازة', 'أنظمة تجميع سريع', 'دعم الصيانة'] : ['Modular Design Systems', 'Custom Fabrication', 'Structural Engineering', 'Premium Materials', 'Quick Assembly Systems', 'Maintenance Support'],
-      process: isAr ? ['تقييم الموقع والتخطيط', 'التصميم الهيكلي', 'اختيار المواد', 'التصنيع ومراقبة الجودة', 'التركيب والاختبار', 'التسليم والتدريب'] : ['Site Assessment & Planning', 'Structural Design', 'Material Selection', 'Fabrication & QC', 'Installation & Testing', 'Handover & Training'],
+      title: ct('services','card4','title','Custom Fabrication'),
+      subtitle: ct('services','card4','subtitle','Tailored structures for any space and purpose'),
+      desc: ct('services','card4','desc','Modular and custom structures designed to your exact specifications — from temporary installations to permanent displays, kiosks, and architectural elements.'),
+      image: ci('services','card4','image', IMAGES.BOOTH_3),
+      features: [ct('services','card4','f1','Modular Design Systems'),ct('services','card4','f2','Custom Fabrication'),ct('services','card4','f3','Structural Engineering'),ct('services','card4','f4','Premium Materials'),ct('services','card4','f5','Quick Assembly Systems'),ct('services','card4','f6','Maintenance Support')],
+      process: [ct('services','card4','p1','Site Assessment & Planning'),ct('services','card4','p2','Structural Design'),ct('services','card4','p3','Material Selection'),ct('services','card4','p4','Fabrication & QC'),ct('services','card4','p5','Installation & Testing'),ct('services','card4','p6','Handover & Training')],
     },
   ];
 
   const additionalServices = [
-    { icon: Palette, title: isAr ? 'هوية بصرية وجرافيك' : 'Branding & Graphics', desc: isAr ? 'بانرات، لافتات، لايتبوكسات، وهوية بصرية متكاملة ترفع مستوى حضورك في أي معرض.' : 'Banners, signage, lightboxes, and full visual branding that elevates your presence at any show.' },
-    { icon: Settings, title: isAr ? 'دعم تقني' : 'Technical Support', desc: isAr ? 'دعم تقني ميداني على مدار الساعة أثناء الفعاليات والمعارض — لا تفاصيل صغيرة.' : '24/7 on-site technical support during events and exhibitions — no detail is too small.' },
-    { icon: Truck, title: isAr ? 'إدارة اللوجستيات' : 'Logistics Management', desc: isAr ? 'تنسيق لوجستي متكامل يشمل الشحن والتخزين والنقل.' : 'Complete logistics coordination including shipping, storage, and transportation management.' },
-    { icon: Users, title: isAr ? 'إدارة المشاريع' : 'Project Management', desc: isAr ? 'مديرو مشاريع متخصصون يضمنون التسليم في الوقت المحدد وبالميزانية المقررة.' : 'Dedicated project managers ensuring on-time, on-budget delivery with zero surprises.' },
+    { icon: Palette, title: ct('services','additional','s1_title','Branding & Graphics'), desc: ct('services','additional','s1_desc','Banners, signage, lightboxes, and full visual branding that elevates your presence at any show.') },
+    { icon: Settings, title: ct('services','additional','s2_title','Technical Support'), desc: ct('services','additional','s2_desc','24/7 on-site technical support during events and exhibitions — no detail is too small.') },
+    { icon: Truck, title: ct('services','additional','s3_title','Logistics Management'), desc: ct('services','additional','s3_desc','Complete logistics coordination including shipping, storage, and transportation management.') },
+    { icon: Users, title: ct('services','additional','s4_title','Project Management'), desc: ct('services','additional','s4_desc','Dedicated project managers ensuring on-time, on-budget delivery with zero surprises.') },
   ];
 
-  const industries = isAr
-    ? ['تكنولوجيا المعلومات', 'الصحة والدواء', 'السيارات', 'الخدمات المالية', 'السلع الاستهلاكية', 'الطاقة والمرافق', 'التعليم', 'الحكومة والقطاع العام']
-    : ['Technology & IT', 'Healthcare & Pharma', 'Automotive', 'Financial Services', 'Consumer Goods', 'Energy & Utilities', 'Education', 'Government & Public'];
+  const industries = [
+    ct('services','industries','i1','Technology & IT'),
+    ct('services','industries','i2','Healthcare & Pharma'),
+    ct('services','industries','i3','Automotive'),
+    ct('services','industries','i4','Financial Services'),
+    ct('services','industries','i5','Consumer Goods'),
+    ct('services','industries','i6','Energy & Utilities'),
+    ct('services','industries','i7','Education'),
+    ct('services','industries','i8','Government & Public'),
+  ];
 
-  // CMS-driven data with fallbacks
+  // CMS-driven data
   const companyName = cms.settings.company_name || 'MOPi Production';
   const logoUrl = getLogoUrl(cms.headerLogo);
-const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings.whatsapp_number.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
-const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
+  const whatsappUrl = cms.settings.whatsapp_number ? `https://wa.me/${cms.settings.whatsapp_number.replace(/[^0-9]/g, '')}` : 'https://wa.me/201000000000';
+  const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
   const phoneDisplay2 = cms.settings.phone_2 || '';
   const hero = cms.heroes['services'];
-
-  // CMS services (available for future dynamic service cards)
-  const _cmsServices = cms.services;
 
   return (
     <div className="overflow-x-hidden" dir={dir} style={{ fontFamily }}>
@@ -367,11 +372,11 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-16">
-            <SectionLabel text={isAr ? 'خدمات الدعم' : 'Support Services'} />
+            <SectionLabel text={ct('services','additional','label','Support Services')} />
             <h2 className="font-black mb-4 text-white" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>
-              {isAr ? <>خدمات <span style={{ color: '#ED8214' }}>إضافية</span></> : <>Additional <span style={{ color: '#ED8214' }}>Services</span></>}
+              {ct('services','additional','heading','Additional')} <span style={{ color: '#ED8214' }}>{ct('services','additional','heading2','Services')}</span>
             </h2>
-            <p className="text-lg max-w-xl mx-auto" style={{ color: '#9ca3af' }}>{isAr ? 'دعم شامل لضمان نجاح كل مشروع بالكامل' : "Comprehensive support to ensure every project's complete success"}</p>
+            <p className="text-lg max-w-xl mx-auto" style={{ color: '#9ca3af' }}>{ct('services','additional','subtitle',"Comprehensive support to ensure every project's complete success")}</p>
           </Reveal>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -400,9 +405,9 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-14">
-            <SectionLabel text={isAr ? 'القطاعات التي نخدمها' : 'Sectors We Serve'} />
-            <h2 className="font-black mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>{isAr ? 'القطاعات التي نخدمها' : 'Industries We Serve'}</h2>
-            <p className="text-lg max-w-xl mx-auto" style={{ color: '#555' }}>{isAr ? 'خبرتنا تمتد عبر قطاعات متعددة بحلول مخصصة' : 'Our expertise spans multiple industries with tailored solutions'}</p>
+            <SectionLabel text={ct('services','industries','label','Sectors We Serve')} />
+            <h2 className="font-black mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>{ct('services','industries','heading','Industries We Serve')}</h2>
+            <p className="text-lg max-w-xl mx-auto" style={{ color: '#555' }}>{ct('services','industries','subtitle','Our expertise spans multiple industries with tailored solutions')}</p>
           </Reveal>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -427,18 +432,18 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
 
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center mb-14">
-            <SectionLabel text={isAr ? 'لماذا موبي؟' : 'Why Choose Us'} />
-            <h2 className="font-black mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>{isAr ? 'لماذا تختار موبي؟' : 'Why Choose MOPi?'}</h2>
+            <SectionLabel text={ct('services','why','label','Why Choose Us')} />
+            <h2 className="font-black mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>{ct('services','why','heading','Why Choose MOPi?')}</h2>
           </Reveal>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              { icon: Clock, t: isAr ? 'التسليم في الموعد' : 'On-Time Delivery', d: isAr ? 'نلتزم بكل موعد — بدون أعذار.' : 'We meet every deadline — no excuses, no exceptions.' },
-              { icon: Award, t: isAr ? 'تصاميم حائزة على جوائز' : 'Award-Winning Design', d: isAr ? 'جوائز صناعية متعددة للابتكار والتميز.' : 'Multiple industry awards for innovation and excellence.' },
-              { icon: Shield, t: isAr ? 'جودة عالية' : 'Premium Quality', d: isAr ? 'جودة لا تهاون فيها في كل خامة وتشطيبة وتفصيلة هيكلية.' : 'Uncompromising quality at every material, finish, and structural detail.' },
-              { icon: Users, t: isAr ? 'فريق متخصص' : 'Expert Team', d: isAr ? '+8 سنوات من المتخصصين في التصميم والإنتاج والفعاليات.' : '8+ years of specialists in design, production, and live events.' },
-              { icon: Layers, t: isAr ? 'خدمة من أول لآخر' : 'A-to-Z Service', d: isAr ? 'الفكرة، اللوجستيات، التركيب، الإدارة — كل شيء تحت سقف واحد.' : 'Concept, logistics, hotel, setup, management — all under one roof.' },
-              { icon: Zap, t: isAr ? '+8 سنوات خبرة' : '8+ Years Experience', d: isAr ? 'سجل حافل بتسليم +500 مشروع في منطقة الشرق الأوسط.' : 'Proven track record delivering 500+ projects across the MENA region.' },
+              { icon: Clock, t: ct('services','why','w1_title','On-Time Delivery'), d: ct('services','why','w1_desc','We meet every deadline — no excuses, no exceptions.') },
+              { icon: Award, t: ct('services','why','w2_title','Award-Winning Design'), d: ct('services','why','w2_desc','Multiple industry awards for innovation and excellence.') },
+              { icon: Shield, t: ct('services','why','w3_title','Premium Quality'), d: ct('services','why','w3_desc','Uncompromising quality at every material, finish, and structural detail.') },
+              { icon: Users, t: ct('services','why','w4_title','Expert Team'), d: ct('services','why','w4_desc','8+ years of specialists in design, production, and live events.') },
+              { icon: Layers, t: ct('services','why','w5_title','A-to-Z Service'), d: ct('services','why','w5_desc','Concept, logistics, setup, management — all under one roof.') },
+              { icon: Zap, t: ct('services','why','w6_title','8+ Years Experience'), d: ct('services','why','w6_desc','Proven track record delivering 500+ projects across the MENA region.') },
             ].map((w, i) => (
               <Reveal key={i} delay={i * 60}>
                 <div className="group flex items-start gap-5 p-7 rounded-2xl cursor-default transition-all duration-400 hover:-translate-y-1"
@@ -469,18 +474,18 @@ const phoneDisplay = cms.settings.phone_1 || '+20 100 000 0000';
         <div className="absolute left-0 inset-y-0 w-[4px]" style={{ background: '#ED8214' }} />
 
         <Reveal className="relative max-w-4xl mx-auto text-center">
-            <SectionLabel text={isAr ? 'لنبدأ معاً' : "Let's Get Started"} />
+            <SectionLabel text={ct('services','cta','label',"Let's Get Started")} />
             <h2 className="font-black text-white leading-tight mb-6" style={{ fontSize: 'clamp(2.2rem, 5vw, 4rem)' }}>
-              {isAr ? <>مستعد لبدء<br /><span style={{ color: '#ED8214' }}>مشروعك؟</span></> : <>Ready to Start<br /><span style={{ color: '#ED8214' }}>Your Project?</span></>}
+              {ct('services','cta','heading','Ready to Start')}<br /><span style={{ color: '#ED8214' }}>{ct('services','cta','heading2','Your Project?')}</span>
             </h2>
-            <p className="text-lg mb-11" style={{ color: '#9ca3af' }}>{isAr ? 'دعنا نناقش احتياجات معرضك ونصنع لك حلاً مخصصاً يفوق التوقعات.' : "Let's discuss your exhibition needs and create a custom solution that exceeds expectations."}</p>
+            <p className="text-lg mb-11" style={{ color: '#9ca3af' }}>{ct('services','cta','subtitle',"Let's discuss your exhibition needs and create a custom solution that exceeds expectations.")}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/contact"
                 className="group inline-flex items-center justify-center gap-3 text-white font-bold text-lg px-10 py-5 rounded-full transition-all hover:scale-105"
                 style={{ background: '#ED8214', boxShadow: '0 12px 30px rgba(244,163,0,0.3)' }}
                 onMouseEnter={e => (e.currentTarget.style.background = '#e09200')}
                 onMouseLeave={e => (e.currentTarget.style.background = '#ED8214')}>
-                {isAr ? 'استشارة مجانية' : 'Free Consultation'} <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                {ct('services','cta','cta_primary','Free Consultation')} <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
 <a href={`tel:${phoneDisplay.replace(/\s/g, '')}`}
               className="inline-flex items-center justify-center gap-3 text-white font-bold text-lg px-10 py-5 rounded-full transition-all hover:scale-105"
